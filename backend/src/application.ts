@@ -1,9 +1,10 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import Controller from "@interfaces/controller";
 import helmet from "helmet";
 import hpp from "hpp";
 import cors from "cors";
 import { PORT, ORIGIN, CREDENTIALS } from "./config";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
 class Application {
   public app: express.Application;
@@ -18,11 +19,8 @@ class Application {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(helmet());
     this.app.use(hpp());
-    // todo: delete this later
-    this.app.get("/", (_: Request, res: Response) => {
-      res.send("Hello, TypeScript with Express!");
-    });
     this.initRoutes(controllers);
+    this.app.use(errorMiddleware);
   }
 
   public listen() {

@@ -8,7 +8,7 @@ class AuthController implements Controller {
   public router = Router();
 
   constructor() {
-    this.initializeRoutes();
+    this.initRoutes();
   }
 
   register = async (_: Request): Promise<BaseResponse> => {
@@ -19,7 +19,7 @@ class AuthController implements Controller {
     return { data: "halo", message: "berhasil login" };
   };
 
-  private initializeRoutes() {
+  private initRoutes() {
     this.router.get(`${this.path}/register`, handleRequest(this.register));
     this.router.get(`${this.path}/login`, handleRequest(this.login));
   }
