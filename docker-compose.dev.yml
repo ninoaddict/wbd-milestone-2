@@ -1,6 +1,22 @@
 version: '3.8'
 
 services:
+  linkedpurry-db:
+    image: postgres:14-alpine
+    container_name: linkedpurry-db
+    hostname: linkedpurry-db
+    ports:
+      - "5433:5432"
+    env_file:
+      - ./backend/.env
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -13,8 +29,10 @@ services:
     env_file:
       - ./backend/.env
     depends_on:
-      - linkedpurry-db
-      - redis
+      linkedpurry-db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app-network
 
@@ -29,17 +47,6 @@ services:
       - "5173:5173"
     environment:
       VITE_BACKEND_URL: http://localhost:3000
-    networks:
-      - app-network
-
-  linkedpurry-db:
-    image: postgres:14-alpine
-    container_name: postgres
-    hostname: linkedpurry-db
-    ports:
-      - "5433:5432"
-    env_file:
-      - ./backend/.env
     networks:
       - app-network
 

@@ -1,23 +1,37 @@
 FROM node:20-alpine
 
+# Create application directory and set permissions
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
+# Set working directory
 WORKDIR /home/node/app
 
+# Switch to non-root user
 USER node
 
+# Copy package files and install dependencies
 COPY --chown=node:node package*.json ./
-
 RUN npm install
 
+# Install Prisma CLI and @prisma/client
+RUN npm install prisma @prisma/client
+
+# Copy all project files
 COPY --chown=node:node . .
 
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Switch to root temporarily to install nodemon globally
 USER root
 RUN npm install -g nodemon
 USER node
 
+# Set environment variables
 ENV PORT=3000
 
+# Expose the application port
 EXPOSE 3000
 
-CMD ["nodemon", "--legacy-watch","src/index.ts"]
+# Combine both commands in a single CMD
+CMD ["sh", "-c", "npx prisma migrate dev && nodemon --legacy-watch src/index.ts"]
