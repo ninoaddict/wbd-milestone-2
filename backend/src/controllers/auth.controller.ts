@@ -2,26 +2,45 @@ import { Request, Router } from "express";
 import Controller from "@/interfaces/controller";
 import { BaseResponse } from "@/interfaces/base-response";
 import { handleRequest } from "../utils/handle-request";
+import { validateRequest } from "../middlewares/validate.middleware";
+import { loginSchema, registerSchema } from "../domain/schema/auth.schema";
+import UserService from "../services/user.service";
 
 class AuthController implements Controller {
   public path = "/api";
   public router = Router();
+  private userService: UserService;
 
   constructor() {
+    this.userService = new UserService();
     this.initRoutes();
   }
 
-  register = async (_: Request): Promise<BaseResponse> => {
-    return { data: "halo", message: "berhasil register" };
+  register = async (req: Request): Promise<BaseResponse> => {
+    return {
+      body: await this.userService.register(req.body),
+      message: "User registered successfully",
+    };
   };
 
-  login = async (_: Request): Promise<BaseResponse> => {
-    return { data: "halo", message: "berhasil login" };
+  login = async (req: Request): Promise<BaseResponse> => {
+    return {
+      body: await this.userService.login(req.body),
+      message: "User logged in successfully",
+    };
   };
 
   private initRoutes() {
-    this.router.get(`${this.path}/register`, handleRequest(this.register));
-    this.router.get(`${this.path}/login`, handleRequest(this.login));
+    this.router.post(
+      `${this.path}/register`,
+      validateRequest(registerSchema),
+      handleRequest(this.register)
+    );
+    this.router.post(
+      `${this.path}/login`,
+      validateRequest(loginSchema),
+      handleRequest(this.login)
+    );
   }
 }
 

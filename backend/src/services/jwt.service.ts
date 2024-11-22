@@ -1,8 +1,8 @@
-import { SECRET_KEY } from "@/config";
-import Unauthorized from "@/errors/unauthorized.error";
+import { SECRET_KEY } from "../config";
+import Unauthorized from "../errors/unauthorized.error";
 const crypto = require("crypto");
 
-class JwtService {
+export class JwtService {
   private key: string;
   private alg;
 
@@ -73,7 +73,7 @@ class JwtService {
         throw new Unauthorized("Token issued in the future");
       }
 
-      if (currTime > res.iat + 2592000) {
+      if (currTime > res.exp) {
         throw new Unauthorized("Token expired");
       }
 
@@ -84,4 +84,4 @@ class JwtService {
   }
 }
 
-export default JwtService;
+export const jwtService = new JwtService();

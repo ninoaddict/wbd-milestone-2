@@ -7,10 +7,10 @@ export const handleRequest = (
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { status, message, data } = await handler(req);
+      const { status, message, body } = await handler(req);
       res
         .status(status || 200)
-        .send({ message: message || "HTTP request OK", data });
+        .send({ message: message || "HTTP request OK", body, success: true });
       next();
     } catch (err) {
       console.log(err);

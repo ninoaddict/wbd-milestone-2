@@ -9,5 +9,5 @@ export const errorMiddleware = (
 ) => {
   console.log(err);
   const { status, message, fieldErrors } = err;
-  res.status(status).json({ message, fieldErrors });
+  res.status(status).json({ message, error: fieldErrors, success: false });
 };

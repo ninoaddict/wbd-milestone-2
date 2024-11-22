@@ -1,8 +1,17 @@
-import NotFound from "@/errors/not-found.error";
-import UserRepository from "@/repositories/user.repository";
+import { LoginDto, registerDto } from "@/domain/dtos/auth.dto";
+import NotFound from "../errors/not-found.error";
+import Unauthorized from "../errors/unauthorized.error";
+import UserRepository from "../repositories/user.repository";
+import bcrypt from "bcrypt";
+import { jwtService } from "./jwt.service";
+import { User } from "@prisma/client";
+import BadRequest from "../errors/bad-request.error";
 
 class UserService {
-  constructor(private userRepository: UserRepository) {}
+  private userRepository: UserRepository;
+  constructor() {
+    this.userRepository = new UserRepository();
+  }
 
   findUserByUsername = async (username: string) => {
     const user = await this.userRepository.getUserByUsername(username);
@@ -26,6 +35,61 @@ class UserService {
       throw new NotFound("User not found");
     }
     return user;
+  };
+
+  findUserByIdentifier = async (identifier: string) => {
+    const user = await this.userRepository.getUserByIdentifier(identifier);
+    if (!user) {
+      throw new NotFound("User not found");
+    }
+    return user;
+  };
+
+  login = async ({ identifier, password }: LoginDto) => {
+    const user = await this.findUserByIdentifier(identifier);
+    const isValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isValid) {
+      throw new Unauthorized("Invalid credentials");
+    }
+    const token = this.generateToken(user);
+    return { token };
+  };
+
+  register = async ({ email, username, password }: registerDto) => {
+    if (await this.userRepository.getUserByEmail(email)) {
+      throw new BadRequest("Validation error", {
+        email: "Email is already taken",
+      });
+    }
+
+    if (await this.userRepository.getUserByUsername(username)) {
+      throw new BadRequest("Validation error", {
+        email: "Username is already taken",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await this.userRepository.addUser(
+      email,
+      username,
+      hashedPassword
+    );
+
+    const token = this.generateToken(user);
+    return { token };
+  };
+
+  generateToken = (user: User) => {
+    const iat = Date.now();
+    const exp = iat + 3600000;
+    const payload = {
+      id: Number(user.id),
+      email: user.email,
+      username: user.username,
+      iat,
+      exp,
+    };
+    return jwtService.encode(payload);
   };
 }
 

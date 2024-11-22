@@ -1,4 +1,4 @@
-import ApplicationError from "errors/application.error";
+import ApplicationError from "./application.error";
 
 export default class ForbiddenError extends ApplicationError {
   constructor(message?: string) {

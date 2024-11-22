@@ -1,5 +1,5 @@
 import { AnyZodObject } from "zod";
-import { NextFunction, Request } from "express";
+import { NextFunction, Request, Response } from "express";
 import BadRequest from "../errors/bad-request.error";
 
 export interface RequestSchema {

@@ -1,4 +1,4 @@
-import prisma from "@/database/prisma";
+import prisma from "../database/prisma";
 
 class UserRepository {
   getUserById = async (id: number) => {
@@ -21,6 +21,31 @@ class UserRepository {
     return await prisma.user.findFirst({
       where: {
         email,
+      },
+    });
+  };
+
+  getUserByIdentifier = async (identifier: string) => {
+    return await prisma.user.findFirst({
+      where: {
+        OR: [
+          {
+            username: identifier,
+          },
+          {
+            email: identifier,
+          },
+        ],
+      },
+    });
+  };
+
+  addUser = async (email: string, username: string, passwordHash: string) => {
+    return await prisma.user.create({
+      data: {
+        email,
+        username,
+        passwordHash,
       },
     });
   };
