@@ -10,6 +10,7 @@ export interface registerDto {
   email: string;
   username: string;
   password: string;
+  name: string;
 }
 
 export type RequestWithUser = Request & {

@@ -6,11 +6,14 @@ import bcrypt from "bcrypt";
 import { jwtService } from "./jwt.service";
 import { User } from "@prisma/client";
 import BadRequest from "../errors/bad-request.error";
+import ProfileRepository from "../repositories/profile.repository";
 
 class UserService {
   private userRepository: UserRepository;
+  private profileRepository: ProfileRepository;
   constructor() {
     this.userRepository = new UserRepository();
+    this.profileRepository = new ProfileRepository();
   }
 
   findUserByUsername = async (username: string) => {
@@ -55,7 +58,7 @@ class UserService {
     return { token };
   };
 
-  register = async ({ email, username, password }: registerDto) => {
+  register = async ({ email, username, password, name }: registerDto) => {
     if (await this.userRepository.getUserByEmail(email)) {
       throw new BadRequest("Validation error", {
         email: "Email is already taken",
@@ -74,6 +77,8 @@ class UserService {
       username,
       hashedPassword
     );
+
+    await this.profileRepository.addProfile(user.id, name);
 
     const token = this.generateToken(user);
     return { token };

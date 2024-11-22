@@ -22,5 +22,6 @@ export const registerSchema: RequestSchema = {
     password: z
       .string({ required_error: "Password cannot be empty" })
       .min(8, { message: "Password must be at least 8 characters" }),
+    name: z.string({ required_error: "Name cannot be empty" }),
   }),
 };
