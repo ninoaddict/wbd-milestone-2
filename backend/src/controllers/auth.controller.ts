@@ -7,7 +7,7 @@ import { loginSchema, registerSchema } from "../domain/schema/auth.schema";
 import UserService from "../services/user.service";
 
 class AuthController implements Controller {
-  public path = "/api";
+  public path = "";
   public router = Router();
   private userService: UserService;
 
