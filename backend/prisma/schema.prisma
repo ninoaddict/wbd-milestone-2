@@ -87,7 +87,7 @@ model Chat {
 model ConnectionRequest {
   fromId    BigInt
   toId      BigInt
-  createdAt DateTime @map("created_at") @db.Timestamptz()
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   from      User     @relation("ConnectionRequestFromUser", fields: [fromId], references: [id], onDelete: Cascade)
   to        User     @relation("ConnectionRequestToUser", fields: [toId], references: [id], onDelete: Cascade)
 
@@ -98,7 +98,7 @@ model ConnectionRequest {
 model Connection {
   fromId    BigInt
   toId      BigInt
-  createdAt DateTime @map("created_at") @db.Timestamptz()
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   from      User     @relation("ConnectionFromUser", fields: [fromId], references: [id], onDelete: Cascade)
   to        User     @relation("ConnectionToUser", fields: [toId], references: [id], onDelete: Cascade)
 

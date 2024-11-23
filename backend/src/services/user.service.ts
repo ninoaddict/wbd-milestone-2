@@ -6,14 +6,11 @@ import bcrypt from "bcrypt";
 import { jwtService } from "./jwt.service";
 import { User } from "@prisma/client";
 import BadRequest from "../errors/bad-request.error";
-import ProfileRepository from "../repositories/profile.repository";
 
 class UserService {
   private userRepository: UserRepository;
-  private profileRepository: ProfileRepository;
   constructor() {
     this.userRepository = new UserRepository();
-    this.profileRepository = new ProfileRepository();
   }
 
   findAllUsers = async (query: any) => {
@@ -80,10 +77,9 @@ class UserService {
     const user = await this.userRepository.addUser(
       email,
       username,
-      hashedPassword
+      hashedPassword,
+      name
     );
-
-    await this.profileRepository.addProfile(user.id, name);
 
     const token = this.generateToken(user);
     return { token };

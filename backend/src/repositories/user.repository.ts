@@ -1,3 +1,4 @@
+import ApplicationError from "../errors/application.error";
 import prisma from "../database/prisma";
 
 class UserRepository {
@@ -75,14 +76,34 @@ class UserRepository {
     });
   };
 
-  addUser = async (email: string, username: string, passwordHash: string) => {
-    return await prisma.user.create({
-      data: {
-        email,
-        username,
-        passwordHash,
-      },
-    });
+  addUser = async (
+    email: string,
+    username: string,
+    passwordHash: string,
+    name: string
+  ) => {
+    try {
+      return prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            email,
+            username,
+            passwordHash,
+          },
+        });
+
+        await tx.profile.create({
+          data: {
+            userId: user.id,
+            name,
+          },
+        });
+
+        return user;
+      });
+    } catch (error) {
+      throw new ApplicationError("Internal server error", 500);
+    }
   };
 }
 
