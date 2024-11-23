@@ -14,5 +14,5 @@ export interface registerDto {
 }
 
 export type RequestWithUser = Request & {
-  user: User;
+  user?: User;
 };

@@ -82,6 +82,7 @@ model Chat {
   to        User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
 
   @@map("chat")
+  @@index([timestamp], type: BTree)
 }
 
 model ConnectionRequest {
@@ -93,6 +94,7 @@ model ConnectionRequest {
 
   @@id([fromId, toId])
   @@map("connection_request")
+  @@index([createdAt], type: BTree)
 }
 
 model Connection {
@@ -104,6 +106,7 @@ model Connection {
 
   @@id([fromId, toId])
   @@map("connection")
+  @@index([createdAt], type: BTree)
 }
 
 model PushSubscription {

@@ -1,8 +1,8 @@
 import { RequestWithUser } from "@/domain/dtos/auth.dto";
-import Unauthorized from "@/errors/unauthorized.error";
-import UserService from "@/services/user.service";
+import Unauthorized from "../errors/unauthorized.error";
+import UserService from "../services/user.service";
 import { Response, NextFunction } from "express";
-import { jwtService } from "@/services/jwt.service";
+import { jwtService } from "../services/jwt.service";
 
 export class AuthMiddleware {
   private userService: UserService;

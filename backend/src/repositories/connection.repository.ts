@@ -22,6 +22,62 @@ class ConnectionRepository {
     return !!conn;
   };
 
+  getAllRequests = async (toId: bigint) => {
+    return await prisma.connectionRequest.findMany({
+      select: {
+        from: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            profile: {
+              select: {
+                name: true,
+                profile_photo: true,
+                description: true,
+              },
+            },
+          },
+        },
+        createdAt: true,
+      },
+      where: {
+        toId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  };
+
+  getAllConnections = async (fromId: bigint) => {
+    return await prisma.connection.findMany({
+      select: {
+        to: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            profile: {
+              select: {
+                name: true,
+                profile_photo: true,
+                description: true,
+              },
+            },
+          },
+        },
+        createdAt: true,
+      },
+      where: {
+        fromId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  };
+
   sendConnectionRequest = async (fromId: bigint, toId: bigint) => {
     return await prisma.connectionRequest.create({
       data: {
@@ -45,7 +101,7 @@ class ConnectionRepository {
   acceptConnectionRequest = async (fromId: bigint, toId: bigint) => {
     try {
       return prisma.$transaction(async (tx) => {
-        await tx.connectionRequest.delete({
+        const connRequest = await tx.connectionRequest.delete({
           where: {
             fromId_toId: {
               fromId,
@@ -67,7 +123,7 @@ class ConnectionRepository {
             toId: fromId,
           },
         });
-        return true;
+        return connRequest;
       });
     } catch (error) {
       throw new ApplicationError("Internal server error", 500);
@@ -77,7 +133,7 @@ class ConnectionRepository {
   deleteConnection = async (fromId: bigint, toId: bigint) => {
     try {
       return prisma.$transaction(async (tx) => {
-        await tx.connection.delete({
+        const conn = await tx.connection.delete({
           where: {
             fromId_toId: {
               fromId,
@@ -94,7 +150,7 @@ class ConnectionRepository {
             },
           },
         });
-        return true;
+        return conn;
       });
     } catch (error) {
       throw new ApplicationError("Internal server error", 500);
