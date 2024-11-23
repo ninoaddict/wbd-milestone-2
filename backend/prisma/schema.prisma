@@ -52,10 +52,10 @@ model Experience {
   profileId   BigInt
   title       String
   companyName String
-  description String
+  description String?
   location    String
   startDate   DateTime  @db.Date
-  endDate     DateTime?
+  endDate     DateTime? @db.Date
   profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@map("experience")
@@ -81,8 +81,8 @@ model Chat {
   from      User     @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
   to        User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
 
-  @@map("chat")
   @@index([timestamp], type: BTree)
+  @@map("chat")
 }
 
 model ConnectionRequest {
@@ -93,8 +93,8 @@ model ConnectionRequest {
   to        User     @relation("ConnectionRequestToUser", fields: [toId], references: [id], onDelete: Cascade)
 
   @@id([fromId, toId])
-  @@map("connection_request")
   @@index([createdAt], type: BTree)
+  @@map("connection_request")
 }
 
 model Connection {
@@ -105,8 +105,8 @@ model Connection {
   to        User     @relation("ConnectionToUser", fields: [toId], references: [id], onDelete: Cascade)
 
   @@id([fromId, toId])
-  @@map("connection")
   @@index([createdAt], type: BTree)
+  @@map("connection")
 }
 
 model PushSubscription {

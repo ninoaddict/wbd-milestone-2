@@ -28,8 +28,6 @@ class ConnectionRepository {
         from: {
           select: {
             id: true,
-            email: true,
-            username: true,
             profile: {
               select: {
                 name: true,
@@ -56,8 +54,6 @@ class ConnectionRepository {
         to: {
           select: {
             id: true,
-            email: true,
-            username: true,
             profile: {
               select: {
                 name: true,
@@ -76,6 +72,22 @@ class ConnectionRepository {
         createdAt: "desc",
       },
     });
+  };
+
+  getNumberOfConnectedUsers = async (id: bigint) => {
+    const data = await prisma.user.findUnique({
+      select: {
+        _count: {
+          select: {
+            connectionsSent: true,
+          },
+        },
+      },
+      where: {
+        id,
+      },
+    });
+    return data?._count.connectionsSent || 0;
   };
 
   sendConnectionRequest = async (fromId: bigint, toId: bigint) => {
