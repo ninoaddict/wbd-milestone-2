@@ -16,6 +16,11 @@ class UserService {
     this.profileRepository = new ProfileRepository();
   }
 
+  findAllUsers = async (query: any) => {
+    const users = await this.userRepository.getAllUsers(query);
+    return users;
+  };
+
   findUserByUsername = async (username: string) => {
     const user = await this.userRepository.getUserByUsername(username);
     if (!user) {

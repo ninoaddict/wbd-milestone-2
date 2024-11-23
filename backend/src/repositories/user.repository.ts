@@ -1,6 +1,41 @@
 import prisma from "../database/prisma";
 
 class UserRepository {
+  getAllUsers = async (query: string | undefined) => {
+    return await prisma.user.findMany({
+      select: {
+        email: true,
+        username: true,
+        id: true,
+        profile: {
+          select: {
+            name: true,
+            profile_photo: true,
+            description: true,
+          },
+        },
+      },
+      where: {
+        OR: [
+          {
+            username: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+          {
+            profile: {
+              name: {
+                contains: query,
+                mode: "insensitive",
+              },
+            },
+          },
+        ],
+      },
+    });
+  };
+
   getUserById = async (id: number) => {
     return await prisma.user.findFirst({
       where: {

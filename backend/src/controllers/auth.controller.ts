@@ -30,6 +30,13 @@ class AuthController implements Controller {
     };
   };
 
+  getUsers = async (req: Request): Promise<BaseResponse> => {
+    return {
+      body: await this.userService.findAllUsers(req.query.query),
+      message: "Successfully fetch all users",
+    };
+  };
+
   private initRoutes() {
     this.router.post(
       `${this.path}/register`,
@@ -41,6 +48,7 @@ class AuthController implements Controller {
       validateRequest(loginSchema),
       handleRequest(this.login)
     );
+    this.router.get(`${this.path}/users`, handleRequest(this.getUsers));
   }
 }
 

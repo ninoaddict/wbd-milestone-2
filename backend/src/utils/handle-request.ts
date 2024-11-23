@@ -8,9 +8,20 @@ export const handleRequest = (
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { status, message, body } = await handler(req);
+
+      const safeBody = JSON.parse(
+        JSON.stringify(body, (_, value) =>
+          typeof value === "bigint" ? value.toString() : value
+        )
+      );
+
       res
         .status(status || 200)
-        .send({ message: message || "HTTP request OK", body, success: true });
+        .send({
+          message: message || "HTTP request OK",
+          safeBody,
+          success: true,
+        });
       next();
     } catch (err) {
       console.log(err);
