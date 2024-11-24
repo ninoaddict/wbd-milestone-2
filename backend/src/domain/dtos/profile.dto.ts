@@ -1,4 +1,5 @@
 export interface experienceDto {
+  id?: bigint;
   title: string;
   companyName: string;
   description?: string;

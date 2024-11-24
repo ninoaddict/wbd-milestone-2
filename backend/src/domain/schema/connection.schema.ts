@@ -4,12 +4,14 @@ import BadRequest from "../../errors/bad-request.error";
 
 export const getConnectionSchema: RequestSchema = {
   params: z.object({
-    id: z.string().transform((val) => {
-      const parsed = BigInt(val);
-      if (isNaN(Number(parsed))) {
-        throw new BadRequest("Invalid id");
-      }
-      return parsed;
-    }),
+    id: z
+      .string({ required_error: "userId cannot be empty" })
+      .transform((val) => {
+        const parsed = BigInt(val);
+        if (isNaN(Number(parsed))) {
+          throw new BadRequest("Invalid id");
+        }
+        return parsed;
+      }),
   }),
 };

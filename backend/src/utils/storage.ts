@@ -1,4 +1,4 @@
-import BadRequest from "@/errors/bad-request.error";
+import BadRequest from "../errors/bad-request.error";
 import multer from "multer";
 
 const allowedFileTypes = ["image/jpeg", "image/png", "image/gif"];
