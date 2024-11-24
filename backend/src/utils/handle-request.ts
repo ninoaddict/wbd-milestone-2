@@ -3,11 +3,11 @@ import ApplicationError from "../errors/application.error";
 import { BaseResponse } from "@interfaces/base-response";
 
 export const handleRequest = (
-  handler: (req: Request) => Promise<BaseResponse>
+  handler: (req: Request, res: Response) => Promise<BaseResponse>
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { status, message, body } = await handler(req);
+      const { status, message, body } = await handler(req, res);
 
       const safeBody = JSON.parse(
         JSON.stringify(body, (_, value) =>
@@ -15,13 +15,11 @@ export const handleRequest = (
         )
       );
 
-      res
-        .status(status || 200)
-        .send({
-          message: message || "HTTP request OK",
-          safeBody,
-          success: true,
-        });
+      res.status(status || 200).send({
+        message: message || "HTTP request OK",
+        safeBody,
+        success: true,
+      });
       next();
     } catch (err) {
       console.log(err);

@@ -12,18 +12,8 @@ export class AuthMiddleware {
   }
 
   extractToken = (req: RequestWithUser) => {
-    const bearerHeader = req.headers["authorization"];
-
-    if (!bearerHeader) {
-      return "";
-    }
-
-    const bearer = bearerHeader.split(" ");
-
-    if (bearer.length != 2 || bearer[0] != "Bearer") {
-      return "";
-    }
-    return bearer[1];
+    const token = req.cookies["auth_token"];
+    return token;
   };
 
   checkUser = async (
@@ -33,7 +23,7 @@ export class AuthMiddleware {
   ) => {
     try {
       const token = this.extractToken(req);
-      if (token === "") {
+      if (!token) {
         throw new Unauthorized();
       }
       const decoded = jwtService.decode(token);
@@ -61,7 +51,7 @@ export class AuthMiddleware {
   ) => {
     try {
       const token = this.extractToken(req);
-      if (token === "") {
+      if (!token) {
         throw new Unauthorized();
       }
       const decoded = jwtService.decode(token);
@@ -89,6 +79,33 @@ export class AuthMiddleware {
     }
   };
 
+  checkAuthUser = (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const token = this.extractToken(req);
+      if (!token) {
+        return next();
+      }
+
+      const decoded = jwtService.decode(token);
+      const validDecoded =
+        decoded.id &&
+        decoded.email &&
+        decoded.username &&
+        decoded.iat &&
+        decoded.exp;
+      // if token valid
+      if (validDecoded) {
+        throw new Unauthorized("You have to log out first");
+      }
+
+      // invalid token
+      res.clearCookie("auth_token");
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+
   checkPublicUser = async (
     req: RequestWithUser,
     _res: Response,
@@ -96,7 +113,7 @@ export class AuthMiddleware {
   ) => {
     try {
       const token = this.extractToken(req);
-      if (token === "") {
+      if (!token) {
         return next();
       }
       const decoded = jwtService.decode(token);

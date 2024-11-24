@@ -5,6 +5,7 @@ import hpp from "hpp";
 import cors from "cors";
 import { PORT, ORIGIN, CREDENTIALS } from "./config";
 import { errorMiddleware } from "./middlewares/error.middleware";
+import cookieParser from "cookie-parser";
 
 class Application {
   public app: express.Application;
@@ -19,6 +20,7 @@ class Application {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(helmet());
     this.app.use(hpp());
+    this.app.use(cookieParser());
     this.initRoutes(controllers);
     this.app.use(errorMiddleware);
   }
