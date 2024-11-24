@@ -5,7 +5,7 @@ import { handleRequest } from "../utils/handle-request";
 import { validateRequest } from "../middlewares/validate.middleware";
 import { loginSchema, registerSchema } from "../domain/schema/auth.schema";
 import UserService from "../services/user.service";
-import { AuthMiddleware } from "@/middlewares/auth.middleware";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
 
 class AuthController implements Controller {
   public path = "";
