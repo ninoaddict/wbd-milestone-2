@@ -11,32 +11,14 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as RegisterImport } from './routes/register'
-import { Route as ProfileImport } from './routes/profile'
-import { Route as LoginImport } from './routes/login'
 import { Route as JobImport } from './routes/job'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as ProfileUserIdImport } from './routes/profile/$userId'
+import { Route as authRegisterImport } from './routes/(auth)/register'
+import { Route as authLoginImport } from './routes/(auth)/login'
 
 // Create/Update Routes
-
-const RegisterRoute = RegisterImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ProfileRoute = ProfileImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const LoginRoute = LoginImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const JobRoute = JobImport.update({
   id: '/job',
@@ -53,6 +35,24 @@ const AboutRoute = AboutImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileUserIdRoute = ProfileUserIdImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authRegisterRoute = authRegisterImport.update({
+  id: '/(auth)/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authLoginRoute = authLoginImport.update({
+  id: '/(auth)/login',
+  path: '/login',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -81,25 +81,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobImport
       parentRoute: typeof rootRoute
     }
-    '/login': {
-      id: '/login'
+    '/(auth)/login': {
+      id: '/(auth)/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
+      preLoaderRoute: typeof authLoginImport
       parentRoute: typeof rootRoute
     }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileImport
-      parentRoute: typeof rootRoute
-    }
-    '/register': {
-      id: '/register'
+    '/(auth)/register': {
+      id: '/(auth)/register'
       path: '/register'
       fullPath: '/register'
-      preLoaderRoute: typeof RegisterImport
+      preLoaderRoute: typeof authRegisterImport
+      parentRoute: typeof rootRoute
+    }
+    '/profile/$userId': {
+      id: '/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -111,18 +111,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
-  '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/register': typeof RegisterRoute
+  '/login': typeof authLoginRoute
+  '/register': typeof authRegisterRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
-  '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/register': typeof RegisterRoute
+  '/login': typeof authLoginRoute
+  '/register': typeof authRegisterRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 
 export interface FileRoutesById {
@@ -130,17 +130,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
-  '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/register': typeof RegisterRoute
+  '/(auth)/login': typeof authLoginRoute
+  '/(auth)/register': typeof authRegisterRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/job' | '/login' | '/profile' | '/register'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/job'
+    | '/login'
+    | '/register'
+    | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/job' | '/login' | '/profile' | '/register'
-  id: '__root__' | '/' | '/about' | '/job' | '/login' | '/profile' | '/register'
+  to: '/' | '/about' | '/job' | '/login' | '/register' | '/profile/$userId'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/job'
+    | '/(auth)/login'
+    | '/(auth)/register'
+    | '/profile/$userId'
   fileRoutesById: FileRoutesById
 }
 
@@ -148,18 +161,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   JobRoute: typeof JobRoute
-  LoginRoute: typeof LoginRoute
-  ProfileRoute: typeof ProfileRoute
-  RegisterRoute: typeof RegisterRoute
+  authLoginRoute: typeof authLoginRoute
+  authRegisterRoute: typeof authRegisterRoute
+  ProfileUserIdRoute: typeof ProfileUserIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   JobRoute: JobRoute,
-  LoginRoute: LoginRoute,
-  ProfileRoute: ProfileRoute,
-  RegisterRoute: RegisterRoute,
+  authLoginRoute: authLoginRoute,
+  authRegisterRoute: authRegisterRoute,
+  ProfileUserIdRoute: ProfileUserIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -175,9 +188,9 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/job",
-        "/login",
-        "/profile",
-        "/register"
+        "/(auth)/login",
+        "/(auth)/register",
+        "/profile/$userId"
       ]
     },
     "/": {
@@ -189,14 +202,14 @@ export const routeTree = rootRoute
     "/job": {
       "filePath": "job.tsx"
     },
-    "/login": {
-      "filePath": "login.tsx"
+    "/(auth)/login": {
+      "filePath": "(auth)/login.tsx"
     },
-    "/profile": {
-      "filePath": "profile.tsx"
+    "/(auth)/register": {
+      "filePath": "(auth)/register.tsx"
     },
-    "/register": {
-      "filePath": "register.tsx"
+    "/profile/$userId": {
+      "filePath": "profile/$userId.tsx"
     }
   }
 }
