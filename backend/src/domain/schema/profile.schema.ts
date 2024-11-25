@@ -13,11 +13,15 @@ export const updateProfileParamsSchema: RequestSchema = {
     userId: z
       .string({ required_error: "userId cannot be empty" })
       .transform((val) => {
-        const parsed = BigInt(val);
-        if (isNaN(Number(parsed))) {
+        try {
+          const parsed = BigInt(val);
+          if (isNaN(Number(parsed))) {
+            throw new BadRequest("Invalid id");
+          }
+          return parsed;
+        } catch (error) {
           throw new BadRequest("Invalid id");
         }
-        return parsed;
       }),
   }),
 };
@@ -31,11 +35,15 @@ export const getProfileSchema: RequestSchema = {
     userId: z
       .string({ required_error: "userId cannot be empty" })
       .transform((val) => {
-        const parsed = BigInt(val);
-        if (isNaN(Number(parsed))) {
+        try {
+          const parsed = BigInt(val);
+          if (isNaN(Number(parsed))) {
+            throw new BadRequest("Invalid id");
+          }
+          return parsed;
+        } catch (error) {
           throw new BadRequest("Invalid id");
         }
-        return parsed;
       }),
   }),
 };

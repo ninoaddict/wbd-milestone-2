@@ -6,6 +6,7 @@ import { validateRequest } from "../middlewares/validate.middleware";
 import { loginSchema, registerSchema } from "../domain/schema/auth.schema";
 import UserService from "../services/user.service";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { RequestWithUser } from "../domain/dtos/auth.dto";
 
 class AuthController implements Controller {
   public path = "";
@@ -37,6 +38,13 @@ class AuthController implements Controller {
     };
   };
 
+  self = async (req: RequestWithUser): Promise<BaseResponse> => {
+    return {
+      body: await this.userService.findUserById(req.user!.id),
+      message: "Retrieve user successfully",
+    };
+  };
+
   logout = async (_: Request, res: Response): Promise<BaseResponse> => {
     res.clearCookie("auth_token");
     return {
@@ -61,6 +69,16 @@ class AuthController implements Controller {
       `${this.path}/login`,
       [this.authMiddleware.checkAuthUser, validateRequest(loginSchema)],
       handleRequest(this.login)
+    );
+    this.router.post(
+      `${this.path}/logout`,
+      this.authMiddleware.checkUser,
+      handleRequest(this.logout)
+    );
+    this.router.get(
+      `${this.path}/self`,
+      this.authMiddleware.checkUser,
+      handleRequest(this.self)
     );
     this.router.get(`${this.path}/users`, handleRequest(this.getUsers));
   }

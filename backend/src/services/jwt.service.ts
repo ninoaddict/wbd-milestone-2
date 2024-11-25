@@ -67,7 +67,7 @@ export class JwtService {
     if (hash === checkSum) {
       const res = JSON.parse(this.decodeBase64(body));
 
-      const currTime = Math.floor(Date.now() / 1000);
+      const currTime = Date.now();
 
       if (currTime < res.iat) {
         throw new Unauthorized("Token issued in the future");

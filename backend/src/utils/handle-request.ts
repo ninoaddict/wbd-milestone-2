@@ -9,15 +9,19 @@ export const handleRequest = (
     try {
       const { status, message, body } = await handler(req, res);
 
-      const safeBody = JSON.parse(
-        JSON.stringify(body, (_, value) =>
-          typeof value === "bigint" ? value.toString() : value
-        )
-      );
+      let safeBody = body;
+
+      if (safeBody) {
+        safeBody = JSON.parse(
+          JSON.stringify(body, (_, value) =>
+            typeof value === "bigint" ? value.toString() : value
+          )
+        );
+      }
 
       res.status(status || 200).send({
         message: message || "HTTP request OK",
-        safeBody,
+        body: safeBody,
         success: true,
       });
       next();

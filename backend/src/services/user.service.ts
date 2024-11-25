@@ -26,7 +26,7 @@ class UserService {
     return user;
   };
 
-  findUserById = async (id: number) => {
+  findUserById = async (id: bigint) => {
     const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new NotFound("User not found");
@@ -92,7 +92,6 @@ class UserService {
       id: Number(user.id),
       email: user.email,
       username: user.username,
-      name: user.name,
       iat,
       exp,
     };

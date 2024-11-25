@@ -12,23 +12,27 @@ class UserRepository {
         profile_photo_path: true,
       },
       where: {
-        OR: [
-          {
-            username: {
-              contains: query,
-              mode: "insensitive",
-            },
-            name: {
-              contains: query,
-              mode: "insensitive",
-            },
-          },
-        ],
+        OR: query
+          ? [
+              {
+                username: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                name: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+            ]
+          : undefined,
       },
     });
   };
 
-  getUserById = async (id: number) => {
+  getUserById = async (id: bigint) => {
     return await prisma.user.findUnique({
       where: {
         id,

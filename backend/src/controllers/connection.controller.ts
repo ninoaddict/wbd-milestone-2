@@ -90,31 +90,31 @@ class ConnectionController implements Controller {
     );
 
     this.router.get(
-      `${this.path}/:id`,
+      `${this.path}/:id(\\d+)`,
       validateRequest(getConnectionSchema),
       handleRequest(this.getAllConnections)
     );
 
     this.router.post(
-      `${this.path}/send/:id`,
+      `${this.path}/send/:id(\\d+)`,
       [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
       handleRequest(this.sendConnectionRequest)
     );
 
     this.router.post(
-      `${this.path}/reject/:id`,
+      `${this.path}/reject/:id(\\d+)`,
       [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
       handleRequest(this.rejectConnectionRequest)
     );
 
     this.router.post(
-      `${this.path}/accept/:id`,
+      `${this.path}/accept/:id(\\d+)`,
       [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
       handleRequest(this.acceptConnectionRequest)
     );
 
     this.router.delete(
-      `${this.path}/delete/:id`,
+      `${this.path}/delete/:id(\\d+)`,
       [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
       handleRequest(this.deleteConnection)
     );

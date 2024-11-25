@@ -40,7 +40,7 @@ class ProfileService {
         profile_photo: raw.profile_photo_path,
         work_history: raw.work_history,
         connection_count: raw._count.connectionsSent,
-        connection_status: "connected",
+        connection_status: "self",
       };
     } else if (await this.connectionRepository.isConnected(user.id, userId)) {
       const raw = await this.profileRepository.getProfileByConnectedUser(
