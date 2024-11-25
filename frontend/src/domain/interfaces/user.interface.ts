@@ -13,10 +13,6 @@ export interface User {
   updatedAt: Date;
 }
 
-export interface SelfResponse {
-  body: User | undefined;
-}
-
 export interface Profile {
   username: string;
   name: string;
