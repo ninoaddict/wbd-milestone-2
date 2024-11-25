@@ -17,6 +17,8 @@ class ProfileRepository {
         username: true,
         name: true,
         profile_photo_path: true,
+        work_history: true,
+        skills: true,
         _count: {
           select: {
             connectionsSent: true,
@@ -36,6 +38,8 @@ class ProfileRepository {
         name: true,
         profile_photo_path: true,
         work_history: true,
+        skills: true,
+        feeds: true,
         _count: {
           select: {
             connectionsSent: true,

@@ -23,7 +23,9 @@ class ProfileService {
       return {
         username: raw.username,
         name: raw.name,
+        skills: raw.skills,
         profile_photo: raw.profile_photo_path,
+        work_history: raw.work_history,
         connection_count: raw._count.connectionsSent,
         connection_status: "public",
       };
@@ -67,6 +69,8 @@ class ProfileService {
       return {
         username: raw.username,
         name: raw.name,
+        skills: raw.skills,
+        relevant_post: raw.feeds,
         profile_photo: raw.profile_photo_path,
         work_history: raw.work_history,
         connection_count: raw._count.connectionsSent,

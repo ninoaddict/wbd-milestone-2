@@ -39,8 +39,13 @@ class AuthController implements Controller {
   };
 
   self = async (req: RequestWithUser): Promise<BaseResponse> => {
+    if (!req.user) {
+      return {
+        message: "User not logged in",
+      };
+    }
     return {
-      body: await this.userService.findUserById(req.user!.id),
+      body: await this.userService.findUserById(req.user.id),
       message: "Retrieve user successfully",
     };
   };
@@ -77,7 +82,7 @@ class AuthController implements Controller {
     );
     this.router.get(
       `${this.path}/self`,
-      this.authMiddleware.checkUser,
+      this.authMiddleware.checkPublicUser,
       handleRequest(this.self)
     );
     this.router.get(`${this.path}/users`, handleRequest(this.getUsers));

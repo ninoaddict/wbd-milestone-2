@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
+import { UserContext, UserProvider, useUser } from "./context/auth-context";
 
 const queryClient = new QueryClient();
 
@@ -10,6 +11,11 @@ const router = createRouter({
   routeTree,
   context: {
     queryClient,
+    auth: {
+      user: undefined,
+      loading: true,
+      setUser: null,
+    },
   },
   defaultPreload: "intent",
   // Since we're using React Query, we don't want loader calls to ever be stale
@@ -30,7 +36,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
     </QueryClientProvider>
   );
 }
