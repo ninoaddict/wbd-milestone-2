@@ -1,7 +1,7 @@
-import * as React from "react";
 import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
 import { getProfile } from "@/services/profile";
-import { dataTagSymbol, queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import ProfilePage from "@/components/profile/profile";
 
 const profileQueryOptions = (userId: string) =>
   queryOptions({
@@ -23,9 +23,5 @@ function RouteComponent() {
   if (!profile) {
     return <div>Unexpected error occured</div>;
   }
-  return (
-    <div className="min-h-screen bg-[#f4f2ee]">
-      <div></div>
-    </div>
-  );
+  return ProfilePage();
 }

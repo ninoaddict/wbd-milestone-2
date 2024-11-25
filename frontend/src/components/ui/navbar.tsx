@@ -21,7 +21,7 @@ export const Navbar = () => {
     return <div>...Loading</div>;
   }
   return (
-    <nav className="border-b border-b-[rgb(140,140,140,0.2)] bg-white fixed w-full">
+    <nav className="border-b border-b-[rgb(140,140,140,0.2)] bg-white fixed z-20 w-full">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
         <div className="flex items-center gap-2 lg:gap-3">
           <Link to="/" className="text-[#0A66C2]">

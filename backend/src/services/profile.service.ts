@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import ProfileRepository from "../repositories/profile.repository";
 import ConnectionRepository from "../repositories/connection.repository";
 import { updateProfileDto } from "../domain/schema/profile.schema";
-import BadRequest from "../errors/bad-request.error";
+import NotFound from "../errors/not-found.error";
 
 class ProfileService {
   private profileRepository: ProfileRepository;
@@ -17,7 +17,7 @@ class ProfileService {
       const raw = await this.profileRepository.getProfileByPublic(userId);
 
       if (!raw) {
-        throw new BadRequest("Invalid user id");
+        throw new NotFound("User not found");
       }
 
       return {
@@ -32,7 +32,7 @@ class ProfileService {
     } else if (user.id === userId) {
       const raw = await this.profileRepository.getSelfProfile(userId);
       if (!raw) {
-        throw new BadRequest("Invalid user id");
+        throw new NotFound("User not found");
       }
       return {
         username: raw.username,
@@ -49,7 +49,7 @@ class ProfileService {
         userId
       );
       if (!raw) {
-        throw new BadRequest("Invalid user id");
+        throw new NotFound("User not found");
       }
       return {
         username: raw.username,
@@ -64,7 +64,7 @@ class ProfileService {
     } else {
       const raw = await this.profileRepository.getProfileByUser(userId);
       if (!raw) {
-        throw new BadRequest("Invalid user id");
+        throw new NotFound("User not found");
       }
       return {
         username: raw.username,
