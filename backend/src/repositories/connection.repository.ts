@@ -28,13 +28,9 @@ class ConnectionRepository {
         from: {
           select: {
             id: true,
-            profile: {
-              select: {
-                name: true,
-                profile_photo: true,
-                description: true,
-              },
-            },
+            name: true,
+            profile_photo_path: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -54,13 +50,9 @@ class ConnectionRepository {
         to: {
           select: {
             id: true,
-            profile: {
-              select: {
-                name: true,
-                profile_photo: true,
-                description: true,
-              },
-            },
+            name: true,
+            profile_photo_path: true,
+            username: true,
           },
         },
         createdAt: true,

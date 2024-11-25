@@ -13,17 +13,19 @@ class ProfileService {
   }
 
   getProfile = async (user: User | undefined, userId: bigint) => {
-    const numberOfConnections =
-      await this.connectionRepository.getNumberOfConnectedUsers(userId);
-
     if (!user) {
       const raw = await this.profileRepository.getProfileByPublic(userId);
+
       if (!raw) {
         throw new BadRequest("Invalid user id");
       }
+
       return {
-        ...raw,
-        numberOfConnections,
+        username: raw.username,
+        name: raw.name,
+        profile_photo: raw.profile_photo_path,
+        connection_count: raw._count.connectionsSent,
+        connection_status: "public",
       };
     } else if (user.id === userId) {
       const raw = await this.profileRepository.getSelfProfile(userId);
@@ -31,12 +33,14 @@ class ProfileService {
         throw new BadRequest("Invalid user id");
       }
       return {
-        id: raw?.id,
-        username: raw?.id,
-        email: raw?.id,
-        feeds: raw?.feeds,
-        ...raw?.profile,
-        numberOfConnections,
+        username: raw.username,
+        name: raw.name,
+        skills: raw.skills,
+        relevant_post: raw.feeds,
+        profile_photo: raw.profile_photo_path,
+        work_history: raw.work_history,
+        connection_count: raw._count.connectionsSent,
+        connection_status: "connected",
       };
     } else if (await this.connectionRepository.isConnected(user.id, userId)) {
       const raw = await this.profileRepository.getProfileByConnectedUser(
@@ -46,10 +50,14 @@ class ProfileService {
         throw new BadRequest("Invalid user id");
       }
       return {
-        id: raw?.id,
-        feeds: raw?.feeds,
-        ...raw?.profile,
-        numberOfConnections,
+        username: raw.username,
+        name: raw.name,
+        skills: raw.skills,
+        relevant_post: raw.feeds,
+        profile_photo: raw.profile_photo_path,
+        work_history: raw.work_history,
+        connection_count: raw._count.connectionsSent,
+        connection_status: "connected",
       };
     } else {
       const raw = await this.profileRepository.getProfileByUser(userId);
@@ -57,55 +65,36 @@ class ProfileService {
         throw new BadRequest("Invalid user id");
       }
       return {
-        ...raw,
-        numberOfConnections,
+        username: raw.username,
+        name: raw.name,
+        profile_photo: raw.profile_photo_path,
+        work_history: raw.work_history,
+        connection_count: raw._count.connectionsSent,
+        connection_status: "connected",
       };
     }
   };
 
   updateProfile = async (
-    userId: bigint,
+    id: bigint,
     payload: updateProfileDto,
     profile_photo: string | undefined
   ) => {
-    const { experience, ...profileData } = payload;
-
-    const newExperiences = experience.filter((exp) => !exp.id);
-    const existingExperiences = experience.filter((exp) => exp.id);
-    const currentExperiences = await this.profileRepository.getExperiences(
-      userId
-    );
-
-    if (!currentExperiences) {
-      throw new BadRequest("Invalid user id");
-    }
-
-    const currExpIds = currentExperiences.map((exp) => exp.id);
-    const expIdsToDelete = currExpIds.filter((id) => {
-      !existingExperiences.some((exp) => exp.id === id);
-    });
-
-    const profileDataFin: ProfileData = {
-      ...profileData,
-      profile_photo,
+    const profileData: ProfileData = {
+      name: payload.name,
+      skills: payload.skills ?? "",
+      work_history: payload.work_history ?? "",
+      profile_photo_path: profile_photo,
     };
-
-    return await this.profileRepository.updateProfile(
-      profileDataFin,
-      newExperiences,
-      existingExperiences,
-      expIdsToDelete,
-      userId
-    );
+    return await this.profileRepository.updateProfile(profileData, id);
   };
 }
 
 export type ProfileData = {
   name: string;
-  skills: string[];
-  description?: string | undefined;
-  about?: string | undefined;
-  profile_photo: string | undefined;
+  work_history: string;
+  skills: string;
+  profile_photo_path: string | undefined;
 };
 
 export default ProfileService;

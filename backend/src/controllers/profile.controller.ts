@@ -57,7 +57,7 @@ class ProfileController implements Controller {
       [
         validateRequest(updateProfileParamsSchema),
         this.authMiddleware.checkUserUpload,
-        upload.single("file"),
+        upload.single("profile_photo"),
         validateRequest(updateProfileSchema),
       ],
       handleRequest(this.updateProfile)

@@ -92,6 +92,7 @@ class UserService {
       id: Number(user.id),
       email: user.email,
       username: user.username,
+      name: user.name,
       iat,
       exp,
     };

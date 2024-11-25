@@ -5,16 +5,11 @@ class UserRepository {
   getAllUsers = async (query: string | undefined) => {
     return await prisma.user.findMany({
       select: {
+        id: true,
         email: true,
         username: true,
-        id: true,
-        profile: {
-          select: {
-            name: true,
-            profile_photo: true,
-            description: true,
-          },
-        },
+        name: true,
+        profile_photo_path: true,
       },
       where: {
         OR: [
@@ -23,13 +18,9 @@ class UserRepository {
               contains: query,
               mode: "insensitive",
             },
-          },
-          {
-            profile: {
-              name: {
-                contains: query,
-                mode: "insensitive",
-              },
+            name: {
+              contains: query,
+              mode: "insensitive",
             },
           },
         ],
@@ -38,7 +29,7 @@ class UserRepository {
   };
 
   getUserById = async (id: number) => {
-    return await prisma.user.findFirst({
+    return await prisma.user.findUnique({
       where: {
         id,
       },
@@ -46,7 +37,7 @@ class UserRepository {
   };
 
   getUserByUsername = async (username: string) => {
-    return await prisma.user.findFirst({
+    return await prisma.user.findUnique({
       where: {
         username,
       },
@@ -54,7 +45,7 @@ class UserRepository {
   };
 
   getUserByEmail = async (email: string) => {
-    return await prisma.user.findFirst({
+    return await prisma.user.findUnique({
       where: {
         email,
       },
@@ -83,23 +74,16 @@ class UserRepository {
     name: string
   ) => {
     try {
-      return prisma.$transaction(async (tx) => {
-        const user = await tx.user.create({
-          data: {
-            email,
-            username,
-            passwordHash,
-          },
-        });
-
-        await tx.profile.create({
-          data: {
-            userId: user.id,
-            name,
-          },
-        });
-
-        return user;
+      return await prisma.user.create({
+        data: {
+          email,
+          username,
+          passwordHash,
+          name,
+          work_history: "",
+          skills: "",
+          profile_photo_path: "",
+        },
       });
     } catch (error) {
       throw new ApplicationError("Internal server error", 500);
