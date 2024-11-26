@@ -17,6 +17,9 @@ import { Route as IndexImport } from './routes/index'
 import { Route as ProfileUserIdImport } from './routes/profile/$userId'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
+import { Route as connectionUserListUserIdImport } from './routes/(connection)/userList/$userId'
+import { Route as connectionConReqUserIdImport } from './routes/(connection)/conReq/$userId'
+import { Route as connectionConListUserIdImport } from './routes/(connection)/conList/$userId'
 
 // Create/Update Routes
 
@@ -53,6 +56,24 @@ const authRegisterRoute = authRegisterImport.update({
 const authLoginRoute = authLoginImport.update({
   id: '/(auth)/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const connectionUserListUserIdRoute = connectionUserListUserIdImport.update({
+  id: '/(connection)/userList/$userId',
+  path: '/userList/$userId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const connectionConReqUserIdRoute = connectionConReqUserIdImport.update({
+  id: '/(connection)/conReq/$userId',
+  path: '/conReq/$userId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const connectionConListUserIdRoute = connectionConListUserIdImport.update({
+  id: '/(connection)/conList/$userId',
+  path: '/conList/$userId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,6 +123,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUserIdImport
       parentRoute: typeof rootRoute
     }
+    '/(connection)/conList/$userId': {
+      id: '/(connection)/conList/$userId'
+      path: '/conList/$userId'
+      fullPath: '/conList/$userId'
+      preLoaderRoute: typeof connectionConListUserIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/(connection)/conReq/$userId': {
+      id: '/(connection)/conReq/$userId'
+      path: '/conReq/$userId'
+      fullPath: '/conReq/$userId'
+      preLoaderRoute: typeof connectionConReqUserIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/(connection)/userList/$userId': {
+      id: '/(connection)/userList/$userId'
+      path: '/userList/$userId'
+      fullPath: '/userList/$userId'
+      preLoaderRoute: typeof connectionUserListUserIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -114,6 +156,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/conList/$userId': typeof connectionConListUserIdRoute
+  '/conReq/$userId': typeof connectionConReqUserIdRoute
+  '/userList/$userId': typeof connectionUserListUserIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -123,6 +168,9 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/conList/$userId': typeof connectionConListUserIdRoute
+  '/conReq/$userId': typeof connectionConReqUserIdRoute
+  '/userList/$userId': typeof connectionUserListUserIdRoute
 }
 
 export interface FileRoutesById {
@@ -133,6 +181,9 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/(connection)/conList/$userId': typeof connectionConListUserIdRoute
+  '/(connection)/conReq/$userId': typeof connectionConReqUserIdRoute
+  '/(connection)/userList/$userId': typeof connectionUserListUserIdRoute
 }
 
 export interface FileRouteTypes {
@@ -144,8 +195,20 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/profile/$userId'
+    | '/conList/$userId'
+    | '/conReq/$userId'
+    | '/userList/$userId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/job' | '/login' | '/register' | '/profile/$userId'
+  to:
+    | '/'
+    | '/about'
+    | '/job'
+    | '/login'
+    | '/register'
+    | '/profile/$userId'
+    | '/conList/$userId'
+    | '/conReq/$userId'
+    | '/userList/$userId'
   id:
     | '__root__'
     | '/'
@@ -154,6 +217,9 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(auth)/register'
     | '/profile/$userId'
+    | '/(connection)/conList/$userId'
+    | '/(connection)/conReq/$userId'
+    | '/(connection)/userList/$userId'
   fileRoutesById: FileRoutesById
 }
 
@@ -164,6 +230,9 @@ export interface RootRouteChildren {
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
   ProfileUserIdRoute: typeof ProfileUserIdRoute
+  connectionConListUserIdRoute: typeof connectionConListUserIdRoute
+  connectionConReqUserIdRoute: typeof connectionConReqUserIdRoute
+  connectionUserListUserIdRoute: typeof connectionUserListUserIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -173,6 +242,9 @@ const rootRouteChildren: RootRouteChildren = {
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
+  connectionConListUserIdRoute: connectionConListUserIdRoute,
+  connectionConReqUserIdRoute: connectionConReqUserIdRoute,
+  connectionUserListUserIdRoute: connectionUserListUserIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -190,7 +262,10 @@ export const routeTree = rootRoute
         "/job",
         "/(auth)/login",
         "/(auth)/register",
-        "/profile/$userId"
+        "/profile/$userId",
+        "/(connection)/conList/$userId",
+        "/(connection)/conReq/$userId",
+        "/(connection)/userList/$userId"
       ]
     },
     "/": {
@@ -210,6 +285,15 @@ export const routeTree = rootRoute
     },
     "/profile/$userId": {
       "filePath": "profile/$userId.tsx"
+    },
+    "/(connection)/conList/$userId": {
+      "filePath": "(connection)/conList/$userId.tsx"
+    },
+    "/(connection)/conReq/$userId": {
+      "filePath": "(connection)/conReq/$userId.tsx"
+    },
+    "/(connection)/userList/$userId": {
+      "filePath": "(connection)/userList/$userId.tsx"
     }
   }
 }
