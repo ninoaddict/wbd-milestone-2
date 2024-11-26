@@ -1,4 +1,10 @@
-import React, { createContext, ReactNode, useContext, useMemo } from "react";
+import React, {
+  createContext,
+  ReactElement,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { User } from "@/domain/interfaces/user.interface";
 import { getUser } from "@/services/user";
 import { useQuery } from "@tanstack/react-query";
@@ -6,27 +12,33 @@ import { useQuery } from "@tanstack/react-query";
 export interface UserContextValue {
   user: User | undefined | null;
   loading: boolean;
-  setUser: React.Dispatch<React.SetStateAction<User | undefined | null>> | null;
+  setUser: React.Dispatch<React.SetStateAction<User | undefined | null>>;
 }
 
 export const UserContext = createContext<UserContextValue>({
   user: undefined,
   loading: true,
-  setUser: null,
+  setUser: () => {},
 });
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
+export const UserProvider = ({ children }: { children: ReactElement }) => {
+  const [user, setUser] = useState<User | undefined | null>();
   const { data, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: () => getUser(),
   });
-
-  const value = useMemo(
-    () => ({ user: data, loading: isLoading, setUser: null }),
-    [data, isLoading]
+  const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    setLoading(isLoading);
+    if (!isLoading) {
+      setUser(data);
+    }
+  }, [data, isLoading]);
+  return (
+    <UserContext.Provider value={{ user, loading, setUser }}>
+      {children}
+    </UserContext.Provider>
   );
-
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
 export const useUser = () => useContext(UserContext);
