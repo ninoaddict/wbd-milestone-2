@@ -3,7 +3,7 @@ import Controller from "@interfaces/controller";
 import helmet from "helmet";
 import hpp from "hpp";
 import cors from "cors";
-import { PORT, ORIGIN } from "./config";
+import { PORT } from "./config";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import cookieParser from "cookie-parser";
 
@@ -14,7 +14,7 @@ class Application {
   constructor(controllers: Controller[]) {
     this.app = express();
     this.port = PORT;
-    this.app.use(cors({ origin: ORIGIN, credentials: true }));
+    this.app.use(cors({ origin: "http://localhost:5173", credentials: true }));
     this.app.use("/static", express.static("storage"));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));

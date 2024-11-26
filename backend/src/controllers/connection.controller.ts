@@ -39,6 +39,7 @@ class ConnectionController implements Controller {
   sendConnectionRequest = async (
     req: RequestWithUser
   ): Promise<BaseResponse> => {
+    console.log(req.params.id, req.user!.id)
     return {
       body: await this.connectionService.sendConnectionRequest(
         req.user!.id,
@@ -73,6 +74,7 @@ class ConnectionController implements Controller {
   };
 
   deleteConnection = async (req: RequestWithUser): Promise<BaseResponse> => {
+    console.log("Aaaaaa")
     return {
       body: await this.connectionService.deleteConnection(
         BigInt(req.params.id),
@@ -97,7 +99,7 @@ class ConnectionController implements Controller {
 
     this.router.post(
       `${this.path}/send/:id(\\d+)`,
-      [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
+      this.authMiddleware.checkUser,
       handleRequest(this.sendConnectionRequest)
     );
 
@@ -115,7 +117,7 @@ class ConnectionController implements Controller {
 
     this.router.delete(
       `${this.path}/delete/:id(\\d+)`,
-      [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
+      this.authMiddleware.checkUser,
       handleRequest(this.deleteConnection)
     );
   }

@@ -10,7 +10,7 @@ export const handleRequest = (
       const { status, message, body } = await handler(req, res);
 
       let safeBody = body;
-
+      
       if (safeBody) {
         safeBody = JSON.parse(
           JSON.stringify(body, (_, value) =>
@@ -18,7 +18,6 @@ export const handleRequest = (
           )
         );
       }
-
       res.status(status || 200).send({
         message: message || "HTTP request OK",
         body: safeBody,
