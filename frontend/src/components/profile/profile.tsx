@@ -1,11 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Pencil, MapPin, Plus, ExternalLink } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
 
+interface experienceType {
+  title: string;
+  company: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+}
+
 export default function ProfilePage(profile: Profile) {
+  let experience: experienceType[] = [];
+  try {
+    if (profile && profile.work_history && profile.work_history !== "") {
+      const raw = JSON.parse(profile.work_history);
+      experience = raw.map((d: any) => {
+        return {
+          title: d[0],
+          company: d[1],
+          startDate: d[2],
+          endDate: d[3],
+          location: d[4],
+        };
+      });
+    }
+  } catch (error) {
+    // fail to parse
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f2ee] pt-[92px] pb-[48px]">
       {/* Profile Header */}
@@ -60,9 +85,16 @@ export default function ProfilePage(profile: Profile) {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
-                    Connect
-                  </Button>
+                  {profile.connection_status === "disconnected" && (
+                    <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
+                      Connect
+                    </Button>
+                  )}
+                  {profile.connection_status === "connected" && (
+                    <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
+                      Disconnect
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     className="text-xs sm:text-sm border-[#0a66c2]"
@@ -76,23 +108,25 @@ export default function ProfilePage(profile: Profile) {
             {/* Work Experience */}
             <Card className="p-4 sm:p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg sm:text-xl font-semibold">Experience</h2>
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Work Experience
+                </h2>
               </div>
               <div className="space-y-4">
-                {[1, 2, 3].map((job) => (
-                  <div key={job} className="flex gap-4">
+                {experience.map((job, id) => (
+                  <div key={id} className="flex gap-4">
                     <div>
                       <h3 className="text-sm sm:text-base font-semibold">
-                        Senior Software Engineer
+                        {job.title}
                       </h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        Tech Company
+                        {job.company}
                       </p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        Jan 2020 - Present · 4 yrs
+                        {job.startDate} - {job.endDate}
                       </p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        San Francisco Bay Area
+                        {job.location}
                       </p>
                     </div>
                   </div>
@@ -106,20 +140,15 @@ export default function ProfilePage(profile: Profile) {
                 <h2 className="text-lg sm:text-xl font-semibold">Skills</h2>
               </div>
               <div className="flex gap-4 flex-wrap">
-                {[
-                  "React",
-                  "TypeScript",
-                  "Node.js",
-                  "Express.js",
-                  "Next.js",
-                ].map((skill) => (
-                  <div
-                    key={skill}
-                    className="flex items-center justify-between"
-                  >
-                    <Badge className="text-sm font-semibold">{skill}</Badge>
-                  </div>
-                ))}
+                {profile.skills !== "" &&
+                  profile.skills.split(",").map((skill) => (
+                    <div
+                      key={skill}
+                      className="flex items-center justify-between"
+                    >
+                      <Badge className="text-sm font-semibold">{skill}</Badge>
+                    </div>
+                  ))}
               </div>
             </Card>
           </div>

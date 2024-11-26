@@ -1,11 +1,47 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Pencil, MapPin, Plus } from "lucide-react";
+import { Pencil, MapPin, Plus, CameraIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
+import { EditProfileModal } from "./edit-profile-modal";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { updateProfile, UpdateProfilePayload } from "@/services/profile";
+import { useUser } from "@/context/auth-context";
+import { AxiosError } from "axios";
 
 export default function SelfProfilePage(profile: Profile) {
+  const { user, loading, setUser } = useUser();
+  const [name, setName] = useState<string>(profile.name);
+  const [username, setUsername] = useState<string>(profile.username);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const mutation = useMutation({
+    mutationFn: (payload: UpdateProfilePayload) => {
+      return updateProfile(payload);
+    },
+    onSuccess: (data) => {
+      setUser(data);
+      setName(data.name);
+      setUsername(data.username);
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        console.log(err.response?.data.message);
+      } else {
+        console.error("Unexpected error:", err);
+      }
+    },
+  });
+
+  function handleUpdateProfile(name: string, username: string) {
+    mutation.mutate({ id: user!.id, name, username });
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f2ee] pt-[92px] pb-[48px]">
       {/* Profile Header */}
@@ -25,7 +61,6 @@ export default function SelfProfilePage(profile: Profile) {
                   className="object-cover rounded-t-xl w-full h-32 sm:h-48"
                 />
               </div>
-
               {/* Profile Photo */}
               <div className="absolute top-[60px] sm:top-[100px] left-4 sm:left-6">
                 <div className="relative h-24 w-24 sm:h-32 sm:w-32 rounded-full border-4 border-white overflow-hidden">
@@ -41,22 +76,18 @@ export default function SelfProfilePage(profile: Profile) {
                     className="object-cover"
                   />
                 </div>
+                <CameraIcon
+                  width={28}
+                  height={28}
+                  className="absolute bottom-2 right-2 cursor-pointer"
+                />
               </div>
-
-              {/* Edit Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-2 sm:right-4 sm:top-4"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
               <div className="p-4 sm:p-6 mt-4">
-                <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                <div className="mb-4 flex flex-row items-start justify-between">
                   <div>
-                    <h1 className="text-2xl font-semibold">{profile.name}</h1>
+                    <h1 className="text-2xl font-semibold">{name}</h1>
                     <p className="text-sm sm:text-base text-muted-foreground">
-                      {profile.username}
+                      {username}
                     </p>
                     <div className="mt-2">
                       <Link
@@ -67,14 +98,11 @@ export default function SelfProfilePage(profile: Profile) {
                       </Link>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" className="mt-2 sm:mt-0">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
-                    Update profile
-                  </Button>
+                  <EditProfileModal
+                    initName={name}
+                    initUserName={username}
+                    handleUpdateProfile={handleUpdateProfile}
+                  />
                 </div>
               </div>
             </Card>
@@ -82,7 +110,9 @@ export default function SelfProfilePage(profile: Profile) {
             {/* Work Experience */}
             <Card className="p-4 sm:p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg sm:text-xl font-semibold">Experience</h2>
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Work Experience
+                </h2>
                 <Button variant="ghost" size="icon">
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -117,7 +147,7 @@ export default function SelfProfilePage(profile: Profile) {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-wrap">
                 {["React", "TypeScript", "Node.js", "Express.js"].map(
                   (skill) => (
                     <div

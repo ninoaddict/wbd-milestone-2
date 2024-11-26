@@ -74,7 +74,7 @@ class ProfileService {
         profile_photo: raw.profile_photo_path,
         work_history: raw.work_history,
         connection_count: raw._count.connectionsSent,
-        connection_status: "connected",
+        connection_status: "disconnected",
       };
     }
   };
@@ -89,6 +89,7 @@ class ProfileService {
       skills: payload.skills ?? "",
       work_history: payload.work_history ?? "",
       profile_photo_path: profile_photo,
+      username: payload.username,
     };
     return await this.profileRepository.updateProfile(profileData, id);
   };
@@ -96,6 +97,7 @@ class ProfileService {
 
 export type ProfileData = {
   name: string;
+  username: string;
   work_history: string;
   skills: string;
   profile_photo_path: string | undefined;

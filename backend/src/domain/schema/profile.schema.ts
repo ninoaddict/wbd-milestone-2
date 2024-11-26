@@ -3,7 +3,12 @@ import { RequestSchema } from "@/middlewares/validate.middleware";
 import BadRequest from "../../errors/bad-request.error";
 
 const updateProfileBody = z.object({
-  name: z.string({ required_error: "Name cannot be empty" }).min(1),
+  name: z
+    .string({ required_error: "Name cannot be empty" })
+    .min(3, { message: "Name must be at least 3 characters" }),
+  username: z
+    .string({ required_error: "Username cannot be empty" })
+    .min(3, { message: "Name must be at least 3 characters" }),
   work_history: z.string().optional(),
   skills: z.string().optional(),
 });

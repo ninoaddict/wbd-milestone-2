@@ -96,6 +96,13 @@ export const Navbar = () => {
             icon={<Bell className="h-6 w-6" />}
             text="Notifications"
           />
+          {!user && (
+            <NavButton
+              to="/login"
+              icon={<LogIn className="h-6 w-6" />}
+              text="Login"
+            />
+          )}
           {user && (
             <>
               <DropdownMenu>
