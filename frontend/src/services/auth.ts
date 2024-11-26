@@ -23,11 +23,23 @@ interface AuthResponse {
 }
 
 export const login = async (payload: LoginPayload): Promise<User> => {
-  const token = (await api.post("/login", payload)).data as AuthResponse;
-  console.log(token.body.token);
+  (await api.post("/login", payload)).data as AuthResponse;
   const user = await getUser();
   if (!user) {
     throw new AxiosError("User not found");
   }
   return user;
+};
+
+export const register = async (payload: RegisterPayload): Promise<User> => {
+  (await api.post("/login", payload)).data as AuthResponse;
+  const user = await getUser();
+  if (!user) {
+    throw new AxiosError("User not found");
+  }
+  return user;
+};
+
+export const logout = async () => {
+  await api.post("/logout");
 };

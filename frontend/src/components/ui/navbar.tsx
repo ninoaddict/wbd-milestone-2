@@ -1,7 +1,15 @@
 import { useUser } from "@/context/auth-context";
-import { Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { Bell, Home, Menu, MessageSquare, Users } from "lucide-react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import {
+  Bell,
+  Home,
+  Menu,
+  MessageSquare,
+  Users,
+  LogOut,
+  LogIn,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,14 +20,44 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "@/services/auth";
+import { AxiosError } from "axios";
 
 export const Navbar = () => {
-  const { user, loading } = useUser();
+  const { user, loading, setUser } = useUser();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      return logout();
+    },
+    onSuccess: () => {
+      setUser(null);
+      setIsLoggingOut(true);
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        console.log(err.response?.data.message);
+      } else {
+        console.error("Unexpected error:", err);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (isLoggingOut && !user) {
+      router.navigate({ to: "/login", replace: false });
+      setIsLoggingOut(false);
+    }
+  }, [isLoggingOut, user, router]);
 
   if (loading) {
     return <div>...Loading</div>;
   }
+
   return (
     <nav className="border-b border-b-[rgb(140,140,140,0.2)] bg-white fixed z-20 w-full">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
@@ -38,37 +76,51 @@ export const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-1">
           <NavButton to="/" icon={<Home className="h-6 w-6" />} text="Home" />
-          <NavButton
-            to="/mynetwork"
-            icon={<Users className="h-6 w-6" />}
-            text="My Network"
-          />
-          <NavButton
-            to="/messaging"
-            icon={<MessageSquare className="h-6 w-6" />}
-            text="Messaging"
-          />
+          {user && (
+            <>
+              {" "}
+              <NavButton
+                to="/mynetwork"
+                icon={<Users className="h-6 w-6" />}
+                text="My Network"
+              />
+              <NavButton
+                to="/messaging"
+                icon={<MessageSquare className="h-6 w-6" />}
+                text="Messaging"
+              />
+            </>
+          )}
           <NavButton
             to="/notifications"
             icon={<Bell className="h-6 w-6" />}
             text="Notifications"
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex flex-col items-center w-[72px] py-1 hover:text-neutral-600">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <span className="text-xs">Me</span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>View Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Sign Out</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user && (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex flex-col items-center w-[72px] py-1 hover:text-neutral-600">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src="/placeholder.svg" />
+                      <AvatarFallback>A</AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs">Me</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem>View Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => mutation.mutate()}
+                  >
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
           <div className="h-100 w-[1px] bg-gray-200" />
         </div>
 
@@ -92,20 +144,24 @@ export const Navbar = () => {
                 >
                   <Home className="h-5 w-5" /> Home
                 </Link>
-                <Link
-                  to="/"
-                  className="flex items-center gap-2 text-lg font-semibold"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Users className="h-5 w-5" /> My Network
-                </Link>
-                <Link
-                  to="/"
-                  className="flex items-center gap-2 text-lg font-semibold"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <MessageSquare className="h-5 w-5" /> Messaging
-                </Link>
+                {user && (
+                  <>
+                    <Link
+                      to="/"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Users className="h-5 w-5" /> My Network
+                    </Link>
+                    <Link
+                      to="/"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <MessageSquare className="h-5 w-5" /> Messaging
+                    </Link>
+                  </>
+                )}
                 <Link
                   to="/"
                   className="flex items-center gap-2 text-lg font-semibold"
@@ -113,6 +169,23 @@ export const Navbar = () => {
                 >
                   <Bell className="h-5 w-5" /> Notifications
                 </Link>
+                {user && (
+                  <div
+                    className="flex items-center gap-2 text-lg font-semibold cursor-pointer"
+                    onClick={() => mutation.mutate()}
+                  >
+                    <LogOut className="h-5 w-5" /> Sign out
+                  </div>
+                )}
+                {!user && (
+                  <Link
+                    to="/login"
+                    className="flex items-center gap-2 text-lg font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <LogIn className="h-5 w-5" /> Login
+                  </Link>
+                )}
               </nav>
             </SheetContent>
           </Sheet>

@@ -5,7 +5,6 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,12 +38,12 @@ export const LoginForm = () => {
       setUser(data);
       router.navigate({
         to: "/",
-        replace: false,
+        replace: true,
       });
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
-        console.log(err);
+        console.log(err.response?.data.message);
       } else {
         console.error("Unexpected error:", err);
       }
