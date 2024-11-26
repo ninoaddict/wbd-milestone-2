@@ -32,7 +32,7 @@ export const login = async (payload: LoginPayload): Promise<User> => {
 };
 
 export const register = async (payload: RegisterPayload): Promise<User> => {
-  (await api.post("/login", payload)).data as AuthResponse;
+  (await api.post("/register", payload)).data as AuthResponse;
   const user = await getUser();
   if (!user) {
     throw new AxiosError("User not found");
