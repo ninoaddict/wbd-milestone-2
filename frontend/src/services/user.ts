@@ -6,6 +6,11 @@ interface SelfResponse {
 }
 
 export const getUser = async (): Promise<User | null> => {
-  const res = (await api.get("/self")).data as SelfResponse;
-  return res.body ?? null;
+  try {
+    const res = (await api.get("/self")).data as SelfResponse;
+    return res.body ?? null;
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    return null;
+  }
 };

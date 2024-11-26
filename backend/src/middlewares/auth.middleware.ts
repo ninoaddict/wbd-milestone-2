@@ -18,7 +18,7 @@ export class AuthMiddleware {
 
   checkUser = async (
     req: RequestWithUser,
-    _res: Response,
+    res: Response,
     next: NextFunction
   ) => {
     try {
@@ -35,6 +35,18 @@ export class AuthMiddleware {
         decoded.exp;
       if (!validDecoded) {
         throw new Unauthorized();
+      }
+
+      const currTime = Date.now();
+
+      if (decoded.exp < currTime) {
+        res.clearCookie("auth_token");
+        throw new Unauthorized("Token expired");
+      }
+
+      if (currTime < decoded.iat) {
+        res.clearCookie("auth_token");
+        throw new Unauthorized("Token issued in the future");
       }
 
       req.user = await this.userService.findUserByEmail(decoded.email);
@@ -46,7 +58,7 @@ export class AuthMiddleware {
 
   checkUserUpload = async (
     req: RequestWithUser,
-    _res: Response,
+    res: Response,
     next: NextFunction
   ) => {
     try {
@@ -63,6 +75,18 @@ export class AuthMiddleware {
         decoded.exp;
       if (!validDecoded) {
         throw new Unauthorized();
+      }
+
+      const currTime = Date.now();
+
+      if (decoded.exp < currTime) {
+        res.clearCookie("auth_token");
+        throw new Unauthorized("Token expired");
+      }
+
+      if (currTime < decoded.iat) {
+        res.clearCookie("auth_token");
+        throw new Unauthorized("Token issued in the future");
       }
 
       const id = BigInt(req.params.userId);
@@ -93,14 +117,15 @@ export class AuthMiddleware {
         decoded.username &&
         decoded.iat &&
         decoded.exp;
-      // if token valid
-      if (validDecoded) {
+
+      const currTime = Date.now();
+
+      if (!validDecoded || decoded.exp < currTime || currTime < decoded.iat) {
+        res.clearCookie("auth_token");
+        next();
+      } else {
         throw new Unauthorized("You have to log out first");
       }
-
-      // invalid token
-      res.clearCookie("auth_token");
-      next();
     } catch (error) {
       next(error);
     }
@@ -108,7 +133,7 @@ export class AuthMiddleware {
 
   checkPublicUser = async (
     req: RequestWithUser,
-    _res: Response,
+    res: Response,
     next: NextFunction
   ) => {
     try {
@@ -125,6 +150,17 @@ export class AuthMiddleware {
         decoded.exp;
       if (!validDecoded) {
         throw new Unauthorized();
+      }
+
+      const currTime = Date.now();
+      if (decoded.exp < currTime) {
+        res.clearCookie("auth_token");
+        return next();
+      }
+
+      if (currTime < decoded.iat) {
+        res.clearCookie("auth_token");
+        return next();
       }
 
       req.user = await this.userService.findUserByEmail(decoded.email);

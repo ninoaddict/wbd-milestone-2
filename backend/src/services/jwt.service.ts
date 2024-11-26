@@ -66,17 +66,6 @@ export class JwtService {
 
     if (hash === checkSum) {
       const res = JSON.parse(this.decodeBase64(body));
-
-      const currTime = Date.now();
-
-      if (currTime < res.iat) {
-        throw new Unauthorized("Token issued in the future");
-      }
-
-      if (currTime > res.exp) {
-        throw new Unauthorized("Token expired");
-      }
-
       return res;
     } else {
       throw new Unauthorized("Token signature verification failed");

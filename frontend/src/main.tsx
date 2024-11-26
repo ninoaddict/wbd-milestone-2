@@ -15,7 +15,7 @@ const router = createRouter({
     auth: {
       user: undefined,
       loading: true,
-      setUser: null,
+      setUser: () => {},
     },
   },
   defaultPreload: "intent",
