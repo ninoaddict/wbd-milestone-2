@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { api } from "../../lib/api";
 
 export const Route = createFileRoute('/(auth)/login')({
   component: RouteComponent,
@@ -13,27 +14,25 @@ function RouteComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3000/login', {
-        method:'POST',
-        headers:{'Content-Type': 'application/json'},
-        body: JSON.stringify({identifier: email, password}),
-      })
-
+      const response = await api.post("/login", {identifier: email, password});
       console.log('Response:', response);
-      const result = await response.json();
-
-      console.log('Result:', result);
-      if (response.ok) {
+      const {success, message, body} = response.data;
+      
+      if (response.status===200) {
         setMessage("Login successful!");
-        localStorage.setItem('token', result.body.token);
-        
+        localStorage.setItem('token', body.token);
       }
       else {
-        setMessage(result.message || 'Login Failed!');
+        setMessage(message || 'Login Failed!');
       }
-    } catch (error) {
-      console.log('Error:', error);
-      setMessage("Login Error!");
+    } catch (error: any) {
+      console.error('Error: ', error);
+      if (error.response){
+        setMessage(error.response.data.message || "Login Failed!"); // error server
+      }
+      else {
+        setMessage("Unable to connect to server."); // error jaringan
+      }
     }
   }
 
