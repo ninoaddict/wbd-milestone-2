@@ -14,6 +14,7 @@ import { AddExperience } from "./add-experience-modal";
 import { sortExperiences } from "@/lib/utils";
 import { experienceType } from "@/domain/interfaces/profile.interface";
 import { EditExperience } from "./edit-experience-modal";
+import { EditSkills } from "./edit-skillls-modal";
 
 export default function SelfProfilePage(profile: Profile) {
   let initExp: experienceType[] = [];
@@ -87,6 +88,27 @@ export default function SelfProfilePage(profile: Profile) {
       }
     },
   });
+
+  function handleEditSkills(newSkills: string[]) {
+    mutation.mutate({
+      id: user!.id,
+      name,
+      username,
+      skills: JSON.stringify(newSkills),
+      work_history: JSON.stringify(
+        experience.map((exp) => {
+          return [
+            exp.title,
+            exp.company,
+            exp.startDate,
+            exp.endDate,
+            exp.location,
+          ];
+        })
+      ),
+    });
+    setSkills(newSkills);
+  }
 
   function handleAddExperience(data: experienceType) {
     if (
@@ -308,9 +330,10 @@ export default function SelfProfilePage(profile: Profile) {
             <Card className="p-4 sm:p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg sm:text-xl font-semibold">Skills</h2>
-                <Button variant="ghost" size="icon">
-                  <Plus className="h-4 w-4" />
-                </Button>
+                <EditSkills
+                  initSkills={skills}
+                  handleEditSkills={handleEditSkills}
+                />
               </div>
               <div className="flex gap-4 flex-wrap">
                 {profile.skills !== "" &&
