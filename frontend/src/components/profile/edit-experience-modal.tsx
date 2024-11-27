@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, Plus } from "lucide-react";
-import { useState } from "react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { addExperienceSchema } from "@/domain/schema/experience.schema";
 
 import {
@@ -98,6 +98,28 @@ export function EditExperience({
     },
   });
 
+  useEffect(() => {
+    const [newStartMonth, newStartYear] = initExp.startDate.split(" ");
+    let newEndMonth = currMonth;
+    let newEndYear = currYear.toString();
+    if (initExp.endDate !== "Present") {
+      [newEndMonth, newEndYear] = initExp.endDate.split(" ");
+    }
+
+    form.reset({
+      title: initExp.title,
+      company: initExp.company,
+      location: initExp.location,
+      startMonth: newStartMonth,
+      startYear: newStartYear,
+      stillWorking: initExp.endDate === "Present",
+      endMonth: newEndMonth,
+      endYear: newEndYear,
+    });
+
+    setStillWorking(initExp.endDate === "Present");
+  }, [initExp]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -107,14 +129,14 @@ export function EditExperience({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Experience</DialogTitle>
+          <DialogTitle>Edit Experience</DialogTitle>
           <DialogDescription>
-            Add new work experience here. Click save when you're done.
+            Edit new work experience here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
-            id="add-exp"
+            id="edit-exp"
             onSubmit={form.handleSubmit((values) => {
               const startDate = values.startMonth + " " + values.startYear;
               let endDate = "Present";
@@ -331,12 +353,20 @@ export function EditExperience({
         </Form>
         <DialogFooter>
           <Button
-            form="add-exp"
+            form="edit-exp"
             type="submit"
             className="bg-[#0a66c2] hover:bg-[#0a66c2a2]"
           >
-            Create
+            Update
           </Button>
+          <DialogClose asChild>
+            <Button
+              variant="destructive"
+              onClick={() => handleDeleteExperience(id)}
+            >
+              Delete
+            </Button>
+          </DialogClose>
           <DialogClose asChild>
             <Button
               type="button"

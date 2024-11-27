@@ -23,6 +23,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "@/services/auth";
 import { AxiosError } from "axios";
+import { STORAGE_URL } from "@/lib/const";
 
 export const Navbar = () => {
   const { user, loading, setUser } = useUser();
@@ -109,7 +110,13 @@ export const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <button className="flex flex-col items-center w-[72px] py-1 hover:text-neutral-600">
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={user.profile_photo_path} />
+                      <AvatarImage
+                        src={
+                          user.profile_photo_path !== ""
+                            ? `${STORAGE_URL}/${user.profile_photo_path}`
+                            : undefined
+                        }
+                      />
                       <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <span className="text-xs">Me</span>

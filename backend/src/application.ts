@@ -15,7 +15,7 @@ class Application {
     this.app = express();
     this.port = PORT;
     this.app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-    this.app.use("/static", express.static("storage"));
+    this.app.use("/storage", express.static("storage"));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(helmet());

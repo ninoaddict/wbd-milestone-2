@@ -36,6 +36,16 @@ class ProfileController implements Controller {
   };
 
   updateProfile = async (req: RequestWithUser): Promise<BaseResponse> => {
+    if (req.body.profile_photo === null) {
+      return {
+        body: await this.profileService.updateProfile(
+          req.user?.id!,
+          req.body,
+          ""
+        ),
+        message: "Profile updated successfully",
+      };
+    }
     return {
       body: await this.profileService.updateProfile(
         req.user?.id!,

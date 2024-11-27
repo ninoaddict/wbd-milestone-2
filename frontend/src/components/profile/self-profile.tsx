@@ -15,6 +15,8 @@ import { sortExperiences } from "@/lib/utils";
 import { experienceType } from "@/domain/interfaces/profile.interface";
 import { EditExperience } from "./edit-experience-modal";
 import { EditSkills } from "./edit-skillls-modal";
+import EditProfilePicture from "./edit-picture-modal";
+import { STORAGE_URL } from "@/lib/const";
 
 export default function SelfProfilePage(profile: Profile) {
   let initExp: experienceType[] = [];
@@ -48,6 +50,9 @@ export default function SelfProfilePage(profile: Profile) {
   const [username, setUsername] = useState<string>(profile.username);
   const [experience, setExperience] = useState(initExp);
   const [skills, setSkills] = useState(initSkills);
+  const [profilePhoto, setProfilePhoto] = useState(
+    profile.profile_photo ? `${STORAGE_URL}/${profile.profile_photo}` : ""
+  );
 
   if (loading) {
     return <div>Loading...</div>;
@@ -61,6 +66,11 @@ export default function SelfProfilePage(profile: Profile) {
       setUser(data);
       setName(data.name);
       setUsername(data.username);
+      setProfilePhoto(
+        data.profile_photo_path
+          ? `${STORAGE_URL}/${data.profile_photo_path}`
+          : ""
+      );
       try {
         if (data.work_history !== "") {
           const rawData = JSON.parse(data.work_history);
@@ -88,6 +98,27 @@ export default function SelfProfilePage(profile: Profile) {
       }
     },
   });
+
+  function handleUploadPhoto(file: File | null) {
+    mutation.mutate({
+      id: user!.id,
+      name,
+      username,
+      skills: JSON.stringify(skills),
+      work_history: JSON.stringify(
+        experience.map((exp) => {
+          return [
+            exp.title,
+            exp.company,
+            exp.startDate,
+            exp.endDate,
+            exp.location,
+          ];
+        })
+      ),
+      profile_photo: file,
+    });
+  }
 
   function handleEditSkills(newSkills: string[]) {
     mutation.mutate({
@@ -177,7 +208,6 @@ export default function SelfProfilePage(profile: Profile) {
         ),
       });
     }
-    // handle error
   }
 
   function handleDeleteExperience(id: number) {
@@ -249,9 +279,9 @@ export default function SelfProfilePage(profile: Profile) {
                 <div className="relative h-24 w-24 sm:h-32 sm:w-32 rounded-full border-4 border-white overflow-hidden">
                   <img
                     src={
-                      profile.profile_photo === ""
+                      profilePhoto === ""
                         ? "/profile_photo_placeholder.webp"
-                        : profile.profile_photo
+                        : profilePhoto
                     }
                     alt="Profile photo"
                     width={128}
@@ -259,10 +289,9 @@ export default function SelfProfilePage(profile: Profile) {
                     className="object-cover"
                   />
                 </div>
-                <CameraIcon
-                  width={28}
-                  height={28}
-                  className="absolute bottom-2 right-2 cursor-pointer"
+                <EditProfilePicture
+                  initProfilePicture={profilePhoto}
+                  handleUploadPhoto={handleUploadPhoto}
                 />
               </div>
               <div className="p-4 sm:p-6 mt-4">
@@ -274,8 +303,8 @@ export default function SelfProfilePage(profile: Profile) {
                     </p>
                     <div className="mt-2">
                       <Link
-                        href="#"
-                        className="text-xs sm:text-sm text-primary hover:underline"
+                        href="/"
+                        className="text-xs text-[#0a66c2] font-bold sm:text-sm text-primary hover:underline"
                       >
                         {profile.connection_count} connections
                       </Link>
