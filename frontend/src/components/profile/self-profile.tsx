@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
 import { EditProfileModal } from "./edit-profile-modal";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { updateProfile, UpdateProfilePayload } from "@/services/profile";
 import { useUser } from "@/context/auth-context";
@@ -99,161 +99,159 @@ export default function SelfProfilePage(profile: Profile) {
     },
   });
 
-  function handleUploadPhoto(file: File | null) {
-    mutation.mutate({
-      id: user!.id,
-      name,
-      username,
-      skills: JSON.stringify(skills),
-      work_history: JSON.stringify(
-        experience.map((exp) => {
-          return [
+  const handleUploadPhoto = useCallback(
+    (file: File | null) => {
+      mutation.mutate({
+        id: user!.id,
+        name,
+        username,
+        skills: JSON.stringify(skills),
+        work_history: JSON.stringify(
+          experience.map((exp) => [
             exp.title,
             exp.company,
             exp.startDate,
             exp.endDate,
             exp.location,
-          ];
-        })
-      ),
-      profile_photo: file,
-    });
-  }
+          ])
+        ),
+        profile_photo: file,
+      });
+    },
+    [mutation, user, name, username, skills, experience]
+  );
 
-  function handleEditSkills(newSkills: string[]) {
-    mutation.mutate({
-      id: user!.id,
-      name,
-      username,
-      skills: JSON.stringify(newSkills),
-      work_history: JSON.stringify(
-        experience.map((exp) => {
-          return [
+  const handleEditSkills = useCallback(
+    (newSkills: string[]) => {
+      mutation.mutate({
+        id: user!.id,
+        name,
+        username,
+        skills: JSON.stringify(newSkills),
+        work_history: JSON.stringify(
+          experience.map((exp) => [
             exp.title,
             exp.company,
             exp.startDate,
             exp.endDate,
             exp.location,
-          ];
-        })
-      ),
-    });
-    setSkills(newSkills);
-  }
+          ])
+        ),
+      });
+      setSkills(newSkills);
+    },
+    [mutation, user, name, username, experience]
+  );
 
-  function handleAddExperience(data: experienceType) {
-    if (
-      data.title &&
-      data.company &&
-      data.endDate &&
-      data.startDate &&
-      data.location
-    ) {
-      const newExps = [...experience, data];
-      const sortedExps = sortExperiences(newExps);
-      mutation.mutate({
-        id: user!.id,
-        name: name,
-        username: username,
-        skills: JSON.stringify(skills),
-        work_history: JSON.stringify(
-          sortedExps.map((exp) => {
-            return [
+  const handleAddExperience = useCallback(
+    (data: experienceType) => {
+      if (
+        data.title &&
+        data.company &&
+        data.endDate &&
+        data.startDate &&
+        data.location
+      ) {
+        const newExps = [...experience, data];
+        const sortedExps = sortExperiences(newExps);
+        mutation.mutate({
+          id: user!.id,
+          name,
+          username,
+          skills: JSON.stringify(skills),
+          work_history: JSON.stringify(
+            sortedExps.map((exp) => [
               exp.title,
               exp.company,
               exp.startDate,
               exp.endDate,
               exp.location,
-            ];
-          })
-        ),
-      });
-    }
-    // handle error
-  }
+            ])
+          ),
+        });
+      }
+    },
+    [mutation, user, name, username, skills, experience]
+  );
 
-  function handleEditExperience(data: experienceType, id: number) {
-    if (
-      data.title &&
-      data.company &&
-      data.endDate &&
-      data.startDate &&
-      data.location &&
-      id < experience.length &&
-      id >= 0
-    ) {
-      const newExps = experience.map((ex, idx) => {
-        if (id === idx) {
-          return data;
-        } else {
-          return ex;
-        }
-      });
-      const sortedExps = sortExperiences(newExps);
-      mutation.mutate({
-        id: user!.id,
-        name: name,
-        username: username,
-        skills: JSON.stringify(skills),
-        work_history: JSON.stringify(
-          sortedExps.map((exp) => {
-            return [
+  const handleEditExperience = useCallback(
+    (data: experienceType, id: number) => {
+      if (
+        data.title &&
+        data.company &&
+        data.endDate &&
+        data.startDate &&
+        data.location &&
+        id < experience.length &&
+        id >= 0
+      ) {
+        const newExps = experience.map((ex, idx) => (id === idx ? data : ex));
+        const sortedExps = sortExperiences(newExps);
+        mutation.mutate({
+          id: user!.id,
+          name,
+          username,
+          skills: JSON.stringify(skills),
+          work_history: JSON.stringify(
+            sortedExps.map((exp) => [
               exp.title,
               exp.company,
               exp.startDate,
               exp.endDate,
               exp.location,
-            ];
-          })
-        ),
-      });
-    }
-  }
+            ])
+          ),
+        });
+      }
+    },
+    [mutation, user, name, username, skills, experience]
+  );
 
-  function handleDeleteExperience(id: number) {
-    if (id < experience.length && id >= 0) {
-      const newExps = experience.filter((_, idx) => idx !== id);
-      const sortedExps = sortExperiences(newExps);
-      mutation.mutate({
-        id: user!.id,
-        name: name,
-        username: username,
-        skills: JSON.stringify(skills),
-        work_history: JSON.stringify(
-          sortedExps.map((exp) => {
-            return [
+  const handleDeleteExperience = useCallback(
+    (id: number) => {
+      if (id < experience.length && id >= 0) {
+        const newExps = experience.filter((_, idx) => idx !== id);
+        const sortedExps = sortExperiences(newExps);
+        mutation.mutate({
+          id: user!.id,
+          name,
+          username,
+          skills: JSON.stringify(skills),
+          work_history: JSON.stringify(
+            sortedExps.map((exp) => [
               exp.title,
               exp.company,
               exp.startDate,
               exp.endDate,
               exp.location,
-            ];
-          })
-        ),
-      });
-    }
-    // handle error
-  }
+            ])
+          ),
+        });
+      }
+    },
+    [mutation, user, name, username, skills, experience]
+  );
 
-  function handleUpdateProfile(name: string, username: string) {
-    mutation.mutate({
-      id: user!.id,
-      name,
-      username,
-      skills: JSON.stringify(skills),
-      work_history: JSON.stringify(
-        experience.map((exp) => {
-          return [
+  const handleUpdateProfile = useCallback(
+    (name: string, username: string) => {
+      mutation.mutate({
+        id: user!.id,
+        name,
+        username,
+        skills: JSON.stringify(skills),
+        work_history: JSON.stringify(
+          experience.map((exp) => [
             exp.title,
             exp.company,
             exp.startDate,
             exp.endDate,
             exp.location,
-          ];
-        })
-      ),
-    });
-  }
+          ])
+        ),
+      });
+    },
+    [mutation, user, skills, experience]
+  );
 
   return (
     <div className="min-h-screen bg-[#f4f2ee] pt-[92px] pb-[48px]">
