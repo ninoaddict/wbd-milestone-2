@@ -9,10 +9,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
+import { addExperienceSchema } from "@/domain/schema/experience.schema";
 
 import {
   Select,
@@ -23,6 +33,9 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "../ui/checkbox";
 import { experienceType } from "@/domain/interfaces/profile.interface";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 export function AddExperience({
   handleAddExperience,
@@ -53,28 +66,25 @@ export function AddExperience({
     (firstYear + i).toString()
   );
 
-  const [jobTitle, setJobTitle] = useState("");
-  const [company, setCompany] = useState("");
-  const [startMonth, setStartMonth] = useState("January");
-  const [startYear, setStartYear] = useState("2024");
-  const [endMonth, setEndMonth] = useState(currMonth);
-  const [endYear, setEndYear] = useState(currYear.toString());
   const [stillWorking, setStillWorking] = useState(true);
-  const [location, setLocation] = useState("");
+  const [open, setOpen] = useState(false);
 
-  const onSubmit = (e: any) => {
-    e.preventDefault();
-    handleAddExperience({
-      title: jobTitle,
-      company,
-      startDate: `${startMonth} ${startYear}`,
-      endDate: stillWorking ? "Present" : `${endMonth} ${endYear}`,
-      location: location,
-    });
-  };
+  const form = useForm<z.infer<typeof addExperienceSchema>>({
+    resolver: zodResolver(addExperienceSchema),
+    defaultValues: {
+      title: "",
+      company: "",
+      location: "",
+      startMonth: "January",
+      startYear: "2024",
+      stillWorking: true,
+      endMonth: currMonth,
+      endYear: currYear.toString(),
+    },
+  });
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="mt-2 sm:mt-0">
           <Plus className="h-4 w-4" />
@@ -87,157 +97,227 @@ export function AddExperience({
             Add new work experience here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
-        <form id="add-exp" onSubmit={onSubmit}>
-          <div className="grid gap-5 py-4">
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="job-title">Job Title</Label>
-              <Input
-                id="job-title"
-                className="col-span-3"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                required
+        <Form {...form}>
+          <form
+            id="add-exp"
+            onSubmit={form.handleSubmit((values) => {
+              const startDate = values.startMonth + " " + values.startYear;
+              let endDate = "Present";
+              if (!values.stillWorking) {
+                endDate = values.endMonth + " " + values.endYear;
+              }
+              const data = {
+                title: values.title,
+                company: values.company,
+                startDate,
+                endDate,
+                location: values.location,
+              };
+              handleAddExperience(data);
+              setOpen(false);
+            })}
+            className="grid gap-5 py-4"
+          >
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-1">
+                  <FormLabel>Job Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="col-span-3"
+                      placeholder="Job Title"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="company"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-1">
+                  <FormLabel>Company Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="col-span-3"
+                      placeholder="Company Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-1">
+                  <FormLabel>Location</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="col-span-3"
+                      placeholder="Location"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="stillWorking"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(value) => {
+                        field.onChange(value);
+                        setStillWorking(value as boolean);
+                      }}
+                    />
+                  </FormControl>
+                  <div className="leading-none">
+                    <FormLabel>I am currently working in this role</FormLabel>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-between">
+              <FormField
+                control={form.control}
+                name="startMonth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Month</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="sm:w-[180px] w-[150px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {months.map((m) => {
+                          return (
+                            <SelectItem key={m} value={m}>
+                              {m}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="company">Company</Label>
-              <Input
-                id="company"
-                className="col-span-3"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                required
+              <FormField
+                control={form.control}
+                name="startYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Year</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="sm:w-[180px] w-[150px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {years.map((m) => {
+                          return (
+                            <SelectItem key={m} value={m}>
+                              {m}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                className="col-span-3"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex items-center space-x-2 my-2">
-              <Checkbox
-                id="still"
-                defaultChecked
-                onCheckedChange={(value) => {
-                  if (value as boolean) {
-                    setEndMonth(currMonth);
-                    setEndYear(currYear.toString());
-                  }
-                  setStillWorking(value as boolean);
-                }}
-              />
-              <label
-                htmlFor="still"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                I am currently working in this role
-              </label>
             </div>
             <div className="flex justify-between">
-              <div className="flex flex-col gap-1">
-                <p>Start Month</p>
-                <Select
-                  value={startMonth}
-                  onValueChange={(value) => {
-                    setStartMonth(value);
-                  }}
-                >
-                  <SelectTrigger className="sm:w-[180px] w-[150px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((m) => {
-                      return (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <p>Start Year</p>
-                <Select
-                  value={startYear}
-                  onValueChange={(value) => {
-                    setStartYear(value);
-                  }}
-                >
-                  <SelectTrigger className="sm:w-[180px] w-[150px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((y) => {
-                      return (
-                        <SelectItem key={y} value={y}>
-                          {y}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormField
+                control={form.control}
+                name="endMonth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>End Month</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={stillWorking}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="sm:w-[180px] w-[150px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {months.map((m) => {
+                          return (
+                            <SelectItem key={m} value={m}>
+                              {m}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="endYear"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>End Year</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={stillWorking}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="sm:w-[180px] w-[150px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {years.map((m) => {
+                          return (
+                            <SelectItem key={m} value={m}>
+                              {m}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <div className="flex justify-between">
-              <div className="flex flex-col gap-1">
-                <p>End Month</p>
-                <Select
-                  value={endMonth}
-                  onValueChange={(value) => {
-                    setEndMonth(value);
-                  }}
-                  disabled={stillWorking}
-                >
-                  <SelectTrigger className="sm:w-[180px] w-[150px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((m) => {
-                      return (
-                        <SelectItem key={m} value={m}>
-                          {m}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <p>End Year</p>
-                <Select
-                  value={endYear}
-                  onValueChange={(value) => {
-                    setEndYear(value);
-                  }}
-                  disabled={stillWorking}
-                >
-                  <SelectTrigger className="sm:w-[180px] w-[150px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((y) => {
-                      return (
-                        <SelectItem key={y} value={y}>
-                          {y}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        </form>
+          </form>
+        </Form>
         <DialogFooter>
           <Button
-            type="submit"
             form="add-exp"
+            type="submit"
             className="bg-[#0a66c2] hover:bg-[#0a66c2a2]"
           >
             Create

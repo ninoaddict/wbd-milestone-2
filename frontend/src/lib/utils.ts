@@ -7,6 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const parseDate = (dateStr: string): Date => {
+  if (dateStr === "Present") {
+    return new Date();
+  }
   const [month, year] = dateStr.split(" ");
   const monthIndex = new Date(Date.parse(`${month} 1`)).getMonth(); // Parse month name to index
   return new Date(Number(year), monthIndex); // Create a Date object
