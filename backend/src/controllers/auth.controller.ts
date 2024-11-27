@@ -57,9 +57,9 @@ class AuthController implements Controller {
     };
   };
 
-  getUsers = async (req: Request): Promise<BaseResponse> => {
+  getUsers = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
-      body: await this.userService.findAllUsers(req.query.query),
+      body: await this.userService.findAllUsers(req.user?.id),
       message: "Successfully fetch all users",
     };
   };
@@ -85,7 +85,11 @@ class AuthController implements Controller {
       this.authMiddleware.checkPublicUser,
       handleRequest(this.self)
     );
-    this.router.get(`${this.path}/users`, handleRequest(this.getUsers));
+    this.router.get(
+      `${this.path}/users`,
+      this.authMiddleware.checkPublicUser,
+      handleRequest(this.getUsers)
+    );
   }
 }
 

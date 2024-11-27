@@ -6,16 +6,38 @@ import bcrypt from "bcrypt";
 import { jwtService } from "./jwt.service";
 import { User } from "@prisma/client";
 import BadRequest from "../errors/bad-request.error";
+import ConnectionRepository from "../repositories/connection.repository";
 
 class UserService {
   private userRepository: UserRepository;
+  private connectionRepository: ConnectionRepository;
   constructor() {
     this.userRepository = new UserRepository();
+    this.connectionRepository = new ConnectionRepository();
   }
 
-  findAllUsers = async (query: any) => {
+  findAllUsers = async (query: any, userId?: bigint) => {
     const users = await this.userRepository.getAllUsers(query);
-    return users;
+    if (!userId) {
+      return users;
+    }
+    const finalUsers = users.map(async (user) => {
+      let status = "disconnected";
+      if (user.id === userId) {
+        status = "self";
+      } else if (await this.connectionRepository.isConnected(userId, user.id)) {
+        status = "connected";
+      } else if (await this.connectionRepository.isRequested(user.id, userId)) {
+        status = "requested";
+      } else if (await this.connectionRepository.isRequested(userId, user.id)) {
+        status = "requesting";
+      }
+      return {
+        ...user,
+        status,
+      };
+    });
+    return finalUsers;
   };
 
   findUserByUsername = async (username: string) => {
