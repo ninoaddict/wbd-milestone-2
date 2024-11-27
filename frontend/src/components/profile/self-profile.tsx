@@ -10,11 +10,43 @@ import { useMutation } from "@tanstack/react-query";
 import { updateProfile, UpdateProfilePayload } from "@/services/profile";
 import { useUser } from "@/context/auth-context";
 import { AxiosError } from "axios";
+import { AddExperience } from "./add-experience-modal";
+import { sortExperiences } from "@/lib/utils";
+import { experienceType } from "@/domain/interfaces/profile.interface";
+import { EditExperience } from "./edit-experience-modal";
 
 export default function SelfProfilePage(profile: Profile) {
+  let initExp: experienceType[] = [];
+  let initSkills: string[] = [];
+
+  try {
+    if (profile && profile.work_history && profile.work_history !== "") {
+      const raw = JSON.parse(profile.work_history);
+
+      const unsortedInitExp = raw.map((d: any) => {
+        return {
+          title: d[0],
+          company: d[1],
+          startDate: d[2],
+          endDate: d[3],
+          location: d[4],
+        };
+      });
+      initExp = sortExperiences(unsortedInitExp);
+    }
+
+    if (profile && profile.skills && profile.skills !== "") {
+      initSkills = JSON.parse(profile.skills);
+    }
+  } catch (error) {
+    // fail to parse
+  }
+
   const { user, loading, setUser } = useUser();
   const [name, setName] = useState<string>(profile.name);
   const [username, setUsername] = useState<string>(profile.username);
+  const [experience, setExperience] = useState(initExp);
+  const [skills, setSkills] = useState(initSkills);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -28,6 +60,24 @@ export default function SelfProfilePage(profile: Profile) {
       setUser(data);
       setName(data.name);
       setUsername(data.username);
+      try {
+        if (data.work_history !== "") {
+          const rawData = JSON.parse(data.work_history);
+          const exps = rawData.map((d: any) => {
+            return {
+              title: d[0],
+              company: d[1],
+              startDate: d[2],
+              endDate: d[3],
+              location: d[4],
+            };
+          });
+          const sortedExps = sortExperiences(exps);
+          setExperience(sortedExps);
+        }
+      } catch (error) {
+        // handler error
+      }
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -38,8 +88,119 @@ export default function SelfProfilePage(profile: Profile) {
     },
   });
 
+  function handleAddExperience(data: experienceType) {
+    if (
+      data.title &&
+      data.company &&
+      data.endDate &&
+      data.startDate &&
+      data.location
+    ) {
+      const newExps = [...experience, data];
+      const sortedExps = sortExperiences(newExps);
+      mutation.mutate({
+        id: user!.id,
+        name: name,
+        username: username,
+        skills: JSON.stringify(skills),
+        work_history: JSON.stringify(
+          sortedExps.map((exp) => {
+            return [
+              exp.title,
+              exp.company,
+              exp.startDate,
+              exp.endDate,
+              exp.location,
+            ];
+          })
+        ),
+      });
+    }
+    // handle error
+  }
+
+  function handleEditExperience(data: experienceType, id: number) {
+    if (
+      data.title &&
+      data.company &&
+      data.endDate &&
+      data.startDate &&
+      data.location &&
+      id < experience.length &&
+      id >= 0
+    ) {
+      const newExps = experience.map((ex, idx) => {
+        if (id === idx) {
+          return data;
+        } else {
+          return ex;
+        }
+      });
+      const sortedExps = sortExperiences(newExps);
+      mutation.mutate({
+        id: user!.id,
+        name: name,
+        username: username,
+        skills: JSON.stringify(skills),
+        work_history: JSON.stringify(
+          sortedExps.map((exp) => {
+            return [
+              exp.title,
+              exp.company,
+              exp.startDate,
+              exp.endDate,
+              exp.location,
+            ];
+          })
+        ),
+      });
+    }
+    // handle error
+  }
+
+  function handleDeleteExperience(id: number) {
+    if (id < experience.length && id >= 0) {
+      const newExps = experience.filter((_, idx) => idx !== id);
+      const sortedExps = sortExperiences(newExps);
+      mutation.mutate({
+        id: user!.id,
+        name: name,
+        username: username,
+        skills: JSON.stringify(skills),
+        work_history: JSON.stringify(
+          sortedExps.map((exp) => {
+            return [
+              exp.title,
+              exp.company,
+              exp.startDate,
+              exp.endDate,
+              exp.location,
+            ];
+          })
+        ),
+      });
+    }
+    // handle error
+  }
+
   function handleUpdateProfile(name: string, username: string) {
-    mutation.mutate({ id: user!.id, name, username });
+    mutation.mutate({
+      id: user!.id,
+      name,
+      username,
+      skills: JSON.stringify(skills),
+      work_history: JSON.stringify(
+        experience.map((exp) => {
+          return [
+            exp.title,
+            exp.company,
+            exp.startDate,
+            exp.endDate,
+            exp.location,
+          ];
+        })
+      ),
+    });
   }
 
   return (
@@ -113,27 +274,31 @@ export default function SelfProfilePage(profile: Profile) {
                 <h2 className="text-lg sm:text-xl font-semibold">
                   Work Experience
                 </h2>
-                <Button variant="ghost" size="icon">
-                  <Plus className="h-4 w-4" />
-                </Button>
+                <AddExperience handleAddExperience={handleAddExperience} />
               </div>
               <div className="space-y-4">
-                {[1, 2, 3].map((job) => (
-                  <div key={job} className="flex gap-4">
+                {experience.map((job, id) => (
+                  <div key={id} className="flex gap-4 justify-between">
                     <div>
                       <h3 className="text-sm sm:text-base font-semibold">
-                        Senior Software Engineer
+                        {job.title}
                       </h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        Tech Company
+                        {job.company}
                       </p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        Jan 2020 - Present · 4 yrs
+                        {job.startDate} - {job.endDate}
                       </p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        San Francisco Bay Area
+                        {job.location}
                       </p>
                     </div>
+                    <EditExperience
+                      initExp={job}
+                      id={id}
+                      handleEditExperience={handleEditExperience}
+                      handleDeleteExperience={handleDeleteExperience}
+                    />
                   </div>
                 ))}
               </div>
@@ -148,16 +313,15 @@ export default function SelfProfilePage(profile: Profile) {
                 </Button>
               </div>
               <div className="flex gap-4 flex-wrap">
-                {["React", "TypeScript", "Node.js", "Express.js"].map(
-                  (skill) => (
+                {profile.skills !== "" &&
+                  skills.map((skill) => (
                     <div
                       key={skill}
                       className="flex items-center justify-between"
                     >
                       <Badge className="text-sm font-semibold">{skill}</Badge>
                     </div>
-                  )
-                )}
+                  ))}
               </div>
             </Card>
           </div>

@@ -16,6 +16,8 @@ export interface UpdateProfilePayload {
   id: string;
   username: string;
   name: string;
+  skills: string;
+  work_history: string;
 }
 
 export const getProfile = async (userId: string) => {

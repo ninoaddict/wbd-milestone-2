@@ -3,17 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
-
-interface experienceType {
-  title: string;
-  company: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-}
+import { experienceType } from "@/domain/interfaces/profile.interface";
 
 export default function ProfilePage(profile: Profile) {
   let experience: experienceType[] = [];
+  let skills: string[] = [];
+
   try {
     if (profile && profile.work_history && profile.work_history !== "") {
       const raw = JSON.parse(profile.work_history);
@@ -26,6 +21,10 @@ export default function ProfilePage(profile: Profile) {
           location: d[4],
         };
       });
+    }
+
+    if (profile && profile.skills && profile.skills !== "") {
+      skills = JSON.parse(profile.skills);
     }
   } catch (error) {
     // fail to parse
@@ -141,7 +140,7 @@ export default function ProfilePage(profile: Profile) {
               </div>
               <div className="flex gap-4 flex-wrap">
                 {profile.skills !== "" &&
-                  profile.skills.split(",").map((skill) => (
+                  skills.map((skill) => (
                     <div
                       key={skill}
                       className="flex items-center justify-between"
