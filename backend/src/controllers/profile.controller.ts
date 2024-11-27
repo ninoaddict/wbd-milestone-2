@@ -41,7 +41,7 @@ class ProfileController implements Controller {
         body: await this.profileService.updateProfile(
           req.user?.id!,
           req.body,
-          ""
+          null
         ),
         message: "Profile updated successfully",
       };

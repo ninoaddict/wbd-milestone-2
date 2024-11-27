@@ -3,13 +3,17 @@ import ProfileRepository from "../repositories/profile.repository";
 import ConnectionRepository from "../repositories/connection.repository";
 import { updateProfileDto } from "../domain/schema/profile.schema";
 import NotFound from "../errors/not-found.error";
+import UserRepository from "../repositories/user.repository";
+import { unlink } from "fs";
 
 class ProfileService {
   private profileRepository: ProfileRepository;
   private connectionRepository: ConnectionRepository;
+  private userRepository: UserRepository;
   constructor() {
     this.profileRepository = new ProfileRepository();
     this.connectionRepository = new ConnectionRepository();
+    this.userRepository = new UserRepository();
   }
 
   getProfile = async (user: User | undefined, userId: bigint) => {
@@ -82,13 +86,36 @@ class ProfileService {
   updateProfile = async (
     id: bigint,
     payload: updateProfileDto,
-    profile_photo: string | undefined
+    profile_photo: string | undefined | null
   ) => {
+    const oldData = await this.userRepository.getUserById(id);
+    if (!oldData) {
+      throw new NotFound("User not found");
+    }
+
+    // if photo is deleted
+    if (profile_photo === null) {
+      unlink("storage/images/" + oldData.profile_photo_path, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+
+    // if photo is updated
+    if (profile_photo && oldData.profile_photo_path !== "") {
+      unlink("storage/images/" + oldData.profile_photo_path, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+
     const profileData: ProfileData = {
       name: payload.name,
       skills: payload.skills ?? "",
       work_history: payload.work_history ?? "",
-      profile_photo_path: profile_photo,
+      profile_photo_path: profile_photo === null ? "" : profile_photo,
       username: payload.username,
     };
     return await this.profileRepository.updateProfile(profileData, id);

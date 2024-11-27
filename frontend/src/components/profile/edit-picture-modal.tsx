@@ -57,7 +57,7 @@ export default function EditProfilePicture({
     }
     setOpen(false);
     setNewPicture(null);
-    setPreviewUrl(initProfilePicture);
+    setPreviewUrl("");
   };
 
   const handleDeletePicture = () => {
