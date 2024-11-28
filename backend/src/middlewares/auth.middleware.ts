@@ -28,11 +28,7 @@ export class AuthMiddleware {
       }
       const decoded = jwtService.decode(token);
       const validDecoded =
-        decoded.id &&
-        decoded.email &&
-        decoded.username &&
-        decoded.iat &&
-        decoded.exp;
+        decoded.id && decoded.email && decoded.iat && decoded.exp;
       if (!validDecoded) {
         throw new Unauthorized();
       }
@@ -68,11 +64,7 @@ export class AuthMiddleware {
       }
       const decoded = jwtService.decode(token);
       const validDecoded =
-        decoded.id &&
-        decoded.email &&
-        decoded.username &&
-        decoded.iat &&
-        decoded.exp;
+        decoded.id && decoded.email && decoded.iat && decoded.exp;
       if (!validDecoded) {
         throw new Unauthorized();
       }
@@ -112,11 +104,7 @@ export class AuthMiddleware {
 
       const decoded = jwtService.decode(token);
       const validDecoded =
-        decoded.id &&
-        decoded.email &&
-        decoded.username &&
-        decoded.iat &&
-        decoded.exp;
+        decoded.id && decoded.email && decoded.iat && decoded.exp;
 
       const currTime = Date.now();
 
@@ -143,11 +131,7 @@ export class AuthMiddleware {
       }
       const decoded = jwtService.decode(token);
       const validDecoded =
-        decoded.id &&
-        decoded.email &&
-        decoded.username &&
-        decoded.iat &&
-        decoded.exp;
+        decoded.id && decoded.email && decoded.iat && decoded.exp;
       if (!validDecoded) {
         throw new Unauthorized();
       }

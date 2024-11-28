@@ -31,6 +31,8 @@ model User {
   connectionRequestsReceived ConnectionRequest[] @relation("ConnectionRequestToUser")
   connectionsSent            Connection[]        @relation("ConnectionFromUser")
   connectionsReceived        Connection[]        @relation("ConnectionToUser")
+  firstUserRoom              RoomChat[]          @relation("firstUserRoom")
+  secondUserRoom             RoomChat[]          @relation("secondUserRoom")
   pushSubscriptions          PushSubscription[]
 
   @@map("users")
@@ -48,16 +50,29 @@ model Feed {
 }
 
 model Chat {
-  id        BigInt   @id @default(autoincrement())
-  timestamp DateTime @default(now()) @db.Timestamptz()
-  fromId    BigInt
-  toId      BigInt
-  message   String   @db.Text
-  from      User     @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
-  to        User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
+  id         BigInt    @id @default(autoincrement())
+  timestamp  DateTime  @default(now()) @db.Timestamptz()
+  fromId     BigInt
+  toId       BigInt
+  message    String    @db.Text
+  from       User      @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
+  to         User      @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
+  roomChatId BigInt
+  roomChat   RoomChat @relation(fields: [roomChatId], references: [id], onDelete: Cascade)
 
   @@index([timestamp], type: BTree)
   @@map("chat")
+}
+
+model RoomChat {
+  id           BigInt @id @default(autoincrement())
+  firstUserId  BigInt
+  secondUserId BigInt
+  firstUser    User   @relation("firstUserRoom", fields: [firstUserId], references: [id])
+  secondUser   User   @relation("secondUserRoom", fields: [secondUserId], references: [id])
+  chat         Chat[]
+
+  @@unique([firstUserId, secondUserId])
 }
 
 model ConnectionRequest {

@@ -21,22 +21,30 @@ class UserService {
     if (!userId) {
       return users;
     }
-    const finalUsers = users.map(async (user) => {
-      let status = "disconnected";
-      if (user.id === userId) {
-        status = "self";
-      } else if (await this.connectionRepository.isConnected(userId, user.id)) {
-        status = "connected";
-      } else if (await this.connectionRepository.isRequested(user.id, userId)) {
-        status = "requested";
-      } else if (await this.connectionRepository.isRequested(userId, user.id)) {
-        status = "requesting";
-      }
-      return {
-        ...user,
-        status,
-      };
-    });
+    const finalUsers = await Promise.all(
+      users.map(async (user) => {
+        let status = "disconnected";
+        if (user.id === userId) {
+          status = "self";
+        } else if (
+          await this.connectionRepository.isConnected(userId, user.id)
+        ) {
+          status = "connected";
+        } else if (
+          await this.connectionRepository.isRequested(user.id, userId)
+        ) {
+          status = "requested";
+        } else if (
+          await this.connectionRepository.isRequested(userId, user.id)
+        ) {
+          status = "requesting";
+        }
+        return {
+          ...user,
+          status,
+        };
+      })
+    );
     return finalUsers;
   };
 
@@ -113,7 +121,6 @@ class UserService {
     const payload = {
       id: Number(user.id),
       email: user.email,
-      username: user.username,
       iat,
       exp,
     };
