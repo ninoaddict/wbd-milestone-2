@@ -1,4 +1,4 @@
-import { Chat, RoomChat } from "@prisma/client";
+import { ChatRoom } from "@prisma/client";
 import { Server, Socket } from "socket.io";
 
 import { getSession, ServerEventsResolver } from "./helper";
@@ -9,9 +9,18 @@ import { isTypingEvent } from "./events/typing";
 const serverEvents = [messageEvent, isTypingEvent] as const;
 export type ClientToServerEvents = ServerEventsResolver<typeof serverEvents>;
 
+type ChatPayload = {
+  id: string;
+  message: string;
+  timestamp: Date;
+  fromId: string;
+  toId: string;
+  chatRoomId: string;
+};
+
 export type ServerToClientEvents = {
   hello: (name: string) => void;
-  addMessage: (post: Chat) => void;
+  addMessage: (post: ChatPayload) => void;
   whoIsTyping: (data: string) => void;
   deleteChat: (data: string) => void;
 };
@@ -22,7 +31,7 @@ interface InterServerEvents {
 
 export type SocketData<AuthRequired = false> = {
   session: AuthRequired extends true ? UserSession : UserSession | null;
-  roomChat: Map<bigint, RoomChat>;
+  chatRoom: Map<bigint, ChatRoom>;
 };
 
 export type SocketServer = Server<
@@ -50,7 +59,7 @@ export function setupSocket(io: SocketServer) {
   });
 
   io.use((socket, next) => {
-    socket.data.roomChat = new Map<bigint, RoomChat>();
+    socket.data.chatRoom = new Map<bigint, ChatRoom>();
     next();
   });
 

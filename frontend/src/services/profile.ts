@@ -27,7 +27,7 @@ export const getProfile = async (userId: string) => {
     .then((r) => r.data)
     .catch((err) => {
       if (err.status === 404) {
-        throw new Error("Profile not found");
+        throw new AxiosError("Profile not found");
       }
       throw err;
     })) as ProfileResponse;

@@ -4,6 +4,8 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import ProfilePage from "@/components/profile/profile";
 import { useUser } from "@/context/auth-context";
 import SelfProfilePage from "@/components/profile/self-profile";
+import NotFound from "@/components/not-found/not-found";
+import Loading from "@/components/loading/loading";
 
 const profileQueryOptions = (userId: string) =>
   queryOptions({
@@ -13,7 +15,7 @@ const profileQueryOptions = (userId: string) =>
 
 export const Route = createFileRoute("/profile/$userId")({
   component: RouteComponent,
-  errorComponent: ErrorComponent,
+  errorComponent: NotFound,
   loader: ({ context: { queryClient }, params: { userId } }) => {
     return queryClient.ensureQueryData(profileQueryOptions(userId));
   },
@@ -22,10 +24,18 @@ export const Route = createFileRoute("/profile/$userId")({
 function RouteComponent() {
   const userId = Route.useParams().userId;
   const { user, loading } = useUser();
-  const { data: profile } = useQuery(profileQueryOptions(userId));
-  if (!profile) {
-    return <div>Unexpected error occured</div>;
+  const { data: profile, isLoading: profileLoading } = useQuery(
+    profileQueryOptions(userId)
+  );
+
+  if (loading || profileLoading) {
+    return <Loading />;
   }
+
+  if (!profile) {
+    return <NotFound />;
+  }
+
   if (!user || user.id !== userId) {
     return ProfilePage(profile);
   } else {

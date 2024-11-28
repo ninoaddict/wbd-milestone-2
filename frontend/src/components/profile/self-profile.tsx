@@ -55,7 +55,7 @@ export default function SelfProfilePage(profile: Profile) {
   );
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   const mutation = useMutation({

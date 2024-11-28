@@ -128,7 +128,7 @@ class ConnectionRepository {
           },
         });
 
-        await tx.roomChat.create({
+        await tx.chatRoom.create({
           data: {
             firstUserId: fromId,
             secondUserId: toId,
@@ -162,7 +162,7 @@ class ConnectionRepository {
           },
         });
 
-        await tx.roomChat.deleteMany({
+        await tx.chatRoom.deleteMany({
           where: {
             OR: [
               { firstUserId: fromId, secondUserId: toId },

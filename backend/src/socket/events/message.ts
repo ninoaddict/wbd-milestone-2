@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createEvent } from "../helper";
-import { RoomChat } from "@prisma/client";
+import { ChatRoom } from "@prisma/client";
 
 export const messageEvent = createEvent(
   {
@@ -25,11 +25,11 @@ export const messageEvent = createEvent(
     authRequired: true,
   },
   async ({ ctx, input }) => {
-    let roomChat: RoomChat;
+    let chatRoom: ChatRoom;
 
-    const roomChatFromSession = ctx.client.data.roomChat.get(input.receiverId);
-    if (!roomChatFromSession) {
-      const roomFromDb = await ctx.prisma.roomChat.findFirst({
+    const chatRoomFromSession = ctx.client.data.chatRoom.get(input.receiverId);
+    if (!chatRoomFromSession) {
+      const roomFromDb = await ctx.prisma.chatRoom.findFirst({
         where: {
           OR: [
             {
@@ -45,9 +45,9 @@ export const messageEvent = createEvent(
       });
 
       if (!roomFromDb) throw new Error("Room chat not found");
-      roomChat = roomFromDb;
+      chatRoom = roomFromDb;
     } else {
-      roomChat = roomChatFromSession;
+      chatRoom = chatRoomFromSession;
     }
 
     const message = await ctx.prisma.chat.create({
@@ -55,12 +55,19 @@ export const messageEvent = createEvent(
         fromId: ctx.client.data.session.id,
         toId: input.receiverId,
         message: input.message,
-        roomChatId: roomChat.id,
+        chatRoomId: chatRoom.id,
       },
     });
     ctx.io
       .to([message.fromId.toString(), message.toId.toString()])
-      .emit("addMessage", message);
+      .emit("addMessage", {
+        id: message.id.toString(),
+        message: message.message,
+        timestamp: message.timestamp,
+        fromId: message.fromId.toString(),
+        toId: message.toId.toString(),
+        chatRoomId: message.chatRoomId.toString(),
+      });
     return message;
   }
 );

@@ -31,8 +31,8 @@ model User {
   connectionRequestsReceived ConnectionRequest[] @relation("ConnectionRequestToUser")
   connectionsSent            Connection[]        @relation("ConnectionFromUser")
   connectionsReceived        Connection[]        @relation("ConnectionToUser")
-  firstUserRoom              RoomChat[]          @relation("firstUserRoom")
-  secondUserRoom             RoomChat[]          @relation("secondUserRoom")
+  firstUserRoom              ChatRoom[]          @relation("firstUserRoom")
+  secondUserRoom             ChatRoom[]          @relation("secondUserRoom")
   pushSubscriptions          PushSubscription[]
 
   @@map("users")
@@ -57,14 +57,14 @@ model Chat {
   message    String    @db.Text
   from       User      @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
   to         User      @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
-  roomChatId BigInt
-  roomChat   RoomChat @relation(fields: [roomChatId], references: [id], onDelete: Cascade)
+  chatRoomId BigInt
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
 
   @@index([timestamp], type: BTree)
   @@map("chat")
 }
 
-model RoomChat {
+model ChatRoom {
   id           BigInt @id @default(autoincrement())
   firstUserId  BigInt
   secondUserId BigInt
