@@ -23,3 +23,10 @@ export interface Profile {
   connection_status: string;
   relevant_post: Feed[] | null | undefined;
 }
+
+export interface LimitedUser {
+  id: string;
+  name: string;
+  username: string;
+  profile_photo_path: string;
+}

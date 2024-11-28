@@ -28,18 +28,18 @@ export type ClientToServerEvents = {
   message: (
     input: {
       message: string;
-      receiverId: bigint;
+      receiverId: string;
     },
     callback?:
       | ((
           data: SocketResponse<
             {
               message: string;
-              id: bigint;
+              id: string;
               timestamp: Date;
-              fromId: bigint;
-              toId: bigint;
-              chatRoomId: bigint;
+              fromId: string;
+              toId: string;
+              chatRoomId: string;
             },
             unknown
           >

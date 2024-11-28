@@ -1,27 +1,27 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { RegisterForm } from "@/components/auth/register-form";
-import { useUser } from "@/context/auth-context";
-import { useEffect } from "react";
+import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { RegisterForm } from '@/components/auth/register-form'
+import { useUser } from '@/context/auth-context'
+import { useEffect } from 'react'
 
-export const Route = createFileRoute("/(auth)/register")({
+export const Route = createFileRoute('/_navbar-layout/(auth)/register')({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
-  const router = useRouter();
-  const { user, loading } = useUser();
+  const router = useRouter()
+  const { user, loading } = useUser()
 
   useEffect(() => {
     if (user && !loading) {
       router.navigate({
-        to: "/",
+        to: '/',
         replace: true,
-      });
+      })
     }
-  }, [user, router, loading]);
+  }, [user, router, loading])
 
   if (loading) {
-    return <div>...Loading</div>;
+    return <div>...Loading</div>
   }
 
   return (
@@ -43,5 +43,5 @@ function RouteComponent() {
         </Link>
       </div>
     </div>
-  );
+  )
 }

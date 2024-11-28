@@ -18,7 +18,7 @@ import { EditSkills } from "./edit-skillls-modal";
 import EditProfilePicture from "./edit-picture-modal";
 import { STORAGE_URL } from "@/lib/const";
 
-export default function SelfProfilePage(profile: Profile) {
+export default function SelfProfilePage({ profile }: { profile: Profile }) {
   let initExp: experienceType[] = [];
   let initSkills: string[] = [];
 
@@ -53,10 +53,6 @@ export default function SelfProfilePage(profile: Profile) {
   const [profilePhoto, setProfilePhoto] = useState(
     profile.profile_photo ? `${STORAGE_URL}/${profile.profile_photo}` : ""
   );
-
-  if (loading) {
-    return <div></div>;
-  }
 
   const mutation = useMutation({
     mutationFn: (payload: UpdateProfilePayload) => {
@@ -252,6 +248,10 @@ export default function SelfProfilePage(profile: Profile) {
     },
     [mutation, user, skills, experience]
   );
+
+  if (loading) {
+    return <div></div>;
+  }
 
   return (
     <div className="min-h-screen bg-[#f4f2ee] pt-[92px] pb-[48px]">

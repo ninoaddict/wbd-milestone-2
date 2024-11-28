@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect } from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import NotFound from "@/components/not-found/not-found";
 import { useUser } from "@/context/auth-context";
@@ -6,6 +6,7 @@ import Loading from "@/components/loading/loading";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getChatRoomData } from "@/services/chat";
 import ChatPage from "@/components/chat/chat";
+import { socket } from "@/services/socket";
 
 const chatRoomQueryOptions = (roomId: string) =>
   queryOptions({
@@ -26,31 +27,33 @@ function RouteComponent() {
   const router = useRouter();
   const { user, loading } = useUser();
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (!user) {
-    router.navigate({
-      to: "/login",
-      replace: true,
-    });
-    return <></>;
-  }
-
+  // Always call hooks unconditionally
   const { data: chatRoom, isLoading: chatRoomLoading } = useQuery(
     chatRoomQueryOptions(chatRoomId)
   );
 
-  if (chatRoomLoading) {
+  useEffect(() => {
+    if (!user && !loading) {
+      router.navigate({
+        to: "/login",
+        replace: true,
+      });
+    }
+  }, [user, loading, router]);
+
+  // Conditional logic inside the render
+  if (loading || chatRoomLoading) {
     return <Loading />;
   }
 
-  if (!chatRoom) {
-    return <NotFound />;
+  if (!user) {
+    return null; // Prevent rendering while navigating
   }
 
-  if (user.id !== chatRoom.firstUserId && user.id !== chatRoom.secondUserId) {
+  if (
+    !chatRoom ||
+    (user.id !== chatRoom.firstUserId && user.id !== chatRoom.secondUserId)
+  ) {
     return <NotFound />;
   }
 

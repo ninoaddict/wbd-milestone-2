@@ -13,15 +13,16 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as JobImport } from './routes/job'
 import { Route as AboutImport } from './routes/about'
-import { Route as IndexImport } from './routes/index'
+import { Route as NavbarLayoutImport } from './routes/_navbar-layout'
 import { Route as ChatIndexImport } from './routes/chat/index'
-import { Route as ProfileUserIdImport } from './routes/profile/$userId'
+import { Route as NavbarLayoutIndexImport } from './routes/_navbar-layout/index'
 import { Route as ChatRoomIdImport } from './routes/chat/$roomId'
-import { Route as authRegisterImport } from './routes/(auth)/register'
-import { Route as authLoginImport } from './routes/(auth)/login'
-import { Route as connectionUserListUserIdImport } from './routes/(connection)/userList/$userId'
-import { Route as connectionConReqUserIdImport } from './routes/(connection)/conReq/$userId'
-import { Route as connectionConListUserIdImport } from './routes/(connection)/conList/$userId'
+import { Route as NavbarLayoutProfileUserIdImport } from './routes/_navbar-layout/profile/$userId'
+import { Route as NavbarLayoutauthRegisterImport } from './routes/_navbar-layout/(auth)/register'
+import { Route as NavbarLayoutauthLoginImport } from './routes/_navbar-layout/(auth)/login'
+import { Route as NavbarLayoutconnectionUserListUserIdImport } from './routes/_navbar-layout/(connection)/userList/$userId'
+import { Route as NavbarLayoutconnectionConReqUserIdImport } from './routes/_navbar-layout/(connection)/conReq/$userId'
+import { Route as NavbarLayoutconnectionConListUserIdImport } from './routes/_navbar-layout/(connection)/conList/$userId'
 
 // Create/Update Routes
 
@@ -37,9 +38,8 @@ const AboutRoute = AboutImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
+const NavbarLayoutRoute = NavbarLayoutImport.update({
+  id: '/_navbar-layout',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -49,10 +49,10 @@ const ChatIndexRoute = ChatIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProfileUserIdRoute = ProfileUserIdImport.update({
-  id: '/profile/$userId',
-  path: '/profile/$userId',
-  getParentRoute: () => rootRoute,
+const NavbarLayoutIndexRoute = NavbarLayoutIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NavbarLayoutRoute,
 } as any)
 
 const ChatRoomIdRoute = ChatRoomIdImport.update({
@@ -61,45 +61,54 @@ const ChatRoomIdRoute = ChatRoomIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const authRegisterRoute = authRegisterImport.update({
+const NavbarLayoutProfileUserIdRoute = NavbarLayoutProfileUserIdImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
+  getParentRoute: () => NavbarLayoutRoute,
+} as any)
+
+const NavbarLayoutauthRegisterRoute = NavbarLayoutauthRegisterImport.update({
   id: '/(auth)/register',
   path: '/register',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => NavbarLayoutRoute,
 } as any)
 
-const authLoginRoute = authLoginImport.update({
+const NavbarLayoutauthLoginRoute = NavbarLayoutauthLoginImport.update({
   id: '/(auth)/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => NavbarLayoutRoute,
 } as any)
 
-const connectionUserListUserIdRoute = connectionUserListUserIdImport.update({
-  id: '/(connection)/userList/$userId',
-  path: '/userList/$userId',
-  getParentRoute: () => rootRoute,
-} as any)
+const NavbarLayoutconnectionUserListUserIdRoute =
+  NavbarLayoutconnectionUserListUserIdImport.update({
+    id: '/(connection)/userList/$userId',
+    path: '/userList/$userId',
+    getParentRoute: () => NavbarLayoutRoute,
+  } as any)
 
-const connectionConReqUserIdRoute = connectionConReqUserIdImport.update({
-  id: '/(connection)/conReq/$userId',
-  path: '/conReq/$userId',
-  getParentRoute: () => rootRoute,
-} as any)
+const NavbarLayoutconnectionConReqUserIdRoute =
+  NavbarLayoutconnectionConReqUserIdImport.update({
+    id: '/(connection)/conReq/$userId',
+    path: '/conReq/$userId',
+    getParentRoute: () => NavbarLayoutRoute,
+  } as any)
 
-const connectionConListUserIdRoute = connectionConListUserIdImport.update({
-  id: '/(connection)/conList/$userId',
-  path: '/conList/$userId',
-  getParentRoute: () => rootRoute,
-} as any)
+const NavbarLayoutconnectionConListUserIdRoute =
+  NavbarLayoutconnectionConListUserIdImport.update({
+    id: '/(connection)/conList/$userId',
+    path: '/conList/$userId',
+    getParentRoute: () => NavbarLayoutRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
+    '/_navbar-layout': {
+      id: '/_navbar-layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof NavbarLayoutImport
       parentRoute: typeof rootRoute
     }
     '/about': {
@@ -116,20 +125,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobImport
       parentRoute: typeof rootRoute
     }
-    '/(auth)/login': {
-      id: '/(auth)/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof authLoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/(auth)/register': {
-      id: '/(auth)/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof authRegisterImport
-      parentRoute: typeof rootRoute
-    }
     '/chat/$roomId': {
       id: '/chat/$roomId'
       path: '/chat/$roomId'
@@ -137,12 +132,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatRoomIdImport
       parentRoute: typeof rootRoute
     }
-    '/profile/$userId': {
-      id: '/profile/$userId'
-      path: '/profile/$userId'
-      fullPath: '/profile/$userId'
-      preLoaderRoute: typeof ProfileUserIdImport
-      parentRoute: typeof rootRoute
+    '/_navbar-layout/': {
+      id: '/_navbar-layout/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof NavbarLayoutIndexImport
+      parentRoute: typeof NavbarLayoutImport
     }
     '/chat/': {
       id: '/chat/'
@@ -151,144 +146,184 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatIndexImport
       parentRoute: typeof rootRoute
     }
-    '/(connection)/conList/$userId': {
-      id: '/(connection)/conList/$userId'
+    '/_navbar-layout/(auth)/login': {
+      id: '/_navbar-layout/(auth)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof NavbarLayoutauthLoginImport
+      parentRoute: typeof NavbarLayoutImport
+    }
+    '/_navbar-layout/(auth)/register': {
+      id: '/_navbar-layout/(auth)/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof NavbarLayoutauthRegisterImport
+      parentRoute: typeof NavbarLayoutImport
+    }
+    '/_navbar-layout/profile/$userId': {
+      id: '/_navbar-layout/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof NavbarLayoutProfileUserIdImport
+      parentRoute: typeof NavbarLayoutImport
+    }
+    '/_navbar-layout/(connection)/conList/$userId': {
+      id: '/_navbar-layout/(connection)/conList/$userId'
       path: '/conList/$userId'
       fullPath: '/conList/$userId'
-      preLoaderRoute: typeof connectionConListUserIdImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof NavbarLayoutconnectionConListUserIdImport
+      parentRoute: typeof NavbarLayoutImport
     }
-    '/(connection)/conReq/$userId': {
-      id: '/(connection)/conReq/$userId'
+    '/_navbar-layout/(connection)/conReq/$userId': {
+      id: '/_navbar-layout/(connection)/conReq/$userId'
       path: '/conReq/$userId'
       fullPath: '/conReq/$userId'
-      preLoaderRoute: typeof connectionConReqUserIdImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof NavbarLayoutconnectionConReqUserIdImport
+      parentRoute: typeof NavbarLayoutImport
     }
-    '/(connection)/userList/$userId': {
-      id: '/(connection)/userList/$userId'
+    '/_navbar-layout/(connection)/userList/$userId': {
+      id: '/_navbar-layout/(connection)/userList/$userId'
       path: '/userList/$userId'
       fullPath: '/userList/$userId'
-      preLoaderRoute: typeof connectionUserListUserIdImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof NavbarLayoutconnectionUserListUserIdImport
+      parentRoute: typeof NavbarLayoutImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface NavbarLayoutRouteChildren {
+  NavbarLayoutIndexRoute: typeof NavbarLayoutIndexRoute
+  NavbarLayoutauthLoginRoute: typeof NavbarLayoutauthLoginRoute
+  NavbarLayoutauthRegisterRoute: typeof NavbarLayoutauthRegisterRoute
+  NavbarLayoutProfileUserIdRoute: typeof NavbarLayoutProfileUserIdRoute
+  NavbarLayoutconnectionConListUserIdRoute: typeof NavbarLayoutconnectionConListUserIdRoute
+  NavbarLayoutconnectionConReqUserIdRoute: typeof NavbarLayoutconnectionConReqUserIdRoute
+  NavbarLayoutconnectionUserListUserIdRoute: typeof NavbarLayoutconnectionUserListUserIdRoute
+}
+
+const NavbarLayoutRouteChildren: NavbarLayoutRouteChildren = {
+  NavbarLayoutIndexRoute: NavbarLayoutIndexRoute,
+  NavbarLayoutauthLoginRoute: NavbarLayoutauthLoginRoute,
+  NavbarLayoutauthRegisterRoute: NavbarLayoutauthRegisterRoute,
+  NavbarLayoutProfileUserIdRoute: NavbarLayoutProfileUserIdRoute,
+  NavbarLayoutconnectionConListUserIdRoute:
+    NavbarLayoutconnectionConListUserIdRoute,
+  NavbarLayoutconnectionConReqUserIdRoute:
+    NavbarLayoutconnectionConReqUserIdRoute,
+  NavbarLayoutconnectionUserListUserIdRoute:
+    NavbarLayoutconnectionUserListUserIdRoute,
+}
+
+const NavbarLayoutRouteWithChildren = NavbarLayoutRoute._addFileChildren(
+  NavbarLayoutRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '': typeof NavbarLayoutRouteWithChildren
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
-  '/login': typeof authLoginRoute
-  '/register': typeof authRegisterRoute
   '/chat/$roomId': typeof ChatRoomIdRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
+  '/': typeof NavbarLayoutIndexRoute
   '/chat': typeof ChatIndexRoute
-  '/conList/$userId': typeof connectionConListUserIdRoute
-  '/conReq/$userId': typeof connectionConReqUserIdRoute
-  '/userList/$userId': typeof connectionUserListUserIdRoute
+  '/login': typeof NavbarLayoutauthLoginRoute
+  '/register': typeof NavbarLayoutauthRegisterRoute
+  '/profile/$userId': typeof NavbarLayoutProfileUserIdRoute
+  '/conList/$userId': typeof NavbarLayoutconnectionConListUserIdRoute
+  '/conReq/$userId': typeof NavbarLayoutconnectionConReqUserIdRoute
+  '/userList/$userId': typeof NavbarLayoutconnectionUserListUserIdRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
-  '/login': typeof authLoginRoute
-  '/register': typeof authRegisterRoute
   '/chat/$roomId': typeof ChatRoomIdRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
+  '/': typeof NavbarLayoutIndexRoute
   '/chat': typeof ChatIndexRoute
-  '/conList/$userId': typeof connectionConListUserIdRoute
-  '/conReq/$userId': typeof connectionConReqUserIdRoute
-  '/userList/$userId': typeof connectionUserListUserIdRoute
+  '/login': typeof NavbarLayoutauthLoginRoute
+  '/register': typeof NavbarLayoutauthRegisterRoute
+  '/profile/$userId': typeof NavbarLayoutProfileUserIdRoute
+  '/conList/$userId': typeof NavbarLayoutconnectionConListUserIdRoute
+  '/conReq/$userId': typeof NavbarLayoutconnectionConReqUserIdRoute
+  '/userList/$userId': typeof NavbarLayoutconnectionUserListUserIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
+  '/_navbar-layout': typeof NavbarLayoutRouteWithChildren
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
-  '/(auth)/login': typeof authLoginRoute
-  '/(auth)/register': typeof authRegisterRoute
   '/chat/$roomId': typeof ChatRoomIdRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
+  '/_navbar-layout/': typeof NavbarLayoutIndexRoute
   '/chat/': typeof ChatIndexRoute
-  '/(connection)/conList/$userId': typeof connectionConListUserIdRoute
-  '/(connection)/conReq/$userId': typeof connectionConReqUserIdRoute
-  '/(connection)/userList/$userId': typeof connectionUserListUserIdRoute
+  '/_navbar-layout/(auth)/login': typeof NavbarLayoutauthLoginRoute
+  '/_navbar-layout/(auth)/register': typeof NavbarLayoutauthRegisterRoute
+  '/_navbar-layout/profile/$userId': typeof NavbarLayoutProfileUserIdRoute
+  '/_navbar-layout/(connection)/conList/$userId': typeof NavbarLayoutconnectionConListUserIdRoute
+  '/_navbar-layout/(connection)/conReq/$userId': typeof NavbarLayoutconnectionConReqUserIdRoute
+  '/_navbar-layout/(connection)/userList/$userId': typeof NavbarLayoutconnectionUserListUserIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
+    | ''
     | '/about'
     | '/job'
+    | '/chat/$roomId'
+    | '/'
+    | '/chat'
     | '/login'
     | '/register'
-    | '/chat/$roomId'
     | '/profile/$userId'
-    | '/chat'
     | '/conList/$userId'
     | '/conReq/$userId'
     | '/userList/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/about'
     | '/job'
+    | '/chat/$roomId'
+    | '/'
+    | '/chat'
     | '/login'
     | '/register'
-    | '/chat/$roomId'
     | '/profile/$userId'
-    | '/chat'
     | '/conList/$userId'
     | '/conReq/$userId'
     | '/userList/$userId'
   id:
     | '__root__'
-    | '/'
+    | '/_navbar-layout'
     | '/about'
     | '/job'
-    | '/(auth)/login'
-    | '/(auth)/register'
     | '/chat/$roomId'
-    | '/profile/$userId'
+    | '/_navbar-layout/'
     | '/chat/'
-    | '/(connection)/conList/$userId'
-    | '/(connection)/conReq/$userId'
-    | '/(connection)/userList/$userId'
+    | '/_navbar-layout/(auth)/login'
+    | '/_navbar-layout/(auth)/register'
+    | '/_navbar-layout/profile/$userId'
+    | '/_navbar-layout/(connection)/conList/$userId'
+    | '/_navbar-layout/(connection)/conReq/$userId'
+    | '/_navbar-layout/(connection)/userList/$userId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  NavbarLayoutRoute: typeof NavbarLayoutRouteWithChildren
   AboutRoute: typeof AboutRoute
   JobRoute: typeof JobRoute
-  authLoginRoute: typeof authLoginRoute
-  authRegisterRoute: typeof authRegisterRoute
   ChatRoomIdRoute: typeof ChatRoomIdRoute
-  ProfileUserIdRoute: typeof ProfileUserIdRoute
   ChatIndexRoute: typeof ChatIndexRoute
-  connectionConListUserIdRoute: typeof connectionConListUserIdRoute
-  connectionConReqUserIdRoute: typeof connectionConReqUserIdRoute
-  connectionUserListUserIdRoute: typeof connectionUserListUserIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  NavbarLayoutRoute: NavbarLayoutRouteWithChildren,
   AboutRoute: AboutRoute,
   JobRoute: JobRoute,
-  authLoginRoute: authLoginRoute,
-  authRegisterRoute: authRegisterRoute,
   ChatRoomIdRoute: ChatRoomIdRoute,
-  ProfileUserIdRoute: ProfileUserIdRoute,
   ChatIndexRoute: ChatIndexRoute,
-  connectionConListUserIdRoute: connectionConListUserIdRoute,
-  connectionConReqUserIdRoute: connectionConReqUserIdRoute,
-  connectionUserListUserIdRoute: connectionUserListUserIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -301,21 +336,24 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
+        "/_navbar-layout",
         "/about",
         "/job",
-        "/(auth)/login",
-        "/(auth)/register",
         "/chat/$roomId",
-        "/profile/$userId",
-        "/chat/",
-        "/(connection)/conList/$userId",
-        "/(connection)/conReq/$userId",
-        "/(connection)/userList/$userId"
+        "/chat/"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_navbar-layout": {
+      "filePath": "_navbar-layout.tsx",
+      "children": [
+        "/_navbar-layout/",
+        "/_navbar-layout/(auth)/login",
+        "/_navbar-layout/(auth)/register",
+        "/_navbar-layout/profile/$userId",
+        "/_navbar-layout/(connection)/conList/$userId",
+        "/_navbar-layout/(connection)/conReq/$userId",
+        "/_navbar-layout/(connection)/userList/$userId"
+      ]
     },
     "/about": {
       "filePath": "about.tsx"
@@ -323,29 +361,39 @@ export const routeTree = rootRoute
     "/job": {
       "filePath": "job.tsx"
     },
-    "/(auth)/login": {
-      "filePath": "(auth)/login.tsx"
-    },
-    "/(auth)/register": {
-      "filePath": "(auth)/register.tsx"
-    },
     "/chat/$roomId": {
       "filePath": "chat/$roomId.tsx"
     },
-    "/profile/$userId": {
-      "filePath": "profile/$userId.tsx"
+    "/_navbar-layout/": {
+      "filePath": "_navbar-layout/index.tsx",
+      "parent": "/_navbar-layout"
     },
     "/chat/": {
       "filePath": "chat/index.tsx"
     },
-    "/(connection)/conList/$userId": {
-      "filePath": "(connection)/conList/$userId.tsx"
+    "/_navbar-layout/(auth)/login": {
+      "filePath": "_navbar-layout/(auth)/login.tsx",
+      "parent": "/_navbar-layout"
     },
-    "/(connection)/conReq/$userId": {
-      "filePath": "(connection)/conReq/$userId.tsx"
+    "/_navbar-layout/(auth)/register": {
+      "filePath": "_navbar-layout/(auth)/register.tsx",
+      "parent": "/_navbar-layout"
     },
-    "/(connection)/userList/$userId": {
-      "filePath": "(connection)/userList/$userId.tsx"
+    "/_navbar-layout/profile/$userId": {
+      "filePath": "_navbar-layout/profile/$userId.tsx",
+      "parent": "/_navbar-layout"
+    },
+    "/_navbar-layout/(connection)/conList/$userId": {
+      "filePath": "_navbar-layout/(connection)/conList/$userId.tsx",
+      "parent": "/_navbar-layout"
+    },
+    "/_navbar-layout/(connection)/conReq/$userId": {
+      "filePath": "_navbar-layout/(connection)/conReq/$userId.tsx",
+      "parent": "/_navbar-layout"
+    },
+    "/_navbar-layout/(connection)/userList/$userId": {
+      "filePath": "_navbar-layout/(connection)/userList/$userId.tsx",
+      "parent": "/_navbar-layout"
     }
   }
 }

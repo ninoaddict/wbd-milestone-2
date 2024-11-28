@@ -3,7 +3,7 @@ import { createFileRoute, ErrorComponent } from '@tanstack/react-router'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
 import { getUserList } from '@/services/userList'
 import { sendConnectionReq } from '@/services/connection'
-import { useUser } from "@/context/auth-context";
+import { useUser } from '@/context/auth-context'
 import { send } from 'process'
 
 const userListQueryOptions = (userId: string) =>
@@ -12,7 +12,9 @@ const userListQueryOptions = (userId: string) =>
     queryFn: () => getUserList(userId),
   })
 
-export const Route = createFileRoute('/(connection)/userList/$userId')({
+export const Route = createFileRoute(
+  '/_navbar-layout/(connection)/userList/$userId',
+)({
   component: ConnectionUserListComponent,
   errorComponent: ErrorComponent,
   loader: ({ context: { queryClient }, params: { userId } }) => {
@@ -21,24 +23,24 @@ export const Route = createFileRoute('/(connection)/userList/$userId')({
 })
 
 function ConnectionUserListComponent() {
-  const userId = Route.useParams().userId;
-  const { data: userList } = useQuery(userListQueryOptions(userId));
-  
+  const userId = Route.useParams().userId
+  const { data: userList } = useQuery(userListQueryOptions(userId))
+
   console.log(userList)
-  
+
   const mutationSend = useMutation({
     mutationFn: (userId: bigint) => sendConnectionReq(userId),
     onSuccess: () => {
-      console.log('Connection request sent successfully!');
+      console.log('Connection request sent successfully!')
     },
     onError: (error) => {
-      console.error('Error sending connection request:', error);
-    }
-  });
+      console.error('Error sending connection request:', error)
+    },
+  })
 
-  const sendConnectionRequest = (userId : bigint) => {
-    console.log(userId);
-    mutationSend.mutate(userId);
+  const sendConnectionRequest = (userId: bigint) => {
+    console.log(userId)
+    mutationSend.mutate(userId)
   }
 
   return (
@@ -77,7 +79,10 @@ function ConnectionUserListComponent() {
                           </p>
                         </div>
                         <div className="flex items-center">
-                          <button onClick={() => sendConnectionRequest(item.id)} className="border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700">
+                          <button
+                            onClick={() => sendConnectionRequest(item.id)}
+                            className="border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700"
+                          >
                             Connect
                           </button>
                         </div>

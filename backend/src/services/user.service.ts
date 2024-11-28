@@ -64,6 +64,14 @@ class UserService {
     return user;
   };
 
+  findLimitedUserById = async (id: bigint) => {
+    const user = await this.userRepository.getLimitedUserById(id);
+    if (!user) {
+      throw new NotFound("User not found");
+    }
+    return user;
+  };
+
   findUserByEmail = async (email: string) => {
     const user = await this.userRepository.getUserByEmail(email);
     if (!user) {

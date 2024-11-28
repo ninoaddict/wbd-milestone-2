@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
 import { experienceType } from "@/domain/interfaces/profile.interface";
 
-export default function ProfilePage(profile: Profile) {
+export default function ProfilePage({ profile }: { profile: Profile }) {
   let experience: experienceType[] = [];
   let skills: string[] = [];
 

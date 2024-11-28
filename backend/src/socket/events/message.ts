@@ -58,16 +58,17 @@ export const messageEvent = createEvent(
         chatRoomId: chatRoom.id,
       },
     });
+    const messagePayload = {
+      id: message.id.toString(),
+      message: message.message,
+      timestamp: message.timestamp,
+      fromId: message.fromId.toString(),
+      toId: message.toId.toString(),
+      chatRoomId: message.chatRoomId.toString(),
+    };
     ctx.io
       .to([message.fromId.toString(), message.toId.toString()])
-      .emit("addMessage", {
-        id: message.id.toString(),
-        message: message.message,
-        timestamp: message.timestamp,
-        fromId: message.fromId.toString(),
-        toId: message.toId.toString(),
-        chatRoomId: message.chatRoomId.toString(),
-      });
-    return message;
+      .emit("addMessage", messagePayload);
+    return messagePayload;
   }
 );
