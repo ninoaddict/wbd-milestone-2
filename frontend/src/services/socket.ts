@@ -17,14 +17,14 @@ export type SocketResponse<Data = unknown, Error = unknown> =
   | { success: false; error?: Error }
   | { success: true; data?: Data };
 
-type ServerToClientEvents = {
+export type ServerToClientEvents = {
   hello: (name: string) => void;
   addMessage: (post: ChatPayload) => void;
   whoIsTyping: (data: string) => void;
   deleteChat: (data: string) => void;
 };
 
-type ClientToServerEvents = {
+export type ClientToServerEvents = {
   message: (
     input: {
       message: string;

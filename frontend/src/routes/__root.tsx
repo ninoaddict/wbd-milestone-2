@@ -9,6 +9,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { UserContextValue } from "@/context/auth-context";
 import { Navbar } from "@/components/ui/navbar";
+import NotFound from "@/components/not-found/not-found";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -16,12 +17,7 @@ export const Route = createRootRouteWithContext<{
 }>()({
   component: RootComponent,
   notFoundComponent: () => {
-    return (
-      <div>
-        <p>This is the notFoundComponent configured on root route</p>
-        <Link to="/">Start Over</Link>
-      </div>
-    );
+    return <NotFound />;
   },
 });
 
