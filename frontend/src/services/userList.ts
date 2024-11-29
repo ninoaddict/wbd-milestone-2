@@ -11,9 +11,9 @@ interface UserListQueriedResponse {
   message: string;
 }
 
-export const getUserList = async (userId: string) => {
+export const getUserList = async (query: string) => {
   const res = (await api
-    .get(`/users`)
+    .get(`/users?query=${query}`)
     .then((r) => r.data)
     .catch((err) => {
       if (err.status === 404) {
@@ -21,12 +21,13 @@ export const getUserList = async (userId: string) => {
       }
       throw err;
     })) as UserListResponse;
+  console.log(res);
   return res.body;
 };
 
 export const getConnectionsList = async (userId: string) => {
   const res = (await api
-    .get(`/connection/requests`)
+    .get(`/connection/${userId}`)
     .then((r) => r.data)
     .catch((err) => {
       if (err.status === 404) {
@@ -39,7 +40,7 @@ export const getConnectionsList = async (userId: string) => {
 
 export const getRequestsList = async (userId: string) => {
   const res = (await api
-    .get(`/connection/${userId}`)
+    .get(`/connection/requests`)
     .then((r) => r.data)
     .catch((err) => {
       if (err.status === 404) {

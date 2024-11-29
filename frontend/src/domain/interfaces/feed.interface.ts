@@ -4,4 +4,7 @@ export interface Feed {
   updatedAt: Date;
   content: string;
   userId: string;
+  name: string;
 }
+
+export type FeedList = Feed[];

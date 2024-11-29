@@ -59,7 +59,7 @@ class AuthController implements Controller {
 
   getUsers = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
-      body: await this.userService.findAllUsers(req.user?.id),
+      body: await this.userService.findAllUsers(req.query.query, req.user?.id),
       message: "Successfully fetch all users",
     };
   };

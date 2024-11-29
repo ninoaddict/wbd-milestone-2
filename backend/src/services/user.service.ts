@@ -21,7 +21,7 @@ class UserService {
     if (!userId) {
       return users;
     }
-    const finalUsers = users.map(async (user) => {
+    const finalUsers = await Promise.all(users.map(async (user) => {
       let status = "disconnected";
       if (user.id === userId) {
         status = "self";
@@ -36,7 +36,7 @@ class UserService {
         ...user,
         status,
       };
-    });
+    }));
     return finalUsers;
   };
 

@@ -77,14 +77,18 @@ export const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-1">
           <NavButton to="/" icon={<Home className="h-6 w-6" />} text="Home" />
+          {user ? <NavButton
+            to={`/userList/${user.id}`}
+            icon={<Users className="h-6 w-6" />}
+            text="My Network"
+          /> : 
+          <NavButton
+            to={`/userList/${0}`}
+            icon={<Users className="h-6 w-6" />}
+            text="My Network"/>}
           {user && (
             <>
               {" "}
-              <NavButton
-                to="/mynetwork"
-                icon={<Users className="h-6 w-6" />}
-                text="My Network"
-              />
               <NavButton
                 to="/messaging"
                 icon={<MessageSquare className="h-6 w-6" />}

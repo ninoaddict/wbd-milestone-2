@@ -3,6 +3,7 @@ import { createFileRoute, ErrorComponent } from '@tanstack/react-router'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
 import { getRequestsList } from '@/services/userList'
 import { acceptConnection, rejectConnection } from '@/services/connection'
+import { useUser } from '@/context/auth-context'
 
 const connectionListQueryOptions = (userId: string) =>
   queryOptions({
@@ -15,11 +16,12 @@ export const Route = createFileRoute('/(connection)/conReq/$userId')({
 })
 
 function ConReqComponent() {
+  const infoUser = useUser();
   const userId = Route.useParams().userId;
-  console.log(userId);
+  
   const { data: userList } = useQuery(connectionListQueryOptions(userId));
   console.log(userList);
-
+  
   const mutationAccept = useMutation({
     mutationFn: (userId: bigint) => acceptConnection(userId),
     onSuccess: () => {
@@ -49,15 +51,21 @@ function ConReqComponent() {
     console.log(userId);
     mutationReject.mutate(userId);
   }
+
   return (
     <div className='min-h-screen w-full bg-[#f4f2ee] flex flex-col'>
       <main className='flex justify-center items-center mt-[150px]'>
         <section id='connection-list' className='flex justify-center items-center'>
-          <div id='connection-container' className='bg-white rounded-t-md w-4/6'>
+          <div id='connection-container' className='bg-white rounded-t-md w-5/6'>
             <header className='border-solid border-gray-200 border p-[10px] rounded-t-md'>
-              <h2 className='text-xl'>Manage Requests</h2>
+              <h2 className='text-xl'>{userList?.length} Requests</h2>
             </header>
             <main>
+              {userList?.length == 0 &&
+                <div className='p-[10px] w-[300px]'>
+                  This user has no requests
+                </div>
+              }
               <ul>
               {userList &&
                   userList.map((item, index) => (
@@ -73,7 +81,7 @@ function ConReqComponent() {
                       </div>
                       <div className="flex flex-1 justify-between">
                         <div className="flex flex-col">
-                          <p className="text-[17px]">{item.user.name}</p>
+                          <p className="text-[17px] text-blue-600">{item.user.name}</p>
                           <p className="text-[14px] text-gray-500">
                             Worked at: {item.user.username}
                           </p>
