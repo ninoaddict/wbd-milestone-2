@@ -139,18 +139,9 @@ function ConnectionUserListComponent() {
   return (
     <div className="min-h-screen w-full bg-[#f4f2ee] flex flex-col">
       <main className="flex justify-center items-center mt-[120px] mb-[50px] flex-col">
-        <section id="to-other-pages" className='flex justify-center items-center'>
-          <div
-              id="connection-container"
-              className="bg-white rounded-md mb-[10px] w-6/6 h-6/6 py-[20px] px-[20px] border-solid border-gray-300 border"
-          >
-            <a href={`/conList/${userId}`} className='py-[7px] px-[14px] bg-[#00008b] rounded-md text-white mr-[5px] ml-[5px]'>My Connections</a>
-            <a href={`/conReq/${userId}`} className='py-[7px] px-[14px] bg-[#00008b] rounded-md text-white mr-[5px] ml-[5px]'>My Requests</a>
-          </div>
-        </section>
         <section id='search-bars' className='flex justify-center items-center mb-[10px]'>
-          <input onChange={changeQuery} type='text' placeholder='Search accounts here' className='py-[5px] px-[10px] w-[500px] rounded-md'></input>
-          {/* <button onClick={() => useQuery(userListQueryOptions(query))} className='py-[5px] px-[10px] bg-blue-950 ml-[10px] text-white rounded-md'>Search</button> */}
+          <input onChange={changeQuery} type='text' placeholder='Search accounts here' className='py-[5px] px-[10px] w-[500px] rounded-md border border-solid border-black'></input>
+          {userId !== "0" && <a href={`/conReq/${userId}`} className='py-[5px] px-[10px] bg-blue-950 ml-[10px] text-white rounded-md'>Manage Requests</a>}
         </section>
         <section
           id="connection-list"
@@ -158,13 +149,18 @@ function ConnectionUserListComponent() {
         >
           <div
             id="connection-container"
-            className="bg-white rounded-t-md w-4/6"
+            className="bg-white rounded-t-md w-5/6"
           >
             <header className="border-solid border-gray-200 border p-[10px] rounded-t-md">
               <h2 className="text-xl">User Lists</h2>
             </header>
             <main>
               <ul>
+                {userList?.length == 0 &&
+                  <div className='p-[10px] w-[300px]'>
+                    Users not found
+                  </div>
+                }
                 {userList &&
                   userList.map((item, index) => (
                     <li
