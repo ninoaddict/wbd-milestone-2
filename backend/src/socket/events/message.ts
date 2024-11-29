@@ -44,8 +44,11 @@ export const messageEvent = createEvent(
         },
       });
 
-      if (!roomFromDb) throw new Error("Room chat not found");
+      if (!roomFromDb) {
+        throw new Error("Room chat not found");
+      }
       chatRoom = roomFromDb;
+      ctx.client.data.chatRoom.set(input.receiverId, roomFromDb);
     } else {
       chatRoom = chatRoomFromSession;
     }
@@ -66,9 +69,7 @@ export const messageEvent = createEvent(
       toId: message.toId.toString(),
       chatRoomId: message.chatRoomId.toString(),
     };
-    ctx.io
-      .to([message.fromId.toString(), message.toId.toString()])
-      .emit("addMessage", messagePayload);
+    ctx.io.to(message.chatRoomId.toString()).emit("addMessage", messagePayload);
     return messagePayload;
   }
 );

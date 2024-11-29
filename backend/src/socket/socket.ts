@@ -5,8 +5,15 @@ import { getSession, ServerEventsResolver } from "./helper";
 import { UserSession } from "./type";
 import { messageEvent } from "./events/message";
 import { isTypingEvent } from "./events/typing";
+import { joinEvent } from "./events/join";
+import { leaveEvent } from "./events/leave";
 
-const serverEvents = [messageEvent, isTypingEvent] as const;
+const serverEvents = [
+  messageEvent,
+  isTypingEvent,
+  joinEvent,
+  leaveEvent,
+] as const;
 export type ClientToServerEvents = ServerEventsResolver<typeof serverEvents>;
 
 type ChatPayload = {
@@ -21,6 +28,8 @@ type ChatPayload = {
 export type ServerToClientEvents = {
   hello: (name: string) => void;
   addMessage: (post: ChatPayload) => void;
+  joinSuccess: (message: string) => void;
+  leaveSuccess: (message: string) => void;
   whoIsTyping: (data: string) => void;
   deleteChat: (data: string) => void;
 };
@@ -66,11 +75,11 @@ export function setupSocket(io: SocketServer) {
   io.on("connection", (socket) => {
     if (socket.data.session) {
       serverEvents.forEach((event) => event(io, socket));
-      const userId = socket.data.session.id;
-      void socket.join(userId.toString());
-      socket.on("disconnect", () => {
-        void socket.leave(userId.toString());
-      });
+      // const userId = socket.data.session.id;
+      // void socket.join(userId.toString());
+      // socket.on("disconnect", () => {
+      //   void socket.leave(userId.toString());
+      // });
     }
   });
 }

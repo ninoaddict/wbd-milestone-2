@@ -5,7 +5,10 @@ import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { RequestWithUser } from "../domain/dtos/auth.dto";
 import { BaseResponse } from "../interfaces/base-response";
 import { validateRequest } from "../middlewares/validate.middleware";
-import { getChatRoomSchema } from "../domain/schema/chat.schema";
+import {
+  getChatRoomSchema,
+  getMessagesSchema,
+} from "../domain/schema/chat.schema";
 import { handleRequest } from "../utils/handle-request";
 
 class ChatController implements Controller {
@@ -30,7 +33,26 @@ class ChatController implements Controller {
     };
   };
 
+  getMessages = async (req: RequestWithUser): Promise<BaseResponse> => {
+    return {
+      body: await this.chatService.getMessages(
+        Number(req.query.take),
+        BigInt(req.params.roomId),
+        req.user?.id!,
+        // @ts-ignore comments
+        req.query.cursor
+      ),
+      message: "Messages fetched successfully",
+    };
+  };
+
   private initRoutes() {
+    this.router.get(
+      `${this.path}/:roomId(\\d+)`,
+      [this.authMiddleware.checkUser, validateRequest(getMessagesSchema)],
+      handleRequest(this.getMessages)
+    );
+
     this.router.get(
       `${this.path}/room/:id(\\d+)`,
       [this.authMiddleware.checkUser, validateRequest(getChatRoomSchema)],

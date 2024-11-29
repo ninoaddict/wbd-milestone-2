@@ -4,26 +4,65 @@ import { ChatPayload } from "@/services/socket";
 
 interface MessagesProps {
   messages: ChatPayload[];
-  // hasNextPage?: boolean;
-  // isFetchingNextPage: boolean;
-  // fetchNextPage: () => void;
-  // isFinished?: boolean;
+  hasNextPage?: boolean;
+  isFetchingNextPage: boolean;
+  fetchNextPage: () => void;
   currId: string;
 }
 
 const Messages = ({
   messages,
   currId,
-  // hasNextPage,
-  // isFetchingNextPage,
-  // fetchNextPage,
-  // isFinished,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
 }: MessagesProps) => {
   const [lastMessageRef, setLastMessageRef] = useState<HTMLDivElement | null>(
     null
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const isScrollingUp = useRef(false);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    const container = containerRef.current;
+    function listener() {
+      if (container) {
+        if (
+          Math.abs(
+            container.scrollTop -
+              container.clientHeight +
+              container.scrollHeight
+          ) < 3
+        ) {
+          fetchNextPage();
+        }
+      }
+    }
+
+    container?.addEventListener("scroll", listener);
+    return () => container?.removeEventListener("scroll", listener);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    function listener() {
+      if (container) {
+        isScrollingUp.current = container.scrollTop < 0;
+      }
+    }
+    container?.addEventListener("scroll", listener);
+    return () => container?.removeEventListener("scroll", listener);
+  }, []);
+
+  useEffect(() => {
+    if (
+      lastMessageRef &&
+      (!isScrollingUp.current || messages[0]?.fromId === currId)
+    ) {
+      lastMessageRef.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [lastMessageRef, messages[0]?.fromId, currId]);
 
   return (
     <div
@@ -39,7 +78,7 @@ const Messages = ({
           })}
           content={msg.message}
           isSent={currId === msg.fromId}
-          // chatRef={index === 0 ? setLastMessageRef : null}
+          chatRef={index === 0 ? setLastMessageRef : null}
         />
       ))}
     </div>

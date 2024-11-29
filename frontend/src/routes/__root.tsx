@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Link,
   Outlet,
@@ -10,6 +9,9 @@ import type { QueryClient } from "@tanstack/react-query";
 import { UserContextValue } from "@/context/auth-context";
 import { Navbar } from "@/components/ui/navbar";
 import NotFound from "@/components/not-found/not-found";
+import { socket } from "@/services/socket";
+import { useUser } from "@/context/auth-context";
+import { useEffect } from "react";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -22,6 +24,19 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const { user, loading } = useUser();
+  useEffect(() => {
+    if (!loading && user?.id) {
+      socket.connect();
+    }
+    if (!loading && !user?.id) {
+      socket.disconnect();
+    }
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?.id, loading]);
+
   return (
     <>
       <Outlet />

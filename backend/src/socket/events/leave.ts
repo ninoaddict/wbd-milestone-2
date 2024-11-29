@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { createEvent } from "../helper";
 
-export const isTypingEvent = createEvent(
+export const leaveEvent = createEvent(
   {
-    name: "isTyping",
+    name: "leaveRoom",
     input: z.object({
       roomId: z
         .string()
@@ -22,8 +22,8 @@ export const isTypingEvent = createEvent(
     }),
     authRequired: true,
   },
-  ({ ctx, input }) => {
-    const user = ctx.client.data.session;
-    ctx.io.to(input.roomId.toString()).emit("whoIsTyping", user.id.toString());
+  async ({ ctx, input }) => {
+    ctx.client.leave(input.roomId.toString());
+    ctx.io.to(ctx.client.id).emit("leaveSuccess", "Leaving room successfully");
   }
 );

@@ -6,7 +6,6 @@ import Loading from "@/components/loading/loading";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getChatRoomData } from "@/services/chat";
 import ChatPage from "@/components/chat/chat";
-import { socket } from "@/services/socket";
 
 const chatRoomQueryOptions = (roomId: string) =>
   queryOptions({
@@ -63,5 +62,5 @@ function RouteComponent() {
       ? chatRoom.secondUserId
       : chatRoom.firstUserId;
 
-  return <ChatPage fromId={fromId} toId={toId} />;
+  return <ChatPage fromId={fromId} toId={toId} roomId={chatRoomId} />;
 }

@@ -20,6 +20,8 @@ export type SocketResponse<Data = unknown, Error = unknown> =
 export type ServerToClientEvents = {
   hello: (name: string) => void;
   addMessage: (post: ChatPayload) => void;
+  joinSuccess: (message: string) => void;
+  leaveSuccess: (message: string) => void;
   whoIsTyping: (data: string) => void;
   deleteChat: (data: string) => void;
 };
@@ -34,8 +36,8 @@ export type ClientToServerEvents = {
       | ((
           data: SocketResponse<
             {
-              message: string;
               id: string;
+              message: string;
               timestamp: Date;
               fromId: string;
               toId: string;
@@ -48,7 +50,19 @@ export type ClientToServerEvents = {
   ) => void;
   isTyping: (
     input: {
-      receiverId: string;
+      roomId: string;
+    },
+    callback?: ((data: SocketResponse<void, unknown>) => void) | undefined
+  ) => void;
+  joinRoom: (
+    input: {
+      roomId: string;
+    },
+    callback?: ((data: SocketResponse<void, unknown>) => void) | undefined
+  ) => void;
+  leaveRoom: (
+    input: {
+      roomId: string;
     },
     callback?: ((data: SocketResponse<void, unknown>) => void) | undefined
   ) => void;

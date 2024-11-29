@@ -8,32 +8,71 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MoreHorizontal, Phone, Video, ChevronLeftIcon } from "lucide-react";
 import { ChatBubble } from "./chat-bubble";
 import useSubscription from "@/hooks/useSubscription";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getProfile } from "@/services/profile";
 import { getLimitedUser } from "@/services/user";
 import ChatNavbar from "./chat-navbar";
-import { useRouter } from "@tanstack/react-router";
+import { useParams, useRouter } from "@tanstack/react-router";
 import { ChatFooter } from "./chat-footer";
 import Messages from "./messages";
+import { match } from "assert";
+import { api } from "@/lib/api";
+import { MessagesData, MessagesResponse } from "@/services/chat";
+import { STORAGE_URL } from "@/lib/const";
 
 export default function ChatPage({
   fromId,
   toId,
+  roomId,
 }: {
   fromId: string;
   toId: string;
+  roomId: string;
 }) {
   const [messages, setMessages] = useState<ChatPayload[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const router = useRouter();
 
+  const getMessages = async ({
+    pageParam,
+  }: {
+    pageParam: string | undefined;
+  }) => {
+    const res = (
+      await api.get(`/chat/${roomId}?${pageParam ? `cursor=${pageParam}` : ""}`)
+    ).data as MessagesResponse;
+
+    const parsedMessages = res.body.messages.map((message) => ({
+      ...message,
+      timestamp: new Date(message.timestamp),
+    }));
+
+    return {
+      messages: parsedMessages,
+      nextCursor: res.body.nextCursor,
+    } as MessagesData;
+  };
+
+  const joinEmit = useEmit("joinRoom");
+  const leaveEmit = useEmit("leaveRoom");
+
   useEffect(() => {
-    socket.connect();
+    joinEmit.mutate(
+      { roomId },
+      {
+        onError: (error) => console.error("Failed to join room:", error),
+      }
+    );
     return () => {
-      socket.disconnect();
+      leaveEmit.mutate(
+        { roomId },
+        {
+          onError: (error) => console.error("Failed to leave room:", error),
+        }
+      );
     };
-  }, []);
+  }, [roomId]);
 
   // get other user data
   const { data: profileData, refetch } = useQuery({
@@ -48,6 +87,17 @@ export default function ChatPage({
     }
   }, [profileData, refetch]);
 
+  const messageQuery = useInfiniteQuery({
+    queryKey: ["messages"],
+    queryFn: getMessages,
+    initialPageParam: "",
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { hasNextPage, isFetchingNextPage, fetchNextPage } = messageQuery;
+
   // add message function
   const addMessages = useCallback((incoming?: ChatPayload[]) => {
     setMessages((current) => {
@@ -59,6 +109,11 @@ export default function ChatPage({
       );
     });
   }, []);
+
+  useEffect(() => {
+    const msgs = messageQuery.data?.pages.map((page) => page.messages).flat();
+    addMessages(msgs);
+  }, [messageQuery.data?.pages, addMessages]);
 
   // sending message
   const messageEmit = useEmit("message");
@@ -84,14 +139,16 @@ export default function ChatPage({
   const isTypingEmit = useEmit("isTyping");
 
   // receiving isTyping
-  useSubscription("whoIsTyping", () => {
-    setIsTyping(true);
+  useSubscription("whoIsTyping", (data) => {
+    if (data !== fromId) {
+      setIsTyping(true);
+    }
     setTimeout(() => setIsTyping(false), 2000);
   });
 
   const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewMessage(e.target.value);
-    isTypingEmit.mutate({ receiverId: toId });
+    isTypingEmit.mutate({ roomId });
   };
 
   return (
@@ -113,7 +170,11 @@ export default function ChatPage({
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage
-                    src={profileData?.profile_photo_path}
+                    src={
+                      profileData?.profile_photo_path
+                        ? `${STORAGE_URL}/${profileData.profile_photo_path}`
+                        : ""
+                    }
                     alt="Sarah Wilson"
                   />
                   <AvatarFallback>
@@ -127,14 +188,22 @@ export default function ChatPage({
                   <p className="text-sm text-muted-foreground">
                     {isTyping
                       ? `${profileData?.name.split(" ").filter((_, id) => id === 0)} is typing...`
-                      : (profileData?.username ?? "")}
+                      : profileData?.username
+                        ? `@${profileData.username}`
+                        : ""}
                   </p>
                 </div>
               </div>
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <Messages currId={fromId} messages={messages} />
+            <Messages
+              currId={fromId}
+              messages={messages}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={fetchNextPage}
+            />
             <ChatFooter
               newMessage={newMessage}
               handleTyping={handleTyping}

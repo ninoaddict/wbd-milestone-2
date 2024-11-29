@@ -23,7 +23,9 @@ export function ChatBubble({
       ref={chatRef ?? null}
     >
       <div className={bubbleClasses}>
-        <div className="text-md break-words pb-[6px]">{content}</div>
+        <div className="text-md break-words pb-[6px] whitespace-pre-wrap">
+          {content}
+        </div>
         <div
           className={`text-xs text-opacity-75 ${
             isSent ? "text-right" : "text-left"

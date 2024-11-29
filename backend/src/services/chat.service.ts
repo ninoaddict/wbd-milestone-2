@@ -15,6 +15,18 @@ class ChatService {
     }
     return match;
   };
+
+  getMessages = async (
+    take: number,
+    roomId: bigint,
+    userId: bigint,
+    id?: bigint
+  ) => {
+    if (!(await this.chatRepository.isInChatRoom(userId, roomId))) {
+      throw new Unauthorized();
+    }
+    return await this.chatRepository.getMessages(take, roomId, id);
+  };
 }
 
 export default ChatService;
