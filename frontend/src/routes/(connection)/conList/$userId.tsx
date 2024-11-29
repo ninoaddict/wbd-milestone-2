@@ -74,7 +74,7 @@ function ConListComponent() {
                         </div>
                         <div className="flex items-center">
                         <a href='/message' className='border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700'>Message</a>
-                        <button onClick={() => deleteConnectionRequest(item.user.id)} className='border border-red-700 border-solid px-[10px] py-[4px] rounded-[15px] text-red-700 text-[14px] mx-[5px] hover:text-white hover:bg-red-700'>Unconnect</button>
+                        <button onClick={() => {deleteConnectionRequest(item.user.id); window.location.reload()}} className='border border-red-700 border-solid px-[10px] py-[4px] rounded-[15px] text-red-700 text-[14px] mx-[5px] hover:text-white hover:bg-red-700'>Unconnect</button>
                         </div>
                       </div>
                     </li>

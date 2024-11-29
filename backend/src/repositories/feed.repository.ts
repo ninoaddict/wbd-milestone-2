@@ -1,8 +1,9 @@
 import ApplicationError from "../errors/application.error";
 import prisma from "../database/prisma";
+// import { off } from "process";
 
 class FeedRepository {
-    getFeedRepository = async (userId: bigint) => {
+    getFeedRepository = async (userId: bigint, limit: bigint, offset: bigint) => {
         const friendFeed = await prisma.feed.findMany({
             where: { 
                 OR: [
@@ -35,7 +36,9 @@ class FeedRepository {
             },
             orderBy: {
                 createdAt: "desc"
-            }
+            },
+            skip: Number(offset),
+            take: Number(limit)
         });
         return friendFeed;
     }

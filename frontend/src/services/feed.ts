@@ -6,17 +6,30 @@ interface FeedListResponse {
   message: string;
 }
 
-export const getFeeds = async () => {
-  const res = (await api
-    .get(`/feed`)
-    .then((r) => r.data)
-    .catch((err) => {
-      if (err.status === 404) {
-        throw new Error("Failed to fetch the feeds");
-      }
-      throw err;
+export const getFeeds = async ({ pageParam }: {pageParam: number}) => {
+  if (pageParam === 0 || !pageParam) {
+    const res = (await api
+      .get(`/feed?limit=${10}`)
+      .then((r) => r.data)
+      .catch((err) => {
+        if (err.status === 404) {
+          throw new Error("Failed to fetch the feeds");
+        }
+        throw err;
+      })) as FeedListResponse;
+      return res.body;
+  } else {
+    const res = (await api
+      .get(`/feed?cursor=${pageParam}&limit=${10}`)
+      .then((r) => r.data)
+      .catch((err) => {
+        if (err.status === 404) {
+          throw new Error("Failed to fetch the feeds");
+        }
+        throw err;
     })) as FeedListResponse;
-  return res.body;
+    return res.body;
+  }
 };
 
 export const postFeeds = async (feed: string) => {

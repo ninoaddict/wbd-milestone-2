@@ -7,15 +7,17 @@ import { getFeeds, postFeeds, editFeeds, deleteFeeds } from "@/services/feed";
 import { Feed } from "../domain/interfaces/feed.interface"
 import { useMutation } from "@tanstack/react-query";
 import FeedEditor from "@/components/feed/edit-feed-modal";
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInView } from 'react-intersection-observer';
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
 });
 
-const feedQueryOptions = () =>
+const feedQueryOptions = (offset: number) =>
   queryOptions({
     queryKey: ["feed"],
-    queryFn: () => getFeeds(),
+    queryFn: () => getFeeds({pageParam: offset}),
   });
 
 function HomeComponent() {
@@ -25,10 +27,33 @@ function HomeComponent() {
   const [editFeedValue, setEditFeedValue] = React.useState("");
   const [editFeedId, setEditFeedId] = React.useState(BigInt(-1));
 
-  const { data: feeds } = useQuery(feedQueryOptions());
+  const { ref, inView } = useInView({
+    threshold: 0.8
+  });
 
   const ago: string[] = [];
   const updater: string[] = [];
+
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ['projects'],
+    queryFn: ({pageParam = 0}) => getFeeds({pageParam}),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPage) => {
+      return lastPage.length > 0 ? allPage.length * 10 : undefined;;
+    },
+  })
+
+  // console.log(data);
+  const flatData = data?.pages.flat()
+  // console.log(flatData)
 
   const openModal = (feed: string, feedId: bigint) => {
     setEditFeedValue(feed);
@@ -66,8 +91,8 @@ function HomeComponent() {
     }
   });
 
-  if (feeds) {
-    for (let feed of feeds) {
+  if (flatData) {
+    for (let feed of flatData) {
       const millisec = Math.floor((Date.now() - new Date(feed.createdAt).getTime()));
       if (millisec >= 1000*60 && millisec < 1000*60*60) {
         ago.push(`Created ${Math.floor(millisec/(1000*60))} minutes ago`);
@@ -87,8 +112,8 @@ function HomeComponent() {
     }
   }
 
-  if (feeds) {
-    for (let feed of feeds) {
+  if (flatData) {
+    for (let feed of flatData) {
       const millisec = Math.floor((Date.now() - new Date(feed.updatedAt).getTime()));
       if (millisec >= 1000*60 && millisec < 1000*60*60) {
         updater.push(`Last updated ${Math.floor(millisec/(1000*60))} minutes ago`);
@@ -141,7 +166,10 @@ function HomeComponent() {
   };
 
   const sendFeed = (feed: string) => {
-    mutationPost.mutate(feed);
+    if (feed.length > 0) {
+      mutationPost.mutate(feed);
+      window.location.reload();
+    }
   }
 
   const editFeed = (feedId: bigint, feed: string) => {
@@ -152,6 +180,14 @@ function HomeComponent() {
     mutationDelete.mutate(feedId);
   }
 
+  React.useEffect(() => {
+    if (inView && hasNextPage) {
+      console.log("BLA");
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage])
+
+  console.log(infoUser)
   // console.log(ago,feeds);
 
   return (
@@ -172,15 +208,24 @@ function HomeComponent() {
           <div className="bg-white border border-solid border-gray-300 w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px]">
             <main className="flex flex-row justify-space-between items-center w-full">
               <input type="text" onChange={value} id="feed-content" name="feed-content" placeholder="Write your feed here" maxLength={280} className="py-2 focus:outline-none focus:border-none grow mr-[10px]"></input>
-              <SendHorizonal className="hover:cursor-pointer hover:bg-gray-200" onClick={() => {sendFeed(feedValue); window.location.reload()}}/>
+              <SendHorizonal className="hover:cursor-pointer hover:bg-gray-200" onClick={() => {sendFeed(feedValue)}}/>
             </main>
           </div>
           <div>
-            {feeds && feeds.map((item, index) => (
+            {infoUser.user && flatData && flatData.map((item, index) => (
               <div key={index}>
                 {feedPage(item, ago[index], updater[index])}
               </div>
             ))}
+          </div>
+          <div className="flex justify-center items-center">
+            {infoUser.user && flatData && flatData.length > 0 && <button ref={ref} onClick={() => fetchNextPage()} disabled={!hasNextPage || isFetchingNextPage} className="text-gray-450 py-[5px] px-[5px]">
+            {isFetchingNextPage
+            ? 'Loading more...'
+            : hasNextPage
+              ? 'Load More'
+              : ''}
+            </button>}
           </div>
         </section>
         {/* <section id="connections" className="ml-[10px] mr-[10px]">

@@ -1,6 +1,7 @@
 // import Unauthorized from "../errors/unauthorized.error";
 import FeedRepository from "../repositories/feed.repository";
 import BadRequest from "../errors/bad-request.error";
+// import { off } from "process";
 
 class FeedService {
     private feedRepository: FeedRepository;
@@ -9,11 +10,11 @@ class FeedService {
         this.feedRepository = new FeedRepository();
     }
 
-    getFeeds = async (userId?: bigint) => {
+    getFeeds = async (limit: any, offset: any, userId?: bigint) => {
         if (!userId) {
             throw new BadRequest();
         }
-        const raw = await this.feedRepository.getFeedRepository(userId);
+        const raw = await this.feedRepository.getFeedRepository(userId, limit, offset);
         const myMapped = raw.map((f) => {
             const myDatum = {
                 id: f.id,

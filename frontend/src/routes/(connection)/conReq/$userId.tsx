@@ -87,8 +87,8 @@ function ConReqComponent() {
                           </p>
                         </div>
                         <div className="flex items-center">
-                          <button onClick={() => clickIgnore(item.user.id)} className='px-[10px] py-[4px] text-gray-700 text-[14px] mx-[5px] hover:bg-gray-100'>Ignore</button>
-                          <button onClick={() => clickAccept(item.user.id)} className='border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700'>Accept</button>
+                          <button onClick={() => {clickIgnore(item.user.id); window.location.reload()}} className='px-[10px] py-[4px] text-gray-700 text-[14px] mx-[5px] hover:bg-gray-100'>Ignore</button>
+                          <button onClick={() => {clickAccept(item.user.id); window.location.reload()}} className='border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700'>Accept</button>
                         </div>
                       </div>
                     </li>

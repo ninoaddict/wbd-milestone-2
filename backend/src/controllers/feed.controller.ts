@@ -22,10 +22,18 @@ class FeedController implements Controller {
     }
 
     getFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
-        return {
-            body: await this.feedService.getFeeds(req.user?.id),
-            message: "Feeds retrieved successfully"
-        };
+        // console.log(req.query.limit, req.query.cursor)
+        if (req.query.cursor) {
+            return {
+                body: await this.feedService.getFeeds(req.query.limit, req.query.cursor, req.user?.id),
+                message: "Feeds retrieved successfully"
+            };
+        } else {
+            return {
+                body: await this.feedService.getFeeds(req.query.limit, BigInt(0), req.user?.id),
+                message: "Feeds retrieved successfully"
+            };
+        }
     }
 
     postFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
@@ -36,7 +44,6 @@ class FeedController implements Controller {
     }
 
     updateFeeds = async (req: Request): Promise<BaseResponse> => {
-        console.log(req.params)
         return {
             body: await this.feedService.updateFeeds(BigInt(req.params.feedId), req.body.content),
             message: "Feeds edited successfully"
