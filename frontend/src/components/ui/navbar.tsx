@@ -136,7 +136,9 @@ export const Navbar = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem>View Profile</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <a href={`/profile/${user.id}`}>View Profile</a>
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"

@@ -43,6 +43,26 @@ class FeedRepository {
         return friendFeed;
     }
 
+    getMyFeedRepository = async (userId: bigint) => {
+        const myFeed = await prisma.feed.findMany({
+            where: {
+                userId: userId
+            },
+            select: {
+                id: true,
+                createdAt: true,
+                updatedAt: true,
+                content: true,
+                userId: true
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            take: 5
+        });
+        return myFeed;
+    }
+
     addFeedRepository = async (userId: bigint, content: string) => {
         try {
             return await prisma.feed.create({

@@ -1,4 +1,4 @@
-import { Feed } from "./feed.interface";
+import { Feed, FeedList } from "./feed.interface";
 
 export interface User {
   id: string;
@@ -21,5 +21,5 @@ export interface Profile {
   work_history: string;
   connection_count: number;
   connection_status: string;
-  relevant_post: Feed[] | null | undefined;
+  relevant_post: FeedList | null | undefined;
 }

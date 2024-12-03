@@ -32,6 +32,19 @@ export const getFeeds = async ({ pageParam }: {pageParam: number}) => {
   }
 };
 
+export const getMyFeeds = async (userId: bigint) => {
+  const res = (await api
+    .get(`/feed/${userId}`)
+    .then((r) => r.data)
+    .catch((err) => {
+      if (err.status === 404) {
+        throw new Error("Failed to fetch the feeds");
+      }
+      throw err;
+    })) as FeedListResponse;
+    return res.body;
+}
+
 export const postFeeds = async (feed: string) => {
   const formData = new FormData();
   formData.append("content", feed);

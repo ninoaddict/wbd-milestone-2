@@ -4,11 +4,19 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import ProfilePage from "@/components/profile/profile";
 import { useUser } from "@/context/auth-context";
 import SelfProfilePage from "@/components/profile/self-profile";
+import { getMyFeeds } from "@/services/feed";
+import { useEffect, useMemo } from "react";
 
 const profileQueryOptions = (userId: string) =>
   queryOptions({
     queryKey: ["profile", { userId }],
     queryFn: () => getProfile(userId),
+  });
+
+const myFeedQueryOptions = (userId: string) =>
+  queryOptions({
+    queryKey: ["myFeed", {userId}],
+    queryFn: () => getMyFeeds(BigInt(userId)),
   });
 
 export const Route = createFileRoute("/profile/$userId")({
@@ -23,6 +31,7 @@ function RouteComponent() {
   const userId = Route.useParams().userId;
   const { user, loading } = useUser();
   const { data: profile } = useQuery(profileQueryOptions(userId));
+  
   if (!profile) {
     return <div>Unexpected error occured</div>;
   }

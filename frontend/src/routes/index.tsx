@@ -22,6 +22,30 @@ const feedQueryOptions = (offset: number) =>
 
 function HomeComponent() {
   const infoUser = useUser();
+  // console.log(infoUser)
+
+  if (!infoUser.user) {
+    return (
+      <div className="flex py-[100px] justify-center">
+        <div className="ml-[50px] justify-center items-center flex flex-col">
+          <p className="text-5xl font-normal flex justify-center text-center items-center">Welcome to your professional community</p>
+          <a href="/login" className="text-md bg-blue-600 py-2 px-40 rounded-3xl text-white items-center flex mt-[20px] border border-solid border-blue-600 hover:text-blue-600 hover:bg-white">Sign in with Email</a>
+          <p className="text-xs font-normal flex justify-center text-center items-center mt-[20px] text-gray-400">
+            By signing in or registering, you agree to LinkedPurry User Agreement, Privacy Policy, and Cookie Policy.
+          </p>
+          <p className="text-sm font-normal flex justify-center text-center items-center mt-[20px] text-gray-500 space-x-1">
+          <span>New to LinkedPurry?</span> 
+          <a href="/register" className="text-blue-600">Register</a>
+          <span>here!</span>
+          </p>
+        </div>
+        <div className="flex justify-end">
+          <img src="/guy_working.svg" className="w-[100%] h-[100%]"></img>
+        </div>
+      </div>
+    )
+  }
+
   const [feedValue, setFeedValue] = React.useState("");
   const [modalOpen, setModalOpen] = React.useState(false);
   const [editFeedValue, setEditFeedValue] = React.useState("");
@@ -135,7 +159,7 @@ function HomeComponent() {
 
   function feedPage(feed: Feed, ago: string, updater: string) {
     return (
-      <div className="bg-white border border-solid border-gray-300 w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px]">
+      <div className="bg-white border border-solid border-gray-300 w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px] shadow-md">
         <header className="flex flex-row mb-[10px] w-full">
           <img
             src="/placeholder.png"
@@ -182,12 +206,12 @@ function HomeComponent() {
 
   React.useEffect(() => {
     if (inView && hasNextPage) {
-      console.log("BLA");
+      // console.log("BLA");
       fetchNextPage();
     }
   }, [inView, hasNextPage, fetchNextPage])
 
-  console.log(infoUser)
+  // console.log(infoUser)
   // console.log(ago,feeds);
 
   return (
@@ -195,7 +219,7 @@ function HomeComponent() {
       <h3>Welcome Home!</h3>
       <main className="flex mt-[100px] flex flex-row justify-center">
         <section id="profile" className="ml-[10px] mr-[10px]">
-          <div className="bg-white border border-solid border-gray-300 w-100 h-100 flex flex-col justify-center items-center rounded-md">
+          <div className="shadow-md bg-white border border-solid border-gray-300 w-100 h-100 flex flex-col justify-center items-center rounded-md">
             <img
               src="/banner.jpeg"
               className="object-cover w-[250px] h-[150px] flex justify-center rounded-t-md"
@@ -205,7 +229,7 @@ function HomeComponent() {
           </div>
         </section>
         <section id="feed" className="ml-[10px] mr-[10px]">
-          <div className="bg-white border border-solid border-gray-300 w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px]">
+          <div className="shadow-md bg-white border border-solid border-gray-300 w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px]">
             <main className="flex flex-row justify-space-between items-center w-full">
               <input type="text" onChange={value} id="feed-content" name="feed-content" placeholder="Write your feed here" maxLength={280} className="py-2 focus:outline-none focus:border-none grow mr-[10px]"></input>
               <SendHorizonal className="hover:cursor-pointer hover:bg-gray-200" onClick={() => {sendFeed(feedValue)}}/>

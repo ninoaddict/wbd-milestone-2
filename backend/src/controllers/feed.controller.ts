@@ -36,6 +36,13 @@ class FeedController implements Controller {
         }
     }
 
+    getMyFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
+        return {
+            body: await this.feedService.getMyFeeds(req.user?.id),
+            message: "Feeds retrieved successfully"
+        }
+    }
+
     postFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
         return {
             body: await this.feedService.postFeeds(req.user?.id, req.body.content),
@@ -81,6 +88,11 @@ class FeedController implements Controller {
             `${this.path}/feed/:feedId`,
             this.authMiddleware.checkUser,
             handleRequest(this.deleteFeeds)
+        )
+        this.router.get(
+            `${this.path}/feed/:userId`,
+            this.authMiddleware.checkUser,
+            handleRequest(this.getMyFeeds)
         )
     }
 }

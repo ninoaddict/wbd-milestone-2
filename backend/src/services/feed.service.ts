@@ -30,6 +30,24 @@ class FeedService {
         return myMapped;
     };
 
+    getMyFeeds = async (userId?: bigint) => {
+        if (!userId) {
+            throw new BadRequest();
+        }
+        const raw = await this.feedRepository.getMyFeedRepository(userId);
+        const myMapped = raw.map((f) => {
+            const myDatum = {
+                id: f.id,
+                createdAt: f.createdAt,
+                updatedAt: f.updatedAt,
+                userId: f.userId,
+                content: f.content
+            };
+            return myDatum;
+        });
+        return myMapped;
+    }
+
     postFeeds = async(userId?: bigint, content?: string) => {
         if (!userId) {
             throw new BadRequest();
