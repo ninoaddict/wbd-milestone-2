@@ -3,7 +3,7 @@ import { LoginForm } from '@/components/auth/login-form'
 import { useUser } from '@/context/auth-context'
 import { useEffect } from 'react'
 
-export const Route = createFileRoute('/_navbar-layout/(auth)/login')({
+export const Route = createFileRoute('/(auth)/login')({
   component: RouteComponent,
 })
 

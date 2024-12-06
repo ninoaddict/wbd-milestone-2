@@ -12,9 +12,7 @@ const userListQueryOptions = (userId: string) =>
     queryFn: () => getUserList(userId),
   })
 
-export const Route = createFileRoute(
-  '/_navbar-layout/(connection)/userList/$userId',
-)({
+export const Route = createFileRoute('/(connection)/userList/$userId')({
   component: ConnectionUserListComponent,
   errorComponent: ErrorComponent,
   loader: ({ context: { queryClient }, params: { userId } }) => {

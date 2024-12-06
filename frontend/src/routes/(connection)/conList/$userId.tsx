@@ -10,9 +10,7 @@ const connectionListQueryOptions = (userId: string) =>
     queryFn: () => getConnectionsList(userId),
   })
 
-export const Route = createFileRoute(
-  '/_navbar-layout/(connection)/conList/$userId',
-)({
+export const Route = createFileRoute('/(connection)/conList/$userId')({
   component: ConListComponent,
 })
 

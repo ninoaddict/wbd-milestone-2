@@ -3,7 +3,7 @@ import { RegisterForm } from '@/components/auth/register-form'
 import { useUser } from '@/context/auth-context'
 import { useEffect } from 'react'
 
-export const Route = createFileRoute('/_navbar-layout/(auth)/register')({
+export const Route = createFileRoute('/(auth)/register')({
   component: RouteComponent,
 })
 

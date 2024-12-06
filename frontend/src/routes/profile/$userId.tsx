@@ -13,7 +13,7 @@ const profileQueryOptions = (userId: string) =>
     queryFn: () => getProfile(userId),
   })
 
-export const Route = createFileRoute('/_navbar-layout/profile/$userId')({
+export const Route = createFileRoute('/profile/$userId')({
   component: RouteComponent,
   errorComponent: NotFound,
   loader: ({ context: { queryClient }, params: { userId } }) => {
