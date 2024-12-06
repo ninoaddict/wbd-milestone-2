@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { queryOptions } from "@tanstack/react-query";
 import { getChatHeaders } from "@/services/chat";
-import { ChatHeaderData } from "@/services/chat";
 import { convertTime } from "@/lib/utils";
 
 const chatHeadersQueryOptions = () =>

@@ -156,8 +156,8 @@ export default function ChatPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f4f2ee] lg:pt-6">
-      <div className="flex flex-col max-h-[1000px] md:max-w-screen-sm w-full h-[100vh] md:h-[calc(100vh-130px)] rounded-xl shadow-lg bg-white">
+    <div className="flex min-h-screen flex-col items-center pt-[52.67px] md:pt-0 md:justify-center bg-[#f4f2ee] lg:pt-6">
+      <div className="flex flex-col max-h-[1000px] md:max-w-screen-sm w-full h-[calc(100vh-52.67px)] md:h-[calc(100vh-130px)] rounded-xl shadow-lg bg-white">
         <Card className="border-x-0 rounded-none sm:rounded-xl border-t-0">
           <CardHeader className="border-b-2 py-4 pl-3">
             <div className="flex items-center">

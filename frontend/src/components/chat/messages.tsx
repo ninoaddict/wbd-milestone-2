@@ -66,7 +66,7 @@ const Messages = ({
 
   return (
     <div
-      className="no-scrollbar gap-1 flex flex-grow flex-col-reverse overflow-y-auto p-4 md:px-5 h-[calc(100vh-82.67px-83.33px)] md:h-[calc(100vh-130px-82.67px-94px)]"
+      className="no-scrollbar gap-1 flex flex-grow flex-col-reverse overflow-y-auto p-4 md:px-5 h-[calc(100vh-82.67px-83.33px-52.67px)] md:h-[calc(100vh-130px-82.67px-94px)]"
       ref={containerRef}
     >
       {messages.map((msg, index) => (
