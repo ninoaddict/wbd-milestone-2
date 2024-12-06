@@ -33,7 +33,6 @@ class Application {
       parser,
       transports: ["websocket"],
     });
-    this.initSocket();
 
     // Middleware
     this.app.use(cors({ origin: "http://localhost:5173", credentials: true }));
@@ -43,6 +42,7 @@ class Application {
     this.app.use(helmet());
     this.app.use(hpp());
     this.app.use(cookieParser());
+    this.initSocket();
 
     // Initialize routes and error handling
     this.initRoutes(controllers);
@@ -74,9 +74,6 @@ class Application {
 
     process.on("SIGTERM", () => {
       console.log("SIGTERM");
-      // Stop Schedule if Exist
-
-      // Close WebSocket Server
       this.io.close();
     });
   }

@@ -37,7 +37,7 @@ const registerFormSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword", "password"],
+    path: ["confirmPassword"],
   });
 
 export const RegisterForm = () => {
