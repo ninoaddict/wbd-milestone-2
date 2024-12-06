@@ -93,31 +93,31 @@ function ConnectionUserListComponent() {
   function ConnectionButtonComponent(info: UserShortInfo) {
     if (info.status === "disconnected") {
       return (
-        <button type='submit' onClick={() => {sendConnectionRequest(info.id); window.location.reload()}} className="border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700">
+        <button type='submit' onClick={() => {sendConnectionRequest(info.id); window.location.reload()}} className="border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] text-[12px] px-[10px] py-[4px] rounded-[15px] text-blue-700 mobile:text-[14px] xs:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-blue-700">
           Connect
         </button>
       )
     } else if (info.status === "requesting") {
       return (
-        <p className='border border-gray-700 border-solid px-[10px] py-[4px] rounded-[15px] text-gray-700 text-[14px] mx-[5px]'>Requesting...</p>
+        <p className='border border-gray-700 border-solid mobile:px-[10px] mobile:py-[4px] text-[12px] px-[10px] py-[4px] rounded-[15px] mt-[5px] xs:mt-[0px] text-gray-700 mobile:text-[14px] xs:ml-[5px] ml-[0px] mr-[5px]'>Requesting...</p>
       )
     } else if (info.status === "requested") {
       return (
-        <div>
-          <button type='submit' onClick={() => {clickIgnore(info.id); window.location.reload()}} className='px-[10px] py-[4px] text-gray-700 text-[14px] mx-[5px] hover:bg-gray-100'>Ignore</button>
-          <button type='submit' onClick={() => {clickAccept(info.id); window.location.reload()}} className='border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700'>Accept</button>
+        <div className='flex items-center justify-center flex-col mobile:flex-row'>
+          <button type='submit' onClick={() => {clickIgnore(info.id); window.location.reload()}} className='mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] text-gray-700 mobile:text-[14px] xs:ml-[5px] ml-[0px] mr-[5px] hover:bg-gray-100'>Ignore</button>
+          <button type='submit' onClick={() => {clickAccept(info.id); window.location.reload()}} className='border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] text-[12px] px-[10px] py-[4px] rounded-[15px] text-blue-700 mobile:text-[14px] mx-[5px] hover:text-white hover:bg-blue-700'>Accept</button>
         </div>
       )
     } else if (info.status === "connected") {
       return (
-        <div>
-          <a href='/message' className='border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700'>Message</a>
-          <button type='submit' onClick={() => {deleteConnectionRequest(info.id); window.location.reload()}} className='border border-red-700 border-solid px-[10px] py-[4px] rounded-[15px] text-red-700 text-[14px] mx-[5px] hover:text-white hover:bg-red-700'>Unconnect</button>
+        <div className='flex items-center justify-center flex-row xs:flex-col mobile:flex-row mt-[5px]'>
+          <a href='/message' className='border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] mobile:mb-[0px] xs:mb-[5px] mb-[0px] px-[10px] py[4px] text-[12px] rounded-[15px] text-blue-700 mobile:text-[14px] xs:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-blue-700'>Message</a>
+          <button type='submit' onClick={() => {deleteConnectionRequest(info.id); window.location.reload()}} className='border border-red-700 border-solid mobile:px-[10px] mobile:py-[4px] px-[10px] py[4px] text-[12px] rounded-[15px] text-red-700 mobile:text-[14px] mx-[5px] hover:text-white hover:bg-red-700'>Unconnect</button>
         </div>
       )
     } else if (info.status === "self") {
       return (
-        <div className='border border-gray-700 border-solid px-[10px] py-[4px] rounded-[15px] text-gray-700 text-[14px] mx-[5px]'>
+        <div className='border border-gray-700 border-solid mobile:px-[10px] mobile:py-[4px] text-[12px] px-[10px] py-[4px] rounded-[15px] text-gray-700 mobile:text-[14px] xs:ml-[5px] ml-[0px] mr-[5px]'>
           You
         </div>
       )
@@ -139,9 +139,9 @@ function ConnectionUserListComponent() {
   return (
     <div className="min-h-screen w-full bg-[#f4f2ee] flex flex-col">
       <main className="flex justify-center items-center mt-[120px] mb-[50px] flex-col">
-        <section id='search-bars' className='flex justify-center items-center mb-[10px]'>
-          <input onChange={changeQuery} type='text' placeholder='Search accounts here' className='py-[5px] px-[10px] w-[500px] rounded-md border border-solid border-black'></input>
-          {userId !== "0" && <a href={`/conReq/${userId}`} className='py-[5px] px-[10px] bg-blue-950 ml-[10px] text-white rounded-md'>Manage Requests</a>}
+        <section id='search-bars' className='flex flex-col-reverse lg:flex-row justify-center items-center mb-[10px]'>
+          <input onChange={changeQuery} type='text' placeholder='Search accounts here' className='w-[200px] xs:w-[300px] py-[5px] px-[10px] mobile:w-[500px] rounded-md border border-solid border-black'></input>
+          {userId !== "0" && <a href={`/conReq/${userId}`} className='mb-[10px] lg:mb-[0px] py-[5px] px-[10px] bg-blue-950 ml-[10px] text-white rounded-md'>Manage Requests</a>}
         </section>
         <section
           id="connection-list"
@@ -173,7 +173,7 @@ function ConnectionUserListComponent() {
                           className="object-cover w-full h-full"
                         ></img>
                       </div>
-                      <div className="flex flex-1 justify-between">
+                      <div className="flex flex-1 justify-between xs:flex-row flex-col">
                         <div className="flex flex-col">
                           <a href={`/profile/${item.id}`} className="text-[17px] text-blue-600">{item.name}</a>
                           <p className="text-[14px] text-gray-500">
