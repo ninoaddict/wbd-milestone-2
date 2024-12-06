@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { useRouter } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { register, RegisterPayload } from "@/services/auth";
@@ -37,11 +37,11 @@ const registerFormSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword", "password"],
+    path: ["confirmPassword"],
   });
 
 export const RegisterForm = () => {
-  const { setUser } = useUser();
+  const { setUser } = useAuth();
   const router = useRouter();
 
   const mutation = useMutation({
@@ -50,6 +50,7 @@ export const RegisterForm = () => {
     },
     onSuccess: (data) => {
       setUser(data);
+      router.invalidate();
       router.navigate({
         to: "/",
         replace: true,

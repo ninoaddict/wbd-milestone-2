@@ -127,6 +127,13 @@ class ConnectionRepository {
             toId: fromId,
           },
         });
+
+        await tx.chatRoom.create({
+          data: {
+            firstUserId: fromId,
+            secondUserId: toId,
+          },
+        });
         return connRequest;
       });
     } catch (error) {
@@ -152,6 +159,15 @@ class ConnectionRepository {
               fromId: toId,
               toId: fromId,
             },
+          },
+        });
+
+        await tx.chatRoom.deleteMany({
+          where: {
+            OR: [
+              { firstUserId: fromId, secondUserId: toId },
+              { firstUserId: toId, secondUserId: fromId },
+            ],
           },
         });
         return conn;

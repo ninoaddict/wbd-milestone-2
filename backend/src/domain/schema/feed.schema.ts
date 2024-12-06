@@ -4,7 +4,6 @@ import { RequestSchema } from "@/middlewares/validate.middleware";
 
 export const updateFeedSchema: RequestSchema = {
   body: z.object({
-    content: z
-      .string({ required_error: "z cannot be empty" })
+    content: z.string({ required_error: "z cannot be empty" }),
   }),
 };

@@ -1,73 +1,79 @@
-import * as React from 'react'
-import { createFileRoute, ErrorComponent } from '@tanstack/react-router'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { getRequestsList } from '@/services/userList'
-import { acceptConnection, rejectConnection } from '@/services/connection'
-import { useUser } from '@/context/auth-context'
+import * as React from "react";
+import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import { getRequestsList } from "@/services/userList";
+import { acceptConnection, rejectConnection } from "@/services/connection";
+import { useAuth } from "@/context/auth-context";
 
 const connectionListQueryOptions = (userId: string) =>
   queryOptions({
-    queryKey: ['connectionList', { userId }],
+    queryKey: ["connectionList", { userId }],
     queryFn: () => getRequestsList(userId),
-})
+  });
 
-export const Route = createFileRoute('/(connection)/conReq/$userId')({
+export const Route = createFileRoute("/(connection)/conReq/$userId")({
   component: ConReqComponent,
-})
+});
 
 function ConReqComponent() {
-  const infoUser = useUser();
+  const infoUser = useAuth();
   const userId = Route.useParams().userId;
-  
+
   const { data: userList } = useQuery(connectionListQueryOptions(userId));
   console.log(userList);
-  
+
   const mutationAccept = useMutation({
     mutationFn: (userId: bigint) => acceptConnection(userId),
     onSuccess: () => {
-      console.log('Connection request sent successfully!');
+      console.log("Connection request sent successfully!");
     },
     onError: (error) => {
-      console.error('Error sending connection request:', error);
-    }
+      console.error("Error sending connection request:", error);
+    },
   });
 
   const mutationReject = useMutation({
     mutationFn: (userId: bigint) => rejectConnection(userId),
     onSuccess: () => {
-      console.log('Connection request sent successfully!');
+      console.log("Connection request sent successfully!");
     },
     onError: (error) => {
-      console.error('Error sending connection request:', error);
-    }
+      console.error("Error sending connection request:", error);
+    },
   });
 
   const clickAccept = async (userId: bigint) => {
     console.log(userId);
     mutationAccept.mutate(userId);
-  }
+  };
 
   const clickIgnore = async (userId: bigint) => {
     console.log(userId);
     mutationReject.mutate(userId);
-  }
+  };
 
   return (
-    <div className='min-h-screen w-full bg-[#f4f2ee] flex flex-col'>
-      <main className='flex justify-center items-center mt-[150px]'>
-        <section id='connection-list' className='flex justify-center items-center'>
-          <div id='connection-container' className='bg-white rounded-t-md w-5/6'>
-            <header className='border-solid border-gray-200 border p-[10px] rounded-t-md'>
-              <h2 className='text-xl'>{userList?.length} Requests</h2>
+    <div className="min-h-screen w-full bg-[#f4f2ee] flex flex-col">
+      <main className="flex justify-center items-center mt-[150px]">
+        <section
+          id="connection-list"
+          className="flex justify-center items-center"
+        >
+          <div
+            id="connection-container"
+            className="bg-white rounded-t-md w-5/6"
+          >
+            <header className="border-solid border-gray-200 border p-[10px] rounded-t-md">
+              <h2 className="text-xl">{userList?.length} Requests</h2>
             </header>
             <main>
-              {userList?.length == 0 &&
-                <div className='p-[10px] w-[300px]'>
+              {userList?.length == 0 && (
+                <div className="p-[10px] w-[300px]">
                   This user has no requests
                 </div>
-              }
+              )}
               <ul>
-              {userList &&
+                {userList &&
                   userList.map((item, index) => (
                     <li
                       className="border-solid border-gray-200 border p-[10px] flex items-center"
@@ -81,14 +87,32 @@ function ConReqComponent() {
                       </div>
                       <div className="flex flex-1 justify-between flex-col sm:flex-row">
                         <div className="flex flex-col">
-                          <p className="text-[17px] text-blue-600">{item.user.name}</p>
+                          <p className="text-[17px] text-blue-600">
+                            {item.user.name}
+                          </p>
                           <p className="text-[14px] text-gray-500">
                             Worked at: {item.user.username}
                           </p>
                         </div>
                         <div className="flex items-center mt-[5px] sm:mt-[0px]">
-                          <button onClick={() => {clickIgnore(item.user.id); window.location.reload()}} className='mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] text-gray-700 mobile:text-[14px] sm:ml-[5px] ml-[0px] mr-[5px] hover:bg-gray-100'>Ignore</button>
-                          <button onClick={() => {clickAccept(item.user.id); window.location.reload()}} className='border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] rounded-[15px] text-blue-700 mobile:text-[14px] sm:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-blue-700'>Accept</button>
+                          <button
+                            onClick={() => {
+                              clickIgnore(item.user.id);
+                              window.location.reload();
+                            }}
+                            className="mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] text-gray-700 mobile:text-[14px] sm:ml-[5px] ml-[0px] mr-[5px] hover:bg-gray-100"
+                          >
+                            Ignore
+                          </button>
+                          <button
+                            onClick={() => {
+                              clickAccept(item.user.id);
+                              window.location.reload();
+                            }}
+                            className="border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] rounded-[15px] text-blue-700 mobile:text-[14px] sm:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-blue-700"
+                          >
+                            Accept
+                          </button>
                         </div>
                       </div>
                     </li>
@@ -99,5 +123,5 @@ function ConReqComponent() {
         </section>
       </main>
     </div>
-  )
+  );
 }

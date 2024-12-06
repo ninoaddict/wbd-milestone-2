@@ -64,6 +64,13 @@ class AuthController implements Controller {
     };
   };
 
+  getUser = async (req: Request): Promise<BaseResponse> => {
+    return {
+      body: await this.userService.findLimitedUserById(BigInt(req.params.id)),
+      message: "Successfully fetch user",
+    };
+  };
+
   private initRoutes() {
     this.router.post(
       `${this.path}/register`,
@@ -90,6 +97,7 @@ class AuthController implements Controller {
       this.authMiddleware.checkPublicUser,
       handleRequest(this.getUsers)
     );
+    this.router.get(`${this.path}/user/:id(\\d+)`, handleRequest(this.getUser));
   }
 }
 

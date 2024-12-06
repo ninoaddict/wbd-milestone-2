@@ -14,7 +14,9 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as JobImport } from './routes/job'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as ProfileUserIdImport } from './routes/profile/$userId'
+import { Route as ChatRoomIdImport } from './routes/chat/$roomId'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
 import { Route as connectionUserListUserIdImport } from './routes/(connection)/userList/$userId'
@@ -41,9 +43,21 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const ChatIndexRoute = ChatIndexImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ProfileUserIdRoute = ProfileUserIdImport.update({
   id: '/profile/$userId',
   path: '/profile/$userId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChatRoomIdRoute = ChatRoomIdImport.update({
+  id: '/chat/$roomId',
+  path: '/chat/$roomId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -116,11 +130,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof rootRoute
     }
+    '/chat/$roomId': {
+      id: '/chat/$roomId'
+      path: '/chat/$roomId'
+      fullPath: '/chat/$roomId'
+      preLoaderRoute: typeof ChatRoomIdImport
+      parentRoute: typeof rootRoute
+    }
     '/profile/$userId': {
       id: '/profile/$userId'
       path: '/profile/$userId'
       fullPath: '/profile/$userId'
       preLoaderRoute: typeof ProfileUserIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatIndexImport
       parentRoute: typeof rootRoute
     }
     '/(connection)/conList/$userId': {
@@ -155,7 +183,9 @@ export interface FileRoutesByFullPath {
   '/job': typeof JobRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/chat/$roomId': typeof ChatRoomIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/chat': typeof ChatIndexRoute
   '/conList/$userId': typeof connectionConListUserIdRoute
   '/conReq/$userId': typeof connectionConReqUserIdRoute
   '/userList/$userId': typeof connectionUserListUserIdRoute
@@ -167,7 +197,9 @@ export interface FileRoutesByTo {
   '/job': typeof JobRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/chat/$roomId': typeof ChatRoomIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/chat': typeof ChatIndexRoute
   '/conList/$userId': typeof connectionConListUserIdRoute
   '/conReq/$userId': typeof connectionConReqUserIdRoute
   '/userList/$userId': typeof connectionUserListUserIdRoute
@@ -180,7 +212,9 @@ export interface FileRoutesById {
   '/job': typeof JobRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/chat/$roomId': typeof ChatRoomIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
+  '/chat/': typeof ChatIndexRoute
   '/(connection)/conList/$userId': typeof connectionConListUserIdRoute
   '/(connection)/conReq/$userId': typeof connectionConReqUserIdRoute
   '/(connection)/userList/$userId': typeof connectionUserListUserIdRoute
@@ -194,7 +228,9 @@ export interface FileRouteTypes {
     | '/job'
     | '/login'
     | '/register'
+    | '/chat/$roomId'
     | '/profile/$userId'
+    | '/chat'
     | '/conList/$userId'
     | '/conReq/$userId'
     | '/userList/$userId'
@@ -205,7 +241,9 @@ export interface FileRouteTypes {
     | '/job'
     | '/login'
     | '/register'
+    | '/chat/$roomId'
     | '/profile/$userId'
+    | '/chat'
     | '/conList/$userId'
     | '/conReq/$userId'
     | '/userList/$userId'
@@ -216,7 +254,9 @@ export interface FileRouteTypes {
     | '/job'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/chat/$roomId'
     | '/profile/$userId'
+    | '/chat/'
     | '/(connection)/conList/$userId'
     | '/(connection)/conReq/$userId'
     | '/(connection)/userList/$userId'
@@ -229,7 +269,9 @@ export interface RootRouteChildren {
   JobRoute: typeof JobRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
+  ChatRoomIdRoute: typeof ChatRoomIdRoute
   ProfileUserIdRoute: typeof ProfileUserIdRoute
+  ChatIndexRoute: typeof ChatIndexRoute
   connectionConListUserIdRoute: typeof connectionConListUserIdRoute
   connectionConReqUserIdRoute: typeof connectionConReqUserIdRoute
   connectionUserListUserIdRoute: typeof connectionUserListUserIdRoute
@@ -241,7 +283,9 @@ const rootRouteChildren: RootRouteChildren = {
   JobRoute: JobRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
+  ChatRoomIdRoute: ChatRoomIdRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
+  ChatIndexRoute: ChatIndexRoute,
   connectionConListUserIdRoute: connectionConListUserIdRoute,
   connectionConReqUserIdRoute: connectionConReqUserIdRoute,
   connectionUserListUserIdRoute: connectionUserListUserIdRoute,
@@ -262,7 +306,9 @@ export const routeTree = rootRoute
         "/job",
         "/(auth)/login",
         "/(auth)/register",
+        "/chat/$roomId",
         "/profile/$userId",
+        "/chat/",
         "/(connection)/conList/$userId",
         "/(connection)/conReq/$userId",
         "/(connection)/userList/$userId"
@@ -283,8 +329,14 @@ export const routeTree = rootRoute
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx"
     },
+    "/chat/$roomId": {
+      "filePath": "chat/$roomId.tsx"
+    },
     "/profile/$userId": {
       "filePath": "profile/$userId.tsx"
+    },
+    "/chat/": {
+      "filePath": "chat/index.tsx"
     },
     "/(connection)/conList/$userId": {
       "filePath": "(connection)/conList/$userId.tsx"

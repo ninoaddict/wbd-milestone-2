@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { LoginForm } from "@/components/auth/login-form";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/(auth)/login")({
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/(auth)/login")({
 
 function RouteComponent() {
   const router = useRouter();
-  const { user, loading } = useUser();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (user) {

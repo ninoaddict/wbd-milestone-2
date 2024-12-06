@@ -5,15 +5,16 @@ import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
 import { experienceType } from "@/domain/interfaces/profile.interface";
 
-export default function ProfilePage(profile: Profile) {
+export default function ProfilePage({ profile }: { profile: Profile }) {
   let experience: experienceType[] = [];
   let skills: string[] = [];
 
-  profile.relevant_post?.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  profile.relevant_post?.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
-  let newList = profile.relevant_post?.slice(0,4);
-  profile.relevant_post?.slice(0,4);
-
+  let newList = profile.relevant_post?.slice(0, 4);
+  profile.relevant_post?.slice(0, 4);
 
   try {
     if (profile && profile.work_history && profile.work_history !== "") {
@@ -36,24 +37,45 @@ export default function ProfilePage(profile: Profile) {
     // fail to parse
   }
 
-  const ago: string[] = []
+  const ago: string[] = [];
   if (profile.relevant_post) {
     for (let feed of profile.relevant_post) {
-      const millisec = Math.floor((Date.now() - new Date(feed.createdAt).getTime()));
-      if (millisec >= 1000*60 && millisec < 1000*60*60) {
-        ago.push(`Created ${Math.floor(millisec/(1000*60))} minutes ago`);
-      } else if (millisec >= 1000*60*60 && millisec < 1000*60*60*24) {
-        ago.push(`Created ${Math.floor(millisec/(1000*60*60))} hours ago`);
-      } else if (millisec >= 1000*60*60*24 && millisec < 1000*60*60*24*7) {
-        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24))} days ago`);
-      } else if (millisec >= 1000*60*60*24*7 && millisec < 1000*60*60*24*30) {
-        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24*7))} weeks ago`);
-      } else if (millisec >= 1000*60*60*24*30 && millisec < 1000*60*60*24*365) {
-        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24*30))} months ago`);
-      } else if (millisec >= 1000*60*60*24*365) {
-        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24*365))} years ago`);
+      const millisec = Math.floor(
+        Date.now() - new Date(feed.createdAt).getTime()
+      );
+      if (millisec >= 1000 * 60 && millisec < 1000 * 60 * 60) {
+        ago.push(`Created ${Math.floor(millisec / (1000 * 60))} minutes ago`);
+      } else if (millisec >= 1000 * 60 * 60 && millisec < 1000 * 60 * 60 * 24) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60))} hours ago`
+        );
+      } else if (
+        millisec >= 1000 * 60 * 60 * 24 &&
+        millisec < 1000 * 60 * 60 * 24 * 7
+      ) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24))} days ago`
+        );
+      } else if (
+        millisec >= 1000 * 60 * 60 * 24 * 7 &&
+        millisec < 1000 * 60 * 60 * 24 * 30
+      ) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 7))} weeks ago`
+        );
+      } else if (
+        millisec >= 1000 * 60 * 60 * 24 * 30 &&
+        millisec < 1000 * 60 * 60 * 24 * 365
+      ) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 30))} months ago`
+        );
+      } else if (millisec >= 1000 * 60 * 60 * 24 * 365) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 365))} years ago`
+        );
       } else {
-        ago.push(`Created ${Math.floor(millisec/(1000))} seconds ago`);
+        ago.push(`Created ${Math.floor(millisec / 1000)} seconds ago`);
       }
     }
   }
@@ -208,9 +230,7 @@ export default function ProfilePage(profile: Profile) {
                       <h3 className="text-sm sm:text-base font-semibold">
                         Post #{ago.length - index}
                       </h3>
-                      <p className="mt-2 text-xs sm:text-sm">
-                        {post.content}
-                      </p>
+                      <p className="mt-2 text-xs sm:text-sm">{post.content}</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         {ago && ago[index]}
                       </p>

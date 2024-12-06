@@ -41,6 +41,20 @@ class UserRepository {
     });
   };
 
+  getLimitedUserById = async (id: bigint) => {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        profile_photo_path: true,
+      },
+    });
+  };
+
   getUserByUsername = async (username: string) => {
     return await prisma.user.findUnique({
       where: {
