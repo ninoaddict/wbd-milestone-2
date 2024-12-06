@@ -69,7 +69,7 @@ function ConListComponent() {
                           className="object-cover w-full h-full"
                         ></img>
                       </div>
-                      <div className="flex flex-1 justify-between">
+                      <div className="flex flex-1 justify-between flex-col sm:flex-row">
                         <div className="flex flex-col">
                           <p className="text-[17px] text-blue-600">
                             {item.user.name}
@@ -78,10 +78,10 @@ function ConListComponent() {
                             Username: {item.user.username}
                           </p>
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center mt-[5px] sm:mt-[0px]">
                           <a
                             href="/message"
-                            className="border border-blue-700 border-solid px-[10px] py-[4px] rounded-[15px] text-blue-700 text-[14px] mx-[5px] hover:text-white hover:bg-blue-700"
+                            className="border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] rounded-[15px] text-blue-700 mobile:text-[14px] sm:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-blue-700"
                           >
                             Message
                           </a>
@@ -90,7 +90,7 @@ function ConListComponent() {
                               deleteConnectionRequest(item.user.id);
                               window.location.reload();
                             }}
-                            className="border border-red-700 border-solid px-[10px] py-[4px] rounded-[15px] text-red-700 text-[14px] mx-[5px] hover:text-white hover:bg-red-700"
+                            className="border border-red-700 border-solid mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] rounded-[15px] text-red-700 mobile:text-[14px] sm:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-red-700"
                           >
                             Unconnect
                           </button>

@@ -24,6 +24,41 @@ const feedQueryOptions = (offset: number) =>
 function HomeComponent() {
   const infoUser = useAuth();
 
+  if (!infoUser.user) {
+    return (
+      <div className="flex py-[100px] justify-center">
+        <div className="ml-[50px] mr-[50px] xl:mr-[0px] mt-[140px] xl2:mt-[0px] justify-center items-center flex flex-col">
+          <p className="text-xl sm:text-3xl lg:text-5xl font-normal flex justify-center text-center items-center">
+            Welcome to your professional community
+          </p>
+          <a
+            href="/login"
+            className="text-xs sm:text-sm lg:text-md bg-blue-600 py-1 md:py-1 px-10 sm:px-20 md:px-40 rounded-3xl text-white items-center flex mt-[20px] border border-solid border-blue-600 hover:text-blue-600 hover:bg-white"
+          >
+            Sign in with Email
+          </a>
+          <p className="text-[9px] sm:text-xs font-normal flex justify-center text-center items-center mt-[20px] text-gray-400">
+            By signing in or registering, you agree to LinkedPurry User
+            Agreement, Privacy Policy, and Cookie Policy.
+          </p>
+          <p className="text-xs sm:text-sm font-normal flex justify-center text-center items-center mt-[20px] text-gray-500 space-x-1">
+            <span>New to LinkedPurry?</span>
+            <a href="/register" className="text-blue-600">
+              Register
+            </a>
+            <span>here!</span>
+          </p>
+        </div>
+        <div className="flex justify-end">
+          <img
+            src="/guy_working.svg"
+            className="w-[100%] h-[100%] hidden xl2:block"
+          ></img>
+        </div>
+      </div>
+    );
+  }
+
   const [feedValue, setFeedValue] = React.useState("");
   const [modalOpen, setModalOpen] = React.useState(false);
   const [editFeedValue, setEditFeedValue] = React.useState("");
@@ -222,7 +257,7 @@ function HomeComponent() {
 
   function feedPage(feed: Feed, ago: string, updater: string) {
     return (
-      <div className="bg-white border border-solid border-gray-300 w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px] shadow-md">
+      <div className="bg-white border border-solid border-gray-300 w-[350px] md:w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px] shadow-md">
         <header className="flex flex-row mb-[10px] w-full">
           <img
             src="/placeholder.png"
@@ -286,12 +321,12 @@ function HomeComponent() {
   return (
     <div className="p-2 min-h-screen bg-[#f4f2ee]">
       <h3>Welcome Home!</h3>
-      <main className="flex mt-[100px] flex-row justify-center">
-        <section id="profile" className="ml-[10px] mr-[10px]">
+      <main className="mt-[100px] flex flex-col xl:flex-row justify-center items-center xl:items-start">
+        <section id="profile" className="ml-[10px] mr-[10px] mb-[20px]">
           <div className="shadow-md bg-white border border-solid border-gray-300 w-100 h-100 flex flex-col justify-center items-center rounded-md">
             <img
               src="/banner.jpeg"
-              className="object-cover w-[250px] h-[150px] flex justify-center rounded-t-md"
+              className="object-cover xl:w-[300px] xl:h-[150px] md:w-[600px] w-[350px] flex justify-center rounded-t-md"
             ></img>
             <a
               href={`profile/${infoUser.user?.id}`}
@@ -305,7 +340,7 @@ function HomeComponent() {
           </div>
         </section>
         <section id="feed" className="ml-[10px] mr-[10px]">
-          <div className="shadow-md bg-white border border-solid border-gray-300 w-[600px] h-100 flex flex-col justify-start items-start rounded-md py-3 px-5 mb-[10px]">
+          <div className="shadow-md bg-white border border-solid border-gray-300 w-[350px] justify-center items-center md:w-[600px] h-100 flex flex-col md:justify-start md:items-start rounded-md py-3 px-5 mb-[10px]">
             <main className="flex flex-row justify-space-between items-center w-full">
               <input
                 type="text"

@@ -35,7 +35,7 @@ function RouteComponent() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#f4f2ee] lg:pt-6">
-      <div className="flex flex-col max-h-[1000px] md:max-w-screen-sm w-full h-[100vh] pt-[52.67px] md:pt-0 md:h-[calc(100vh-130px)] rounded-xl shadow-lg bg-white">
+      <div className="flex flex-col max-h-[1000px] md:max-w-screen-md w-full h-[100vh] pt-[52.67px] md:pt-0 md:h-[calc(100vh-130px)] rounded-xl shadow-lg bg-white">
         <div className="p-4 border-b hidden md:block">
           <h2 className="text-lg font-semibold">Messaging</h2>
         </div>
