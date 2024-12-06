@@ -13,7 +13,6 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as JobImport } from './routes/job'
 import { Route as AboutImport } from './routes/about'
-import { Route as NavbarLayoutImport } from './routes/_navbar-layout'
 import { Route as IndexImport } from './routes/index'
 import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as ProfileUserIdImport } from './routes/profile/$userId'
@@ -35,11 +34,6 @@ const JobRoute = JobImport.update({
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const NavbarLayoutRoute = NavbarLayoutImport.update({
-  id: '/_navbar-layout',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -106,13 +100,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/_navbar-layout': {
-      id: '/_navbar-layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof NavbarLayoutImport
       parentRoute: typeof rootRoute
     }
     '/about': {
@@ -192,7 +179,6 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof NavbarLayoutRoute
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
   '/login': typeof authLoginRoute
@@ -207,7 +193,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof NavbarLayoutRoute
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
   '/login': typeof authLoginRoute
@@ -223,7 +208,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/_navbar-layout': typeof NavbarLayoutRoute
   '/about': typeof AboutRoute
   '/job': typeof JobRoute
   '/(auth)/login': typeof authLoginRoute
@@ -240,7 +224,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | ''
     | '/about'
     | '/job'
     | '/login'
@@ -254,7 +237,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | ''
     | '/about'
     | '/job'
     | '/login'
@@ -268,7 +250,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/_navbar-layout'
     | '/about'
     | '/job'
     | '/(auth)/login'
@@ -284,7 +265,6 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  NavbarLayoutRoute: typeof NavbarLayoutRoute
   AboutRoute: typeof AboutRoute
   JobRoute: typeof JobRoute
   authLoginRoute: typeof authLoginRoute
@@ -299,7 +279,6 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  NavbarLayoutRoute: NavbarLayoutRoute,
   AboutRoute: AboutRoute,
   JobRoute: JobRoute,
   authLoginRoute: authLoginRoute,
@@ -323,7 +302,6 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_navbar-layout",
         "/about",
         "/job",
         "/(auth)/login",
@@ -338,9 +316,6 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/_navbar-layout": {
-      "filePath": "_navbar-layout.tsx"
     },
     "/about": {
       "filePath": "about.tsx"

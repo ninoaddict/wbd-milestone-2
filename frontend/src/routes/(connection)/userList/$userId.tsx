@@ -8,10 +8,7 @@ import {
   rejectConnection,
   deleteConnection,
 } from "@/services/connection";
-import { useUser } from "@/context/auth-context";
-import { send } from "process";
 import { UserShortInfo } from "@/domain/interfaces/connection.interface";
-import { info } from "console";
 
 const userListQueryOptions = (query: string) =>
   queryOptions({
@@ -170,7 +167,7 @@ function ConnectionUserListComponent() {
       return <div></div>;
     }
   }
-  const infoUser = useUser();
+
   const userId = Route.useParams().userId;
 
   const { data: userList } = useQuery(userListQueryOptions(query));

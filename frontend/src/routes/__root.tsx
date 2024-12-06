@@ -10,8 +10,10 @@ import { UserContextValue } from "@/context/auth-context";
 import { Navbar } from "@/components/ui/navbar";
 import NotFound from "@/components/not-found/not-found";
 import { socket } from "@/services/socket";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { useEffect } from "react";
+import { useRouter } from "@tanstack/react-router";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -24,7 +26,11 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
-  const { user, loading } = useUser();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const pathname = router.state.location.pathname;
+  const isMobile = useIsMobile();
+
   useEffect(() => {
     if (!loading && user?.id) {
       socket.connect();
@@ -37,9 +43,11 @@ function RootComponent() {
     };
   }, [user?.id, loading]);
 
+  const hideNavbar = isMobile && pathname.startsWith("/chat/");
+
   return (
     <>
-      <Navbar />
+      {!hideNavbar && <Navbar />}
       <Outlet />
       <ReactQueryDevtools buttonPosition="bottom-left" />
       <TanStackRouterDevtools position="bottom-right" />

@@ -1,8 +1,7 @@
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  Bell,
   Home,
   Menu,
   MessageSquare,
@@ -12,7 +11,6 @@ import {
   Rows4,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,10 +25,9 @@ import { AxiosError } from "axios";
 import { STORAGE_URL } from "@/lib/const";
 
 export const Navbar = () => {
-  const { user, loading, setUser } = useUser();
+  const { user, loading, setUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -38,7 +35,8 @@ export const Navbar = () => {
     },
     onSuccess: () => {
       setUser(null);
-      setIsLoggingOut(true);
+      router.invalidate();
+      router.navigate({ to: "/login", replace: false });
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -49,15 +47,8 @@ export const Navbar = () => {
     },
   });
 
-  useEffect(() => {
-    if (isLoggingOut && !user) {
-      router.navigate({ to: "/login", replace: false });
-      setIsLoggingOut(false);
-    }
-  }, [isLoggingOut, user, router]);
-
   if (loading) {
-    return <div></div>;
+    return <></>;
   }
 
   return (
@@ -106,11 +97,6 @@ export const Navbar = () => {
               />
             </>
           )}
-          <NavButton
-            to="/notifications"
-            icon={<Bell className="h-6 w-6" />}
-            text="Notifications"
-          />
           {!user && (
             <NavButton
               to="/login"
@@ -140,7 +126,6 @@ export const Navbar = () => {
                   <DropdownMenuItem>
                     <a href={`/profile/${user.id}`}>View Profile</a>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={() => mutation.mutate()}
@@ -184,21 +169,14 @@ export const Navbar = () => {
                       <Users className="h-5 w-5" /> My Network
                     </Link>
                     <Link
-                      to="/"
+                      to="/chat"
                       className="flex items-center gap-2 text-lg font-semibold"
                       onClick={() => setIsOpen(false)}
                     >
-                      <MessageSquare className="h-5 w-5" /> Messaging
+                      <MessageSquare className="h-5 w-5" /> Chat
                     </Link>
                   </>
                 )}
-                <Link
-                  to="/"
-                  className="flex items-center gap-2 text-lg font-semibold"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Bell className="h-5 w-5" /> Notifications
-                </Link>
                 {user && (
                   <div
                     className="flex items-center gap-2 text-lg font-semibold cursor-pointer"

@@ -3,7 +3,6 @@ import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { getConnectionsList } from "@/services/userList";
 import { deleteConnection } from "@/services/connection";
-import { useUser } from "@/context/auth-context";
 
 const connectionListQueryOptions = (userId: string) =>
   queryOptions({
@@ -16,7 +15,6 @@ export const Route = createFileRoute("/(connection)/conList/$userId")({
 });
 
 function ConListComponent() {
-  const infoUser = useUser();
   const userId = Route.useParams().userId;
 
   const { data: userList } = useQuery(connectionListQueryOptions(userId));

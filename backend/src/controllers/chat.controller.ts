@@ -46,7 +46,20 @@ class ChatController implements Controller {
     };
   };
 
+  getChatHeaders = async (req: RequestWithUser): Promise<BaseResponse> => {
+    return {
+      body: await this.chatService.getChatHeaders(BigInt(req.user?.id!)),
+      message: "Chat headers fetched successfully",
+    };
+  };
+
   private initRoutes() {
+    this.router.get(
+      `${this.path}/`,
+      this.authMiddleware.checkUser,
+      handleRequest(this.getChatHeaders)
+    );
+
     this.router.get(
       `${this.path}/:roomId(\\d+)`,
       [this.authMiddleware.checkUser, validateRequest(getMessagesSchema)],

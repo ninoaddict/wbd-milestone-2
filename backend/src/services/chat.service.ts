@@ -16,6 +16,10 @@ class ChatService {
     return match;
   };
 
+  getChatHeaders = async (userId: bigint) => {
+    return await this.chatRepository.getChatHeaders(userId);
+  };
+
   getMessages = async (
     take: number,
     roomId: bigint,

@@ -1,11 +1,10 @@
-import { useEffect } from "react";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import NotFound from "@/components/not-found/not-found";
-import { useUser } from "@/context/auth-context";
-import Loading from "@/components/loading/loading";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/context/auth-context";
+import { queryOptions } from "@tanstack/react-query";
 import { getChatRoomData } from "@/services/chat";
 import ChatPage from "@/components/chat/chat";
+import Loading from "@/components/loading/loading";
 
 const chatRoomQueryOptions = (roomId: string) =>
   queryOptions({
@@ -16,44 +15,30 @@ const chatRoomQueryOptions = (roomId: string) =>
 export const Route = createFileRoute("/chat/$roomId")({
   component: RouteComponent,
   errorComponent: NotFound,
+  pendingComponent: Loading,
+  beforeLoad: ({ context }) => {
+    if (!context.auth.user) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
   loader: ({ context: { queryClient }, params: { roomId } }) => {
     return queryClient.ensureQueryData(chatRoomQueryOptions(roomId));
   },
 });
 
 function RouteComponent() {
+  const { user, loading } = useAuth();
   const chatRoomId = Route.useParams().roomId;
-  const router = useRouter();
-  const { user, loading } = useUser();
+  const chatRoom = Route.useLoaderData();
 
-  // Always call hooks unconditionally
-  const { data: chatRoom, isLoading: chatRoomLoading } = useQuery(
-    chatRoomQueryOptions(chatRoomId)
-  );
-
-  useEffect(() => {
-    if (!user && !loading) {
-      router.navigate({
-        to: "/login",
-        replace: true,
-      });
-    }
-  }, [user, loading, router]);
-
-  // Conditional logic inside the render
-  if (loading || chatRoomLoading) {
+  if (loading) {
     return <Loading />;
   }
 
   if (!user) {
-    return null; // Prevent rendering while navigating
-  }
-
-  if (
-    !chatRoom ||
-    (user.id !== chatRoom.firstUserId && user.id !== chatRoom.secondUserId)
-  ) {
-    return <NotFound />;
+    return null;
   }
 
   const fromId = user.id;

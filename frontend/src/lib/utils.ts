@@ -33,3 +33,30 @@ export const sortExperiences = (experiences: experienceType[]) => {
     return 0; // Dates are equal
   });
 };
+
+export const convertTime = (prevDate: any) => {
+  const currDate = new Date();
+  const prevDateObj = new Date(prevDate);
+
+  const isSameDay = currDate.toDateString() === prevDateObj.toDateString();
+
+  const isYesterday =
+    currDate.getDate() - prevDateObj.getDate() === 1 &&
+    currDate.getMonth() === prevDateObj.getMonth();
+
+  if (isSameDay) {
+    return prevDateObj.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
+
+  if (isYesterday) {
+    return "Yesterday";
+  }
+
+  const month = (prevDateObj.getMonth() + 1).toString().padStart(2, "0");
+  const date = prevDateObj.getDate().toString().padStart(2, "0");
+  return `${month}/${date}`;
+};

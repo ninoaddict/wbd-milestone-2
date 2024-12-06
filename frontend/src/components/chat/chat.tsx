@@ -1,24 +1,20 @@
-import { useUser } from "@/context/auth-context";
-import { ChatPayload, socket } from "@/services/socket";
+import { ChatPayload } from "@/services/socket";
 import { useCallback, useEffect, useState } from "react";
 import useEmit from "@/hooks/useEmit";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { MoreHorizontal, Phone, Video, ChevronLeftIcon } from "lucide-react";
-import { ChatBubble } from "./chat-bubble";
+import { ChevronLeftIcon } from "lucide-react";
 import useSubscription from "@/hooks/useSubscription";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/services/profile";
 import { getLimitedUser } from "@/services/user";
-import ChatNavbar from "./chat-navbar";
-import { useParams, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { ChatFooter } from "./chat-footer";
 import Messages from "./messages";
-import { match } from "assert";
 import { api } from "@/lib/api";
 import { MessagesData, MessagesResponse } from "@/services/chat";
 import { STORAGE_URL } from "@/lib/const";
+import Loading from "../loading/loading";
 
 export default function ChatPage({
   fromId,
@@ -75,8 +71,12 @@ export default function ChatPage({
   }, [roomId]);
 
   // get other user data
-  const { data: profileData, refetch } = useQuery({
-    queryKey: ["oponentProfile"],
+  const {
+    data: profileData,
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["opponentProfile", { toId }],
     queryFn: () => getLimitedUser(toId),
   });
 
@@ -88,7 +88,7 @@ export default function ChatPage({
   }, [profileData, refetch]);
 
   const messageQuery = useInfiniteQuery({
-    queryKey: ["messages"],
+    queryKey: ["messages", { roomId }],
     queryFn: getMessages,
     initialPageParam: "",
     getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -151,9 +151,13 @@ export default function ChatPage({
     isTypingEmit.mutate({ roomId });
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f4f2ee]">
-      <div className="flex flex-col max-h-[1000px] md:max-w-screen-sm w-full h-[100vh] md:h-[calc(100vh-60px)] rounded-xl shadow-lg bg-white">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f4f2ee] lg:pt-6">
+      <div className="flex flex-col max-h-[1000px] md:max-w-screen-sm w-full h-[100vh] md:h-[calc(100vh-130px)] rounded-xl shadow-lg bg-white">
         <Card className="border-x-0 rounded-none sm:rounded-xl border-t-0">
           <CardHeader className="border-b-2 py-4 pl-3">
             <div className="flex items-center">

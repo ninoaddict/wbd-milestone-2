@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { SendHorizonal, SquarePen, Trash2 } from "lucide-react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getFeeds, postFeeds, editFeeds, deleteFeeds } from "@/services/feed";
@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import FeedEditor from "@/components/feed/edit-feed-modal";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
+import Loading from "@/components/loading/loading";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
@@ -21,8 +22,77 @@ const feedQueryOptions = (offset: number) =>
   });
 
 function HomeComponent() {
-  const infoUser = useUser();
-  // console.log(infoUser)
+  const infoUser = useAuth();
+
+  const [feedValue, setFeedValue] = React.useState("");
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [editFeedValue, setEditFeedValue] = React.useState("");
+  const [editFeedId, setEditFeedId] = React.useState(BigInt(-1));
+
+  const { ref, inView } = useInView({
+    threshold: 0.8,
+  });
+
+  const ago: string[] = [];
+  const updater: string[] = [];
+
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["projects"],
+    queryFn: ({ pageParam = 0 }) => getFeeds({ pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPage) => {
+      return lastPage.length > 0 ? allPage.length * 10 : undefined;
+    },
+  });
+
+  React.useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
+
+  const mutationPost = useMutation({
+    mutationFn: (content: string) => postFeeds(content),
+    onSuccess: () => {
+      console.log("Connection request sent successfully!");
+    },
+    onError: (error) => {
+      console.error("Error sending connection request:", error);
+    },
+  });
+
+  const mutationUpdate = useMutation({
+    mutationFn: ({ feedId, content }: { feedId: bigint; content: string }) =>
+      editFeeds(content, feedId),
+    onSuccess: () => {
+      console.log("Connection request sent successfully!");
+    },
+    onError: (error) => {
+      console.error("Error sending connection request:", error);
+    },
+  });
+
+  const mutationDelete = useMutation({
+    mutationFn: (feedId: bigint) => deleteFeeds(feedId),
+    onSuccess: () => {
+      console.log("Connection request sent successfully!");
+    },
+    onError: (error) => {
+      console.error("Error sending connection request:", error);
+    },
+  });
+
+  if (infoUser.loading) {
+    return <Loading />;
+  }
 
   if (!infoUser.user) {
     return (
@@ -56,75 +126,13 @@ function HomeComponent() {
     );
   }
 
-  const [feedValue, setFeedValue] = React.useState("");
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [editFeedValue, setEditFeedValue] = React.useState("");
-  const [editFeedId, setEditFeedId] = React.useState(BigInt(-1));
-
-  const { ref, inView } = useInView({
-    threshold: 0.8,
-  });
-
-  const ago: string[] = [];
-  const updater: string[] = [];
-
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
-    queryKey: ["projects"],
-    queryFn: ({ pageParam = 0 }) => getFeeds({ pageParam }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPage) => {
-      return lastPage.length > 0 ? allPage.length * 10 : undefined;
-    },
-  });
-
-  // console.log(data);
   const flatData = data?.pages.flat();
-  // console.log(flatData)
 
   const openModal = (feed: string, feedId: bigint) => {
     setEditFeedValue(feed);
     setEditFeedId(feedId);
     setModalOpen(true);
   };
-
-  const mutationPost = useMutation({
-    mutationFn: (content: string) => postFeeds(content),
-    onSuccess: () => {
-      console.log("Connection request sent successfully!");
-    },
-    onError: (error) => {
-      console.error("Error sending connection request:", error);
-    },
-  });
-
-  const mutationUpdate = useMutation({
-    mutationFn: ({ feedId, content }: { feedId: bigint; content: string }) =>
-      editFeeds(content, feedId),
-    onSuccess: () => {
-      console.log("Connection request sent successfully!");
-    },
-    onError: (error) => {
-      console.error("Error sending connection request:", error);
-    },
-  });
-
-  const mutationDelete = useMutation({
-    mutationFn: (feedId: bigint) => deleteFeeds(feedId),
-    onSuccess: () => {
-      console.log("Connection request sent successfully!");
-    },
-    onError: (error) => {
-      console.error("Error sending connection request:", error);
-    },
-  });
 
   if (flatData) {
     for (let feed of flatData) {
@@ -274,16 +282,6 @@ function HomeComponent() {
   const deleteFeed = (feedId: bigint) => {
     mutationDelete.mutate(feedId);
   };
-
-  React.useEffect(() => {
-    if (inView && hasNextPage) {
-      // console.log("BLA");
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, fetchNextPage]);
-
-  // console.log(infoUser)
-  // console.log(ago,feeds);
 
   return (
     <div className="p-2 min-h-screen bg-[#f4f2ee]">

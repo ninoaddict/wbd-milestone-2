@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { useRouter } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { login, LoginPayload } from "@/services/auth";
@@ -27,7 +27,7 @@ const loginFormSchema = z.object({
 });
 
 export const LoginForm = () => {
-  const { setUser } = useUser();
+  const { setUser } = useAuth();
   const router = useRouter();
 
   const mutation = useMutation({
@@ -36,6 +36,7 @@ export const LoginForm = () => {
     },
     onSuccess: (data) => {
       setUser(data);
+      router.invalidate();
       router.navigate({
         to: "/",
         replace: true,

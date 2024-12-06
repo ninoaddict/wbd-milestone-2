@@ -1,5 +1,8 @@
 import { api } from "@/lib/api";
-import { UserList, UserListQueried } from "@/domain/interfaces/connection.interface";
+import {
+  UserList,
+  UserListQueried,
+} from "@/domain/interfaces/connection.interface";
 
 interface UserListResponse {
   body: UserList;
@@ -21,7 +24,6 @@ export const getUserList = async (query: string) => {
       }
       throw err;
     })) as UserListResponse;
-  console.log(res);
   return res.body;
 };
 

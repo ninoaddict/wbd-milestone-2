@@ -3,7 +3,7 @@ import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { getRequestsList } from "@/services/userList";
 import { acceptConnection, rejectConnection } from "@/services/connection";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 
 const connectionListQueryOptions = (userId: string) =>
   queryOptions({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/(connection)/conReq/$userId")({
 });
 
 function ConReqComponent() {
-  const infoUser = useUser();
+  const infoUser = useAuth();
   const userId = Route.useParams().userId;
 
   const { data: userList } = useQuery(connectionListQueryOptions(userId));

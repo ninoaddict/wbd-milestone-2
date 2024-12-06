@@ -24,7 +24,7 @@ export const UserContext = createContext<UserContextValue>({
 export const UserProvider = ({ children }: { children: ReactElement }) => {
   const [user, setUser] = useState<User | undefined | null>();
   const { data, isLoading } = useQuery({
-    queryKey: ["profile"],
+    queryKey: ["auth"],
     queryFn: () => getUser(),
   });
   const [loading, setLoading] = useState<boolean>(true);
@@ -41,4 +41,4 @@ export const UserProvider = ({ children }: { children: ReactElement }) => {
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export const useAuth = () => useContext(UserContext);
