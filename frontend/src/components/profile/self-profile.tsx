@@ -22,6 +22,15 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
   let initExp: experienceType[] = [];
   let initSkills: string[] = [];
 
+  // console.log(profile.relevant_post);
+
+  profile.relevant_post?.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+  let newList = profile.relevant_post?.slice(0,4);
+  profile.relevant_post?.slice(0,4);
+
+  // console.log(newList)
+
   try {
     if (profile && profile.work_history && profile.work_history !== "") {
       const raw = JSON.parse(profile.work_history);
@@ -252,6 +261,28 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
   if (loading) {
     return <div></div>;
   }
+  
+  const ago: string[] = []
+  if (profile.relevant_post) {
+    for (let feed of profile.relevant_post) {
+      const millisec = Math.floor((Date.now() - new Date(feed.createdAt).getTime()));
+      if (millisec >= 1000*60 && millisec < 1000*60*60) {
+        ago.push(`Created ${Math.floor(millisec/(1000*60))} minutes ago`);
+      } else if (millisec >= 1000*60*60 && millisec < 1000*60*60*24) {
+        ago.push(`Created ${Math.floor(millisec/(1000*60*60))} hours ago`);
+      } else if (millisec >= 1000*60*60*24 && millisec < 1000*60*60*24*7) {
+        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24))} days ago`);
+      } else if (millisec >= 1000*60*60*24*7 && millisec < 1000*60*60*24*30) {
+        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24*7))} weeks ago`);
+      } else if (millisec >= 1000*60*60*24*30 && millisec < 1000*60*60*24*365) {
+        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24*30))} months ago`);
+      } else if (millisec >= 1000*60*60*24*365) {
+        ago.push(`Created ${Math.floor(millisec/(1000*60*60*24*365))} years ago`);
+      } else {
+        ago.push(`Created ${Math.floor(millisec/(1000))} seconds ago`);
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#f4f2ee] pt-[92px] pb-[48px]">
@@ -398,16 +429,16 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
                 Recent Posts
               </h2>
               <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((post) => (
-                  <Card key={post} className="p-3 sm:p-4">
+                {newList && newList.map((post, index) => (
+                  <Card key={post.id} className="p-3 sm:p-4">
                     <h3 className="text-sm sm:text-base font-semibold">
-                      Exciting new developments in React 19
+                        Post #{ago.length - index}
                     </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Shared by John Developer · 2d ago
-                    </p>
                     <p className="mt-2 text-xs sm:text-sm">
-                      Check out these amazing new features coming to React...
+                      {post.content}
+                    </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      {ago && ago[index]}
                     </p>
                   </Card>
                 ))}

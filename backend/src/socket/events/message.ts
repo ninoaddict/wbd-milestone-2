@@ -53,14 +53,28 @@ export const messageEvent = createEvent(
       chatRoom = chatRoomFromSession;
     }
 
-    const message = await ctx.prisma.chat.create({
-      data: {
-        fromId: ctx.client.data.session.id,
-        toId: input.receiverId,
-        message: input.message,
-        chatRoomId: chatRoom.id,
-      },
+    const message = await ctx.prisma.$transaction(async (tx) => {
+      const msg = await tx.chat.create({
+        data: {
+          fromId: ctx.client.data.session.id,
+          toId: input.receiverId,
+          message: input.message,
+          chatRoomId: chatRoom.id,
+        },
+      });
+      // also update for chatroom
+      await tx.chatRoom.update({
+        where: {
+          id: chatRoom.id,
+        },
+        data: {
+          lastTimeStamp: msg.timestamp,
+          lastMessage: msg.message,
+        },
+      });
+      return msg;
     });
+
     const messagePayload = {
       id: message.id.toString(),
       message: message.message,

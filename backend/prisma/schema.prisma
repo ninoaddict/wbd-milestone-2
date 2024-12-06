@@ -46,6 +46,7 @@ model Feed {
   userId    BigInt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([createdAt(sort: Desc)])
   @@map("feed")
 }
 
@@ -60,7 +61,7 @@ model Chat {
   chatRoomId BigInt
   chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
 
-  @@index([timestamp], type: BTree)
+  @@index([timestamp(sort: Desc)])
   @@map("chat")
 }
 
@@ -70,8 +71,11 @@ model ChatRoom {
   secondUserId BigInt
   firstUser    User   @relation("firstUserRoom", fields: [firstUserId], references: [id])
   secondUser   User   @relation("secondUserRoom", fields: [secondUserId], references: [id])
+  lastMessage  String? @db.Text
+  lastTimeStamp DateTime @default(now()) @db.Timestamptz()
   chat         Chat[]
 
+  @@index([lastTimeStamp(sort: Desc)])
   @@unique([firstUserId, secondUserId])
 }
 

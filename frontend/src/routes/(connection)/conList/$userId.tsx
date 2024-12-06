@@ -1,39 +1,42 @@
-import * as React from 'react'
-import { createFileRoute, ErrorComponent } from '@tanstack/react-router'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { getConnectionsList } from '@/services/userList'
-import { deleteConnection } from '@/services/connection'
+import * as React from "react";
+import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import { getConnectionsList } from "@/services/userList";
+import { deleteConnection } from "@/services/connection";
+import { useUser } from "@/context/auth-context";
 
 const connectionListQueryOptions = (userId: string) =>
   queryOptions({
-    queryKey: ['connectionList', { userId }],
+    queryKey: ["connectionList", { userId }],
     queryFn: () => getConnectionsList(userId),
-  })
+  });
 
-export const Route = createFileRoute('/(connection)/conList/$userId')({
+export const Route = createFileRoute("/(connection)/conList/$userId")({
   component: ConListComponent,
-})
+});
 
 function ConListComponent() {
-  const userId = Route.useParams().userId
-  const { data: userList } = useQuery(connectionListQueryOptions(userId))
+  const infoUser = useUser();
+  const userId = Route.useParams().userId;
+
+  const { data: userList } = useQuery(connectionListQueryOptions(userId));
 
   const mutationDelete = useMutation({
     mutationFn: (userId: bigint) => deleteConnection(userId),
     onSuccess: () => {
-      console.log('Connection request sent successfully!')
+      console.log("Connection request sent successfully!");
     },
     onError: (error) => {
-      console.error('Error sending connection request:', error)
+      console.error("Error sending connection request:", error);
     },
-  })
+  });
 
   const deleteConnectionRequest = (userId: bigint) => {
-    console.log(userId)
-    mutationDelete.mutate(userId)
-  }
+    console.log(userId);
+    mutationDelete.mutate(userId);
+  };
 
-  console.log(userList)
+  console.log(userList);
 
   return (
     <div className="min-h-screen w-full bg-[#f4f2ee] flex flex-col">
@@ -44,12 +47,17 @@ function ConListComponent() {
         >
           <div
             id="connection-container"
-            className="bg-white rounded-t-md w-4/6 shadow-lg"
+            className="bg-white rounded-t-md w-11/12 shadow-lg"
           >
             <header className="border-solid border-gray-200 border p-[10px] rounded-t-md">
-              <h2 className="text-xl">Connections</h2>
+              <h2 className="text-xl">{userList?.length} Connections</h2>
             </header>
             <main>
+              {userList?.length == 0 && (
+                <div className="p-[10px] w-[300px]">
+                  This user has no connections
+                </div>
+              )}
               <ul>
                 {userList &&
                   userList.map((item, index) => (
@@ -65,7 +73,9 @@ function ConListComponent() {
                       </div>
                       <div className="flex flex-1 justify-between">
                         <div className="flex flex-col">
-                          <p className="text-[17px]">{item.user.name}</p>
+                          <p className="text-[17px] text-blue-600">
+                            {item.user.name}
+                          </p>
                           <p className="text-[14px] text-gray-500">
                             Username: {item.user.username}
                           </p>
@@ -78,9 +88,10 @@ function ConListComponent() {
                             Message
                           </a>
                           <button
-                            onClick={() =>
-                              deleteConnectionRequest(item.user.id)
-                            }
+                            onClick={() => {
+                              deleteConnectionRequest(item.user.id);
+                              window.location.reload();
+                            }}
                             className="border border-red-700 border-solid px-[10px] py-[4px] rounded-[15px] text-red-700 text-[14px] mx-[5px] hover:text-white hover:bg-red-700"
                           >
                             Unconnect
@@ -95,5 +106,5 @@ function ConListComponent() {
         </section>
       </main>
     </div>
-  )
+  );
 }

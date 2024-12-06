@@ -9,6 +9,7 @@ import {
   Users,
   LogOut,
   LogIn,
+  Rows4,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -77,18 +78,31 @@ export const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-1">
           <NavButton to="/" icon={<Home className="h-6 w-6" />} text="Home" />
+          {user ? (
+            <NavButton
+              to={`/userList/${user.id}`}
+              icon={<Rows4 className="h-6 w-6" />}
+              text="User List"
+            />
+          ) : (
+            <NavButton
+              to={`/userList/${0}`}
+              icon={<Rows4 className="h-6 w-6" />}
+              text="User List"
+            />
+          )}
           {user && (
             <>
               {" "}
               <NavButton
-                to="/mynetwork"
+                to={`/conList/${user.id}`}
                 icon={<Users className="h-6 w-6" />}
                 text="My Network"
               />
               <NavButton
-                to="/messaging"
+                to="/chat"
                 icon={<MessageSquare className="h-6 w-6" />}
-                text="Messaging"
+                text="Chat"
               />
             </>
           )}
@@ -123,7 +137,9 @@ export const Navbar = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem>View Profile</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <a href={`/profile/${user.id}`}>View Profile</a>
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"

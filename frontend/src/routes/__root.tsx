@@ -39,6 +39,7 @@ function RootComponent() {
 
   return (
     <>
+      <Navbar />
       <Outlet />
       <ReactQueryDevtools buttonPosition="bottom-left" />
       <TanStackRouterDevtools position="bottom-right" />
