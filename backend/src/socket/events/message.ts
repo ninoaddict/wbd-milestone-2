@@ -81,29 +81,82 @@ export const messageEvent = createEvent(
         userId: input.receiverId,
       },
     });
-    subscriptions.forEach(async (raw) => {
-      const endpoint = raw.endpoint;
-      const keys = raw.keys as Prisma.JsonObject;
-      const p256dh = keys.p256dh as string;
-      const auth = keys.auth as string;
-      const payload = {
-        title: "New message",
-        body:
-          message.message.length <= 50
-            ? message.message
-            : message.message.substring(0, 50) + "...",
-        url: `http://localhost:5173/chat/${message.chatRoomId}`,
-      };
-      await webPush.sendNotification(
-        {
-          endpoint,
-          keys: {
-            p256dh,
-            auth,
-          },
-        },
-        JSON.stringify(payload)
-      );
+
+    // await Promise.all(
+    //   subscriptions.map(async (raw) => {
+    //     const endpoint = raw.endpoint;
+    //     const keys = raw.keys as Prisma.JsonObject;
+    //     const p256dh = keys.p256dh as string;
+    //     const auth = keys.auth as string;
+
+    //     const payload = {
+    //       title: "New message",
+    //       body:
+    //         message.message.length <= 50
+    //           ? message.message
+    //           : message.message.substring(0, 50) + "...",
+    //       url: `http://localhost:5173/chat/${message.chatRoomId}`,
+    //     };
+
+    //     try {
+    //       await webPush.sendNotification(
+    //         {
+    //           endpoint,
+    //           keys: {
+    //             p256dh,
+    //             auth,
+    //           },
+    //         },
+    //         JSON.stringify(payload)
+    //       );
+    //     } catch (error) {
+    //       // delete invalid subscription
+    //       await ctx.prisma.pushSubscription.delete({
+    //         where: {
+    //           endpoint: raw.endpoint,
+    //         },
+    //       });
+    //     }
+    //   })
+    // );
+
+    setImmediate(() => {
+      subscriptions.forEach(async (raw) => {
+        const endpoint = raw.endpoint;
+        const keys = raw.keys as Prisma.JsonObject;
+        const p256dh = keys.p256dh as string;
+        const auth = keys.auth as string;
+
+        const payload = {
+          title: "New message",
+          body:
+            message.message.length <= 50
+              ? message.message
+              : message.message.substring(0, 50) + "...",
+          url: `http://localhost:5173/chat/${message.chatRoomId}`,
+        };
+
+        try {
+          await webPush.sendNotification(
+            {
+              endpoint,
+              keys: {
+                p256dh,
+                auth,
+              },
+            },
+            JSON.stringify(payload)
+          );
+        } catch (error: any) {
+          if (error.statusCode === 410 || error.statusCode === 404) {
+            await ctx.prisma.pushSubscription.delete({
+              where: { endpoint },
+            });
+          } else {
+            console.error("Push notification error:", error);
+          }
+        }
+      });
     });
 
     const messagePayload = {
