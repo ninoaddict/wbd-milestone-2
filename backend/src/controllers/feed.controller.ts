@@ -52,9 +52,9 @@ class FeedController implements Controller {
   };
 
   postFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
+    await this.feedService.postFeeds(req.user?.id, req.body.content);
     return {
-      body: await this.feedService.postFeeds(req.user?.id, req.body.content),
-      message: "Feeds retrieved successfully",
+      message: "Feeds posted successfully",
     };
   };
 

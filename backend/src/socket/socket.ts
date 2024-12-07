@@ -1,6 +1,4 @@
-import { ChatRoom } from "@prisma/client";
 import { Server, Socket } from "socket.io";
-
 import { getSession, ServerEventsResolver } from "./helper";
 import { UserSession } from "./type";
 import { messageEvent } from "./events/message";
@@ -40,7 +38,6 @@ interface InterServerEvents {
 
 export type SocketData<AuthRequired = false> = {
   session: AuthRequired extends true ? UserSession : UserSession | null;
-  chatRoom: Map<bigint, ChatRoom>;
 };
 
 export type SocketServer = Server<
@@ -67,19 +64,9 @@ export function setupSocket(io: SocketServer) {
       .catch(next);
   });
 
-  io.use((socket, next) => {
-    socket.data.chatRoom = new Map<bigint, ChatRoom>();
-    next();
-  });
-
   io.on("connection", (socket) => {
     if (socket.data.session) {
       serverEvents.forEach((event) => event(io, socket));
-      // const userId = socket.data.session.id;
-      // void socket.join(userId.toString());
-      // socket.on("disconnect", () => {
-      //   void socket.leave(userId.toString());
-      // });
     }
   });
 }

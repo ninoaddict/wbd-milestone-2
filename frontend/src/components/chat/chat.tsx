@@ -119,7 +119,7 @@ export default function ChatPage({
   const messageEmit = useEmit("message");
   const handleSendMessage = () => {
     if (newMessage.trim()) {
-      messageEmit.mutate({ message: newMessage.trim(), receiverId: toId });
+      messageEmit.mutate({ message: newMessage.trim(), receiverId: roomId });
       setNewMessage("");
       const textarea = document.querySelector("textarea");
       if (textarea) {

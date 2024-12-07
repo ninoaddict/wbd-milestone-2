@@ -19,6 +19,31 @@ class NotificationRepository {
       },
     });
   };
+
+  getConnectedSubscriptions = async (userId: bigint) => {
+    return await prisma.$transaction(async (tx) => {
+      const connections = await tx.connection.findMany({
+        where: {
+          fromId: userId,
+        },
+        select: {
+          toId: true,
+        },
+      });
+
+      const connectedUserIds = connections.map((connection) => connection.toId);
+
+      const subscriptions = await tx.pushSubscription.findMany({
+        where: {
+          userId: {
+            in: connectedUserIds,
+          },
+        },
+      });
+
+      return subscriptions;
+    });
+  };
 }
 
 export default NotificationRepository;

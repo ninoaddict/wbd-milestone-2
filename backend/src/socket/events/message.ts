@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createEvent } from "../helper";
-import { ChatRoom, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import webPush from "../../config/webPushConfig";
 
 export const messageEvent = createEvent(
@@ -26,39 +26,36 @@ export const messageEvent = createEvent(
     authRequired: true,
   },
   async ({ ctx, input }) => {
-    let chatRoom: ChatRoom;
-
-    const chatRoomFromSession = ctx.client.data.chatRoom.get(input.receiverId);
-    if (!chatRoomFromSession) {
-      const roomFromDb = await ctx.prisma.chatRoom.findFirst({
-        where: {
-          OR: [
-            {
-              firstUserId: input.receiverId,
-              secondUserId: ctx.client.data.session.id,
-            },
-            {
-              secondUserId: input.receiverId,
-              firstUserId: ctx.client.data.session.id,
-            },
-          ],
-        },
-      });
-
-      if (!roomFromDb) {
-        throw new Error("Room chat not found");
-      }
-      chatRoom = roomFromDb;
-      ctx.client.data.chatRoom.set(input.receiverId, roomFromDb);
-    } else {
-      chatRoom = chatRoomFromSession;
+    // check if chat room is valid
+    const chatRoomId = input.receiverId;
+    const chatRoom = await ctx.prisma.chatRoom.findUnique({
+      where: {
+        id: chatRoomId,
+        OR: [
+          {
+            firstUserId: ctx.client.data.session.id,
+          },
+          {
+            secondUserId: ctx.client.data.session.id,
+          },
+        ],
+      },
+    });
+    if (!chatRoom) {
+      throw new Error("Unauthorized user");
     }
+
+    const myId = ctx.client.data.session.id;
+    const otherId =
+      myId === chatRoom.firstUserId
+        ? chatRoom.secondUserId
+        : chatRoom.firstUserId;
 
     const message = await ctx.prisma.$transaction(async (tx) => {
       const msg = await tx.chat.create({
         data: {
-          fromId: ctx.client.data.session.id,
-          toId: input.receiverId,
+          fromId: myId,
+          toId: otherId,
           message: input.message,
           chatRoomId: chatRoom.id,
         },
@@ -78,48 +75,20 @@ export const messageEvent = createEvent(
 
     const subscriptions = await ctx.prisma.pushSubscription.findMany({
       where: {
-        userId: input.receiverId,
+        userId: otherId,
       },
     });
 
-    // await Promise.all(
-    //   subscriptions.map(async (raw) => {
-    //     const endpoint = raw.endpoint;
-    //     const keys = raw.keys as Prisma.JsonObject;
-    //     const p256dh = keys.p256dh as string;
-    //     const auth = keys.auth as string;
+    const myProfile = await ctx.prisma.user.findUnique({
+      where: {
+        id: myId,
+      },
+      select: {
+        name: true,
+      },
+    });
 
-    //     const payload = {
-    //       title: "New message",
-    //       body:
-    //         message.message.length <= 50
-    //           ? message.message
-    //           : message.message.substring(0, 50) + "...",
-    //       url: `http://localhost:5173/chat/${message.chatRoomId}`,
-    //     };
-
-    //     try {
-    //       await webPush.sendNotification(
-    //         {
-    //           endpoint,
-    //           keys: {
-    //             p256dh,
-    //             auth,
-    //           },
-    //         },
-    //         JSON.stringify(payload)
-    //       );
-    //     } catch (error) {
-    //       // delete invalid subscription
-    //       await ctx.prisma.pushSubscription.delete({
-    //         where: {
-    //           endpoint: raw.endpoint,
-    //         },
-    //       });
-    //     }
-    //   })
-    // );
-
+    // non blocking codes
     setImmediate(() => {
       subscriptions.forEach(async (raw) => {
         const endpoint = raw.endpoint;
@@ -128,7 +97,7 @@ export const messageEvent = createEvent(
         const auth = keys.auth as string;
 
         const payload = {
-          title: "New message",
+          title: myProfile?.name || "New Message",
           body:
             message.message.length <= 50
               ? message.message

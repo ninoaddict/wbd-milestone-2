@@ -39,11 +39,6 @@ export const joinEvent = createEvent(
     if (!chatRoom) {
       throw new Error("Invalid chat room");
     } else {
-      const otherUser =
-        chatRoom.firstUserId === ctx.client.data.session.id
-          ? chatRoom.secondUserId
-          : chatRoom.firstUserId;
-      ctx.client.data.chatRoom.set(otherUser, chatRoom);
       ctx.client.join(input.roomId.toString());
       ctx.io.to(ctx.client.id).emit("joinSuccess", "Joining room successfully");
     }

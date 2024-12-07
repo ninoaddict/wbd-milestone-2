@@ -51,13 +51,13 @@ model Feed {
 }
 
 model Chat {
-  id         BigInt    @id @default(autoincrement())
-  timestamp  DateTime  @default(now()) @db.Timestamptz()
+  id         BigInt   @id @default(autoincrement())
+  timestamp  DateTime @default(now()) @db.Timestamptz()
   fromId     BigInt
   toId       BigInt
-  message    String    @db.Text
-  from       User      @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
-  to         User      @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
+  message    String   @db.Text
+  from       User     @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
+  to         User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
   chatRoomId BigInt
   chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
 
@@ -66,17 +66,17 @@ model Chat {
 }
 
 model ChatRoom {
-  id           BigInt @id @default(autoincrement())
-  firstUserId  BigInt
-  secondUserId BigInt
-  firstUser    User   @relation("firstUserRoom", fields: [firstUserId], references: [id])
-  secondUser   User   @relation("secondUserRoom", fields: [secondUserId], references: [id])
-  lastMessage  String? @db.Text
+  id            BigInt   @id @default(autoincrement())
+  firstUserId   BigInt
+  secondUserId  BigInt
+  firstUser     User     @relation("firstUserRoom", fields: [firstUserId], references: [id])
+  secondUser    User     @relation("secondUserRoom", fields: [secondUserId], references: [id])
+  lastMessage   String?  @db.Text
   lastTimeStamp DateTime @default(now()) @db.Timestamptz()
-  chat         Chat[]
+  chat          Chat[]
 
-  @@index([lastTimeStamp(sort: Desc)])
   @@unique([firstUserId, secondUserId])
+  @@index([lastTimeStamp(sort: Desc)])
 }
 
 model ConnectionRequest {
