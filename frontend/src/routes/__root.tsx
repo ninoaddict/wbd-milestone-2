@@ -57,9 +57,9 @@ function RootComponent() {
           if (subscription) {
             try {
               await subscription.unsubscribe();
-              // await api.post("/notification/unsubscribe", {
-              //   endpoint: subscription.endpoint,
-              // });
+              await api.post("/notification/unsubscribe", {
+                endpoint: subscription.endpoint,
+              });
             } catch (error) {
               console.log(error);
             }
