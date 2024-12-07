@@ -5,7 +5,6 @@ import { routeTree } from "./routeTree.gen";
 import { UserProvider, useAuth } from "./context/auth-context";
 import "./index.css";
 import Loading from "./components/loading/loading";
-import { Suspense } from "react";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +30,13 @@ declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/service-worker.js")
+    .then(() => console.log("Service Worker Registered"))
+    .catch(() => console.log("Service Worker Error"));
 }
 
 const rootElement = document.getElementById("app")!;

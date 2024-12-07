@@ -2,7 +2,6 @@ import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/context/auth-context";
 import { SendHorizonal, SquarePen, Trash2 } from "lucide-react";
-import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getFeeds, postFeeds, editFeeds, deleteFeeds } from "@/services/feed";
 import { Feed } from "../domain/interfaces/feed.interface";
 import { useMutation } from "@tanstack/react-query";
@@ -14,12 +13,6 @@ import Loading from "@/components/loading/loading";
 export const Route = createFileRoute("/")({
   component: HomeComponent,
 });
-
-const feedQueryOptions = (offset: number) =>
-  queryOptions({
-    queryKey: ["feed"],
-    queryFn: () => getFeeds({ pageParam: offset }),
-  });
 
 function HomeComponent() {
   const infoUser = useAuth();

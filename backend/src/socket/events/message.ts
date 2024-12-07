@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createEvent } from "../helper";
-import { ChatRoom } from "@prisma/client";
+import { ChatRoom, Prisma } from "@prisma/client";
+import webPush from "../../config/webPushConfig";
 
 export const messageEvent = createEvent(
   {
@@ -73,6 +74,36 @@ export const messageEvent = createEvent(
         },
       });
       return msg;
+    });
+
+    const subscriptions = await ctx.prisma.pushSubscription.findMany({
+      where: {
+        userId: input.receiverId,
+      },
+    });
+    subscriptions.forEach(async (raw) => {
+      const endpoint = raw.endpoint;
+      const keys = raw.keys as Prisma.JsonObject;
+      const p256dh = keys.p256dh as string;
+      const auth = keys.auth as string;
+      const payload = {
+        title: "New message",
+        body:
+          message.message.length <= 50
+            ? message.message
+            : message.message.substring(0, 50) + "...",
+        url: `http://localhost:5173/chat/${message.chatRoomId}`,
+      };
+      await webPush.sendNotification(
+        {
+          endpoint,
+          keys: {
+            p256dh,
+            auth,
+          },
+        },
+        JSON.stringify(payload)
+      );
     });
 
     const messagePayload = {
