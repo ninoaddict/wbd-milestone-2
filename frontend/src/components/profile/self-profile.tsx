@@ -364,7 +364,7 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
                     </p>
                     <div className="mt-2">
                       <Link
-                        to={`/conList/${user?.id}`}
+                        to={`/connection/${user?.id}`}
                         className="text-xs text-[#0a66c2] font-bold sm:text-sm text-primary hover:underline"
                       >
                         {profile.connection_count} connections

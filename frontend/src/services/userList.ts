@@ -40,7 +40,7 @@ export const getConnectionsList = async (userId: string) => {
   return res.body;
 };
 
-export const getRequestsList = async (userId: string) => {
+export const getRequestsList = async () => {
   const res = (await api
     .get(`/connection/requests`)
     .then((r) => r.data)

@@ -227,7 +227,7 @@ export default function ProfilePage({
                     </p>
                     <div className="mt-2">
                       <Link
-                        to={`/conList/${userId}`}
+                        to={`/connection/${userId}`}
                         className="text-xs text-[#0a66c2] font-bold sm:text-sm text-primary hover:underline"
                       >
                         {profile.connection_count} connections
@@ -271,7 +271,7 @@ export default function ProfilePage({
                       className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
                       disabled
                     >
-                      Connect
+                      Pending
                     </Button>
                   )}
                   {status === "requested" && (

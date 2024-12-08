@@ -72,24 +72,16 @@ export const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-1">
           <NavButton to="/" icon={<Home className="h-6 w-6" />} text="Home" />
-          {user ? (
-            <NavButton
-              to={`/userList/${user.id}`}
-              icon={<Rows4 className="h-6 w-6" />}
-              text="User List"
-            />
-          ) : (
-            <NavButton
-              to={`/userList/${0}`}
-              icon={<Rows4 className="h-6 w-6" />}
-              text="User List"
-            />
-          )}
+          <NavButton
+            to={`/users`}
+            icon={<Rows4 className="h-6 w-6" />}
+            text="User List"
+          />
           {user && (
             <>
               {" "}
               <NavButton
-                to={`/conList/${user.id}`}
+                to={`/connection/${user.id}`}
                 icon={<Users className="h-6 w-6" />}
                 text="My Network"
               />
