@@ -1,6 +1,6 @@
 import { useAuth } from "@/context/auth-context";
 import { Link, useRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Home,
   Menu,
@@ -23,6 +23,7 @@ import { useMutation } from "@tanstack/react-query";
 import { logout } from "@/services/auth";
 import { AxiosError } from "axios";
 import { STORAGE_URL } from "@/lib/const";
+import { flushSync } from "react-dom";
 
 export const Navbar = () => {
   const { user, loading, setUser } = useAuth();
@@ -34,7 +35,9 @@ export const Navbar = () => {
       return logout();
     },
     onSuccess: () => {
-      setUser(null);
+      flushSync(() => {
+        setUser(null);
+      });
       router.invalidate();
       router.navigate({ to: "/login", replace: false });
     },

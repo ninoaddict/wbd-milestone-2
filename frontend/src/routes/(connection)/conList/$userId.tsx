@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
+import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { getConnectionsList } from "@/services/userList";
 import { deleteConnection } from "@/services/connection";
@@ -79,12 +79,12 @@ function ConListComponent() {
                           </p>
                         </div>
                         <div className="flex items-center mt-[5px] sm:mt-[0px]">
-                          <a
-                            href="/message"
+                          <Link
+                            to="/chat"
                             className="border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] px-[10px] py-[4px] text-[12px] rounded-[15px] text-blue-700 mobile:text-[14px] sm:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-blue-700"
                           >
                             Message
-                          </a>
+                          </Link>
                           <button
                             onClick={() => {
                               deleteConnectionRequest(item.user.id);

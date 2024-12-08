@@ -63,7 +63,7 @@ const updateProfileWithPhoto = async (payload: UpdateProfilePayload) => {
   ).data as UpdateProfileResponse;
   const user = res.body;
   if (!user) {
-    throw new AxiosError("Profile updated");
+    throw new AxiosError("Fail to update profile");
   }
   return user;
 };

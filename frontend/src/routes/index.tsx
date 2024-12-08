@@ -12,6 +12,7 @@ import Loading from "@/components/loading/loading";
 
 export const Route = createFileRoute("/")({
   component: HomeComponent,
+  pendingComponent: Loading,
 });
 
 function HomeComponent() {
@@ -378,16 +379,6 @@ function HomeComponent() {
             )}
           </div>
         </section>
-        {/* <section id="connections" className="ml-[10px] mr-[10px]">
-          <div className="bg-white border border-solid border-gray-300 w-100 h-100 flex flex-col justify-center items-center rounded-md">
-            <img
-              src="/placeholder.png"
-              className="object-cover w-[250px] h-[150px] flex justify-center"
-            ></img>
-            <p className="text-center mt-[10px]">{infoUser.user?.name}</p>
-            <p className="text-center text-gray-400 text-xs mb-[10px]">Skills: {infoUser.user?.skills}</p>
-          </div>
-        </section> */}
       </main>
       {modalOpen && (
         <FeedEditor

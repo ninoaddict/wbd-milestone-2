@@ -15,6 +15,6 @@ export const SubscribeSchema: RequestSchema = {
 
 export const UnsubscribeSchema: RequestSchema = {
   body: z.object({
-    endpoint: z.string().url(),
+    endpoint: z.string(),
   }),
 };

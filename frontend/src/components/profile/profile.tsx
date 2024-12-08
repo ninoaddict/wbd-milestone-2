@@ -144,12 +144,14 @@ export default function ProfilePage({ profile }: { profile: Profile }) {
                       Disconnect
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    className="text-xs sm:text-sm border-[#0a66c2]"
-                  >
-                    Message
-                  </Button>
+                  <Link to="/chat">
+                    <Button
+                      variant="outline"
+                      className="text-xs sm:text-sm border-[#0a66c2]"
+                    >
+                      Message
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Card>

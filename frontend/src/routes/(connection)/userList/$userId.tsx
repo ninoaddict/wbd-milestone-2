@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
+import { createFileRoute, ErrorComponent, Link } from "@tanstack/react-router";
 import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { getUserList } from "@/services/userList";
 import {
@@ -139,12 +139,12 @@ function ConnectionUserListComponent() {
     } else if (info.status === "connected") {
       return (
         <div className="flex items-center justify-center flex-row xs:flex-col mobile:flex-row mt-[5px]">
-          <a
-            href="/message"
+          <Link
+            to="/chat"
             className="border border-blue-700 border-solid mobile:px-[10px] mobile:py-[4px] mobile:mb-[0px] xs:mb-[5px] mb-[0px] px-[10px] py[4px] text-[12px] rounded-[15px] text-blue-700 mobile:text-[14px] xs:ml-[5px] ml-[0px] mr-[5px] hover:text-white hover:bg-blue-700"
           >
             Message
-          </a>
+          </Link>
           <button
             type="submit"
             onClick={() => {

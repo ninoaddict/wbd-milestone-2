@@ -16,6 +16,8 @@ import { useRouter } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { login, LoginPayload } from "@/services/auth";
 import { AxiosError } from "axios";
+import { flushSync } from "react-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const loginFormSchema = z.object({
   identifier: z
@@ -29,13 +31,16 @@ const loginFormSchema = z.object({
 export const LoginForm = () => {
   const { setUser } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: (payload: LoginPayload) => {
       return login(payload);
     },
     onSuccess: (data) => {
-      setUser(data);
+      flushSync(() => {
+        setUser(data);
+      });
       router.invalidate();
       router.navigate({
         to: "/",
@@ -44,9 +49,17 @@ export const LoginForm = () => {
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
-        console.log(err.response?.data.message);
+        toast({
+          title: "Login Error",
+          description: err.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
       } else {
-        console.error("Unexpected error:", err);
+        toast({
+          title: "Login Error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
       }
     },
   });

@@ -10,6 +10,7 @@ import { useAuth } from "@/context/auth-context";
 import { useEffect } from "react";
 import { PUBLIC_VAPID_KEY } from "@/config";
 import { api } from "@/lib/api";
+import { Toaster } from "@/components/ui/toaster";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -79,6 +80,7 @@ function RootComponent() {
     <>
       <Navbar />
       <Outlet />
+      <Toaster />
       <ReactQueryDevtools buttonPosition="bottom-left" />
       <TanStackRouterDevtools position="bottom-right" />
     </>

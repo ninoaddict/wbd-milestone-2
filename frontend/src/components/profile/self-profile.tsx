@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
 import { EditProfileModal } from "./edit-profile-modal";
@@ -15,6 +15,7 @@ import { EditExperience } from "./edit-experience-modal";
 import { EditSkills } from "./edit-skillls-modal";
 import EditProfilePicture from "./edit-picture-modal";
 import { STORAGE_URL } from "@/lib/const";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SelfProfilePage({ profile }: { profile: Profile }) {
   let initExp: experienceType[] = [];
@@ -50,8 +51,8 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
     // fail to parse
   }
 
-  const router = useRouter();
-  const { user, loading, setUser } = useAuth();
+  const { toast } = useToast();
+  const { user, setUser } = useAuth();
   const [name, setName] = useState<string>(profile.name);
   const [username, setUsername] = useState<string>(profile.username);
   const [experience, setExperience] = useState(initExp);
@@ -94,9 +95,17 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
-        console.log(err.response?.data.message);
+        toast({
+          title: "Update profile error",
+          description: err.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
       } else {
-        console.error("Unexpected error:", err);
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
       }
     },
   });
@@ -254,10 +263,6 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
     },
     [mutation, user, skills, experience]
   );
-
-  if (loading) {
-    return <div></div>;
-  }
 
   const ago: string[] = [];
   if (profile.relevant_post) {

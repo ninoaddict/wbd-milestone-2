@@ -100,13 +100,13 @@ class UserService {
 
   register = async ({ email, username, password, name }: registerDto) => {
     if (await this.userRepository.getUserByEmail(email)) {
-      throw new BadRequest("Validation error", {
+      throw new BadRequest("Email is already taken", {
         email: "Email is already taken",
       });
     }
 
     if (await this.userRepository.getUserByUsername(username)) {
-      throw new BadRequest("Validation error", {
+      throw new BadRequest("Username is already taken", {
         email: "Username is already taken",
       });
     }

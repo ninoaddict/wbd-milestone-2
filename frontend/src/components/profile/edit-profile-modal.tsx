@@ -10,8 +10,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Pencil } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { editProfileSchema } from "@/domain/schema/edit-profile.schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useState } from "react";
 
 export function EditProfileModal({
@@ -23,11 +34,17 @@ export function EditProfileModal({
   initUserName: string;
   handleUpdateProfile: (name: string, username: string) => void;
 }) {
-  const [name, setName] = useState(initName);
-  const [username, setUsername] = useState(initUserName);
+  const [open, setOpen] = useState(false);
+  const form = useForm<z.infer<typeof editProfileSchema>>({
+    resolver: zodResolver(editProfileSchema),
+    defaultValues: {
+      name: initName,
+      username: initUserName,
+    },
+  });
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="mt-2 sm:mt-0">
           <Pencil className="h-4 w-4" />
@@ -40,48 +57,59 @@ export function EditProfileModal({
             Make changes to your profile here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
-              className="col-span-3"
-              required
+        <Form {...form}>
+          <form
+            id="edit-profile"
+            className="grid gap-4 py-4"
+            onSubmit={form.handleSubmit((values) => {
+              handleUpdateProfile(values.name, values.username);
+              setOpen(false);
+            })}
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel className="text-right">Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="col-span-3 mt-0"
+                      placeholder="Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-              className="col-span-3"
-              required
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel className="text-right">Username</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="col-span-3"
+                      placeholder="Username"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-        </div>
+          </form>
+        </Form>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button
-              type="button"
-              onClick={(e) => {
-                handleUpdateProfile(name, username);
-              }}
-              className="bg-[#0a66c2] hover:bg-[#0a66c2a2]"
-            >
-              Save changes
-            </Button>
-          </DialogClose>
+          <Button
+            type="submit"
+            form="edit-profile"
+            className="bg-[#0a66c2] hover:bg-[#0a66c2a2]"
+          >
+            Save changes
+          </Button>
           <DialogClose asChild>
             <Button
               type="button"
