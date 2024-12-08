@@ -22,7 +22,6 @@ class FeedController implements Controller {
   }
 
   getFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
-    // console.log(req.query.limit, req.query.cursor)
     if (req.query.cursor) {
       return {
         body: await this.feedService.getFeeds(

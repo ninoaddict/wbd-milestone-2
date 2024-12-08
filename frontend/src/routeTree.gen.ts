@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as UsersIndexImport } from './routes/users/index'
+import { Route as FeedIndexImport } from './routes/feed/index'
 import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as ProfileUserIdImport } from './routes/profile/$userId'
 import { Route as ConnectionUserIdImport } from './routes/connection/$userId'
@@ -32,6 +33,12 @@ const IndexRoute = IndexImport.update({
 const UsersIndexRoute = UsersIndexImport.update({
   id: '/users/',
   path: '/users/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FeedIndexRoute = FeedIndexImport.update({
+  id: '/feed/',
+  path: '/feed/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -130,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatIndexImport
       parentRoute: typeof rootRoute
     }
+    '/feed/': {
+      id: '/feed/'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/users/': {
       id: '/users/'
       path: '/users'
@@ -157,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/connection/$userId': typeof ConnectionUserIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/chat': typeof ChatIndexRoute
+  '/feed': typeof FeedIndexRoute
   '/users': typeof UsersIndexRoute
   '/connection/request': typeof ConnectionRequestIndexRoute
 }
@@ -169,6 +184,7 @@ export interface FileRoutesByTo {
   '/connection/$userId': typeof ConnectionUserIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/chat': typeof ChatIndexRoute
+  '/feed': typeof FeedIndexRoute
   '/users': typeof UsersIndexRoute
   '/connection/request': typeof ConnectionRequestIndexRoute
 }
@@ -182,6 +198,7 @@ export interface FileRoutesById {
   '/connection/$userId': typeof ConnectionUserIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
   '/chat/': typeof ChatIndexRoute
+  '/feed/': typeof FeedIndexRoute
   '/users/': typeof UsersIndexRoute
   '/connection/request/': typeof ConnectionRequestIndexRoute
 }
@@ -196,6 +213,7 @@ export interface FileRouteTypes {
     | '/connection/$userId'
     | '/profile/$userId'
     | '/chat'
+    | '/feed'
     | '/users'
     | '/connection/request'
   fileRoutesByTo: FileRoutesByTo
@@ -207,6 +225,7 @@ export interface FileRouteTypes {
     | '/connection/$userId'
     | '/profile/$userId'
     | '/chat'
+    | '/feed'
     | '/users'
     | '/connection/request'
   id:
@@ -218,6 +237,7 @@ export interface FileRouteTypes {
     | '/connection/$userId'
     | '/profile/$userId'
     | '/chat/'
+    | '/feed/'
     | '/users/'
     | '/connection/request/'
   fileRoutesById: FileRoutesById
@@ -231,6 +251,7 @@ export interface RootRouteChildren {
   ConnectionUserIdRoute: typeof ConnectionUserIdRoute
   ProfileUserIdRoute: typeof ProfileUserIdRoute
   ChatIndexRoute: typeof ChatIndexRoute
+  FeedIndexRoute: typeof FeedIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
   ConnectionRequestIndexRoute: typeof ConnectionRequestIndexRoute
 }
@@ -243,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConnectionUserIdRoute: ConnectionUserIdRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
   ChatIndexRoute: ChatIndexRoute,
+  FeedIndexRoute: FeedIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
   ConnectionRequestIndexRoute: ConnectionRequestIndexRoute,
 }
@@ -264,6 +286,7 @@ export const routeTree = rootRoute
         "/connection/$userId",
         "/profile/$userId",
         "/chat/",
+        "/feed/",
         "/users/",
         "/connection/request/"
       ]
@@ -288,6 +311,9 @@ export const routeTree = rootRoute
     },
     "/chat/": {
       "filePath": "chat/index.tsx"
+    },
+    "/feed/": {
+      "filePath": "feed/index.tsx"
     },
     "/users/": {
       "filePath": "users/index.tsx"
