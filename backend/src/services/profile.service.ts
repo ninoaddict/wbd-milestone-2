@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import ProfileRepository from "../repositories/profile.repository";
 import ConnectionRepository from "../repositories/connection.repository";
 import { updateProfileDto } from "../domain/schema/profile.schema";
@@ -16,14 +15,12 @@ class ProfileService {
     this.userRepository = new UserRepository();
   }
 
-  getProfile = async (user: User | undefined, userId: bigint) => {
-    if (!user) {
+  getProfile = async (myUserID: bigint | undefined | null, userId: bigint) => {
+    if (!myUserID) {
       const raw = await this.profileRepository.getProfileByPublic(userId);
-
       if (!raw) {
         throw new NotFound("User not found");
       }
-
       return {
         username: raw.username,
         name: raw.name,
@@ -33,43 +30,29 @@ class ProfileService {
         connection_count: raw._count.connectionsSent,
         connection_status: "public",
       };
-    } else if (user.id === userId) {
-      const raw = await this.profileRepository.getSelfProfile(userId);
-      if (!raw) {
-        throw new NotFound("User not found");
-      }
-      return {
-        username: raw.username,
-        name: raw.name,
-        skills: raw.skills,
-        relevant_post: raw.feeds,
-        profile_photo: raw.profile_photo_path,
-        work_history: raw.work_history,
-        connection_count: raw._count.connectionsSent,
-        connection_status: "self",
-      };
-    } else if (await this.connectionRepository.isConnected(user.id, userId)) {
-      const raw = await this.profileRepository.getProfileByConnectedUser(
-        userId
-      );
-      if (!raw) {
-        throw new NotFound("User not found");
-      }
-      return {
-        username: raw.username,
-        name: raw.name,
-        skills: raw.skills,
-        relevant_post: raw.feeds,
-        profile_photo: raw.profile_photo_path,
-        work_history: raw.work_history,
-        connection_count: raw._count.connectionsSent,
-        connection_status: "connected",
-      };
     } else {
       const raw = await this.profileRepository.getProfileByUser(userId);
       if (!raw) {
         throw new NotFound("User not found");
       }
+
+      let status = "disconnected";
+      if (userId === myUserID) {
+        status = "self";
+      } else if (
+        await this.connectionRepository.isConnected(myUserID, userId)
+      ) {
+        status = "connected";
+      } else if (
+        await this.connectionRepository.isRequested(myUserID, userId)
+      ) {
+        status = "requesting";
+      } else if (
+        await this.connectionRepository.isRequested(userId, myUserID)
+      ) {
+        status = "requested";
+      }
+
       return {
         username: raw.username,
         name: raw.name,
@@ -78,7 +61,7 @@ class ProfileService {
         profile_photo: raw.profile_photo_path,
         work_history: raw.work_history,
         connection_count: raw._count.connectionsSent,
-        connection_status: "disconnected",
+        connection_status: status,
       };
     }
   };

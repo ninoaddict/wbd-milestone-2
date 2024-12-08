@@ -108,7 +108,7 @@ function ConnectionUserListComponent() {
     } else if (info.status === "requesting") {
       return (
         <p className="border border-gray-700 border-solid mobile:px-[10px] mobile:py-[4px] text-[12px] px-[10px] py-[4px] rounded-[15px] mt-[5px] xs:mt-[0px] text-gray-700 mobile:text-[14px] xs:ml-[5px] ml-[0px] mr-[5px]">
-          Requesting...
+          Requesting
         </p>
       );
     } else if (info.status === "requested") {
@@ -171,8 +171,6 @@ function ConnectionUserListComponent() {
   const userId = Route.useParams().userId;
 
   const { data: userList } = useQuery(userListQueryOptions(query));
-
-  console.log(userList);
 
   return (
     <div className="min-h-screen w-full bg-[#f4f2ee] flex flex-col">

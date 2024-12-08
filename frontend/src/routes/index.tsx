@@ -319,7 +319,7 @@ function HomeComponent() {
         <section id="profile" className="ml-[10px] mr-[10px] mb-[20px]">
           <div className="shadow-md bg-white border border-solid border-gray-300 w-100 h-100 flex flex-col justify-center items-center rounded-md">
             <img
-              src="/banner.jpeg"
+              src="/banner.webp"
               className="object-cover xl:w-[300px] xl:h-[150px] md:w-[600px] w-[350px] flex justify-center rounded-t-md"
             ></img>
             <a

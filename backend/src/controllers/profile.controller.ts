@@ -28,7 +28,7 @@ class ProfileController implements Controller {
   getProfile = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
       body: await this.profileService.getProfile(
-        req.user,
+        req.user?.id,
         BigInt(req.params.userId)
       ),
       message: "Profile fetched successfully",

@@ -89,8 +89,17 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
           const sortedExps = sortExperiences(exps);
           setExperience(sortedExps);
         }
+        toast({
+          title: "Success",
+          description: "Profile updated successfully",
+          className: "bg-green-500 text-white",
+        });
       } catch (error) {
-        // handler error
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
       }
     },
     onError: (err) => {
@@ -321,7 +330,7 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
               {/* Cover Photo */}
               <div className="h-32 sm:h-48 bg-gray-300/80 rounded-t-xl">
                 <img
-                  src="/banner.jpeg"
+                  src="/banner.webp"
                   alt="banner"
                   className="object-cover rounded-t-xl w-full h-32 sm:h-48"
                 />
@@ -355,7 +364,7 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
                     </p>
                     <div className="mt-2">
                       <Link
-                        href="/"
+                        to={`/conList/${user?.id}`}
                         className="text-xs text-[#0a66c2] font-bold sm:text-sm text-primary hover:underline"
                       >
                         {profile.connection_count} connections
@@ -371,7 +380,6 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
               </div>
             </Card>
 
-            {/* Work Experience */}
             <Card className="p-4 sm:p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg sm:text-xl font-semibold">
@@ -407,7 +415,6 @@ export default function SelfProfilePage({ profile }: { profile: Profile }) {
               </div>
             </Card>
 
-            {/* Skills */}
             <Card className="p-4 sm:p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg sm:text-xl font-semibold">Skills</h2>

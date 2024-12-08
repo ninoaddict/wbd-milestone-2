@@ -30,11 +30,8 @@ function ConListComponent() {
   });
 
   const deleteConnectionRequest = (userId: bigint) => {
-    console.log(userId);
     mutationDelete.mutate(userId);
   };
-
-  console.log(userList);
 
   return (
     <div className="min-h-screen w-full bg-[#f4f2ee] flex flex-col">

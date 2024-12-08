@@ -32,7 +32,7 @@ function RouteComponent() {
   }
 
   if (!user || user.id !== userId) {
-    return <ProfilePage profile={profile} />;
+    return <ProfilePage profile={profile} userId={BigInt(userId)} />;
   } else {
     return <SelfProfilePage profile={profile} />;
   }

@@ -4,8 +4,110 @@ import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
 import { experienceType } from "@/domain/interfaces/profile.interface";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import {
+  acceptConnection,
+  deleteConnection,
+  sendConnectionReq,
+} from "@/services/connection";
+import { STORAGE_URL } from "@/lib/const";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
 
-export default function ProfilePage({ profile }: { profile: Profile }) {
+export default function ProfilePage({
+  profile,
+  userId,
+}: {
+  profile: Profile;
+  userId: bigint;
+}) {
+  const { toast } = useToast();
+  const [status, setStatus] = useState<String>(profile.connection_status);
+  const mutationAccept = useMutation({
+    mutationFn: (userId: bigint) => acceptConnection(userId),
+    onSuccess: () => {
+      setStatus("connected");
+      toast({
+        title: "Success",
+        description: "Connection request accepted",
+        className: "bg-green-500 text-white",
+      });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Update profile error",
+          description:
+            error.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  const mutationRequest = useMutation({
+    mutationFn: (userId: bigint) => sendConnectionReq(userId),
+    onSuccess: () => {
+      setStatus("requesting");
+      toast({
+        title: "Success",
+        description: "Connection requested successfully",
+        className: "bg-green-500 text-white",
+      });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Update profile error",
+          description:
+            error.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  const mutationDelete = useMutation({
+    mutationFn: (userId: bigint) => deleteConnection(userId),
+    onSuccess: () => {
+      setStatus("disconnected");
+      toast({
+        title: "Success",
+        description: "Connection deleted successfully",
+        className: "bg-green-500 text-white",
+      });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Update profile error",
+          description:
+            error.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
   let experience: experienceType[] = [];
   let skills: string[] = [];
 
@@ -94,7 +196,7 @@ export default function ProfilePage({ profile }: { profile: Profile }) {
               {/* Cover Photo */}
               <div className="h-32 sm:h-48 bg-gray-300/80 rounded-t-xl">
                 <img
-                  src="/banner.jpeg"
+                  src="/banner.webp"
                   alt="banner"
                   className="object-cover rounded-t-xl w-full h-32 sm:h-48"
                 />
@@ -107,7 +209,7 @@ export default function ProfilePage({ profile }: { profile: Profile }) {
                     src={
                       profile.profile_photo === ""
                         ? "/profile_photo_placeholder.webp"
-                        : profile.profile_photo
+                        : `${STORAGE_URL}/${profile.profile_photo}`
                     }
                     alt="Profile photo"
                     width={128}
@@ -125,8 +227,8 @@ export default function ProfilePage({ profile }: { profile: Profile }) {
                     </p>
                     <div className="mt-2">
                       <Link
-                        href="/connections"
-                        className="text-xs sm:text-sm text-primary hover:underline"
+                        to={`/conList/${userId}`}
+                        className="text-xs text-[#0a66c2] font-bold sm:text-sm text-primary hover:underline"
                       >
                         {profile.connection_count} connections
                       </Link>
@@ -134,24 +236,54 @@ export default function ProfilePage({ profile }: { profile: Profile }) {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {profile.connection_status === "disconnected" && (
-                    <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
+                  {status === "disconnected" && (
+                    <Button
+                      className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                      onClick={() => {
+                        mutationRequest.mutate(userId);
+                      }}
+                    >
                       Connect
                     </Button>
                   )}
-                  {profile.connection_status === "connected" && (
-                    <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
-                      Disconnect
+                  {status === "connected" && (
+                    <>
+                      <Button
+                        className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                        onClick={() => {
+                          mutationDelete.mutate(userId);
+                        }}
+                      >
+                        Disconnect
+                      </Button>
+                      <Link to="/chat">
+                        <Button
+                          variant="outline"
+                          className="text-xs sm:text-sm border-[#0a66c2]"
+                        >
+                          Message
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                  {status === "requesting" && (
+                    <Button
+                      className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                      disabled
+                    >
+                      Connect
                     </Button>
                   )}
-                  <Link to="/chat">
+                  {status === "requested" && (
                     <Button
-                      variant="outline"
-                      className="text-xs sm:text-sm border-[#0a66c2]"
+                      className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                      onClick={() => {
+                        mutationAccept.mutate(userId);
+                      }}
                     >
-                      Message
+                      Connect
                     </Button>
-                  </Link>
+                  )}
                 </div>
               </div>
             </Card>
@@ -204,9 +336,7 @@ export default function ProfilePage({ profile }: { profile: Profile }) {
             </Card>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-6">
-            {/* Profile Language */}
             <Card className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -220,7 +350,6 @@ export default function ProfilePage({ profile }: { profile: Profile }) {
               </div>
             </Card>
 
-            {/* Recent Posts */}
             <Card className="p-4 sm:p-6">
               <h2 className="mb-4 text-lg sm:text-xl font-semibold">
                 Recent Posts
