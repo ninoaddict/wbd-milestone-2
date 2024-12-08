@@ -29,6 +29,7 @@ export const validateRequest = ({ params, body, query }: RequestSchema) => {
       if (body) {
         req.body = validate(body, req.body);
       }
+      console.log("query")
       if (query) {
         req.query = validate(query, req.query);
       }

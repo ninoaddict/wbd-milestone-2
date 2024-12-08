@@ -12,6 +12,51 @@ import {
 import { handleRequest } from "../utils/handle-request";
 
 class ChatController implements Controller {
+  /**
+   * @swagger
+   * /api/chat:
+   *   get:
+   *     summary: This is the endpoint to get chat headers
+   *     responses:
+   *       200:
+   *         description: Chat headers fetched successfully
+   * /api/chat/{roomId}:
+   *    get:
+   *     summary: This is the endpoint to get all mesagges from the adjacent chat room
+   *     parameters:
+   *        - name: roomId
+   *          in: path
+   *          descriptions: The id of the specific chat room
+   *          required: true
+   *          schema:
+   *            type: integer
+   *        - name: cursor
+   *          in: query
+   *          descriptions: The cursor of the chat room
+   *          required: false
+   *          schema:
+   *            type: string
+   *     responses:
+   *       200:
+   *         description: Messages fetched successfully
+   *       401:
+   *         description: Unauthorized
+   * /api/chat/room/{roomId}:
+   *    get:
+   *     summary: This is the endpoint to get all mesagges from the adjacent chat room
+   *     parameters:
+   *        - name: roomId
+   *          in: path
+   *          descriptions: The id of the specific chat room
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Successfully fetched chat room
+   *       401:
+   *         description: Unauthorized
+   */
   public path = "/chat";
   public router = Router();
   private chatService: ChatService;

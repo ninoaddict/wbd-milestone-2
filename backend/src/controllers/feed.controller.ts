@@ -10,6 +10,103 @@ import { updateFeedSchema } from "../domain/schema/feed.schema";
 import { upload } from "../utils/storage";
 
 class FeedController implements Controller {
+  /**
+   * @swagger
+   * /api/feed:
+   *   get:
+   *     summary: This is the endpoint to get feeds based on limit and offset
+   *     parameters:
+   *        - name: limit
+   *          in: query
+   *          descriptions: The limit of fetched feeds
+   *          required: true
+   *          schema:
+   *            type: integer
+   *        - name: cursor
+   *          in: query
+   *          descriptions: The offset of fetched feeds
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Feeds retrieved successfully
+   *       400:
+   *         description: Bad Request
+   *   post:
+   *     summary: This is the endpoint to post new feeds
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               content:
+   *                 type: string
+   *                 example: Spongebob is hiding in a closet
+   *     responses:
+   *       200:
+   *         description: Feeds posted successfully
+   *       400:
+   *         description: Bad Request
+   * /api/feed/{editedFeedId}:
+   *    put:
+   *     summary: This is the endpoint to update existing feeds
+   *     parameters:
+   *       - name: editedFeedId
+   *         in: path
+   *         descriptions: The id of the specific feed
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               content:
+   *                 type: string
+   *                 example: Spongebob is not like that
+   *     responses:
+   *       200:
+   *         description: Feeds edited successfully
+   *       400:
+   *         description: Bad Request
+   * /api/feed/{deletedFeedId}:
+   *    delete:
+   *     summary: This is the endpoint to delete existing feeds
+   *     parameters:
+   *       - name: deletedFeedId
+   *         in: path
+   *         descriptions: The id of the specific feed
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Feeds deleted successfully
+   *       400:
+   *         description: Bad Request
+   * /api/feed/{userId}:
+   *    get:
+   *     summary: This is the endpoint to get the specific user's feeds
+   *     parameters:
+   *       - name: userId
+   *         in: path
+   *         descriptions: The id of the specific user
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Feeds retrieved successfully
+   *       400:
+   *         description: Bad Request
+   */
+
   public path = "";
   public router = Router();
   private feedService: FeedService;
@@ -71,7 +168,7 @@ class FeedController implements Controller {
   deleteFeeds = async (req: Request): Promise<BaseResponse> => {
     return {
       body: await this.feedService.deleteFeeds(BigInt(req.params.feedId)),
-      message: "Feeds edited successfully",
+      message: "Feeds deleted successfully",
     };
   };
 
