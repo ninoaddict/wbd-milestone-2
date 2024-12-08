@@ -10,6 +10,8 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
+import swaggerJsDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
 class Application {
   public app: express.Application;
@@ -43,6 +45,7 @@ class Application {
     this.app.use(hpp());
     this.app.use(cookieParser());
     this.initSocket();
+    this.initSwagger();
 
     // Initialize routes and error handling
     this.initRoutes(controllers);
@@ -76,6 +79,27 @@ class Application {
       console.log("SIGTERM");
       this.io.close();
     });
+  }
+
+  private initSwagger() {
+    const swaggerOptions = {
+      definition: {
+        openapi: "3.0.0",
+        info: {
+          title: "LinkedPurry API Documentation",
+          version: "1.0.0",
+          description: "This is the API documentation for LinkedPurry",
+        },
+        servers: [
+          {
+            url: `http://localhost:${this.port}`, // Replace with your base URL if needed
+          },
+        ],
+      },
+      apis: ["./src/controllers/*.ts"], // Path to your controller files for Swagger annotations
+    };
+    const swaggerDocs = swaggerJsDoc(swaggerOptions);
+    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
   }
 }
 
