@@ -20,7 +20,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
@@ -249,12 +249,12 @@ function RouteComponent() {
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <a
-                                href={`/profile/${item.id}`}
+                              <Link
+                                to={`/profile/${item.id}`}
                                 className="text-lg font-medium hover:underline text-blue-700"
                               >
                                 {item.name}
-                              </a>
+                              </Link>
                               <p className="text-sm text-muted-foreground">
                                 @{item.username}
                               </p>

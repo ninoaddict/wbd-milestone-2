@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions } from "@tanstack/react-query";
 import { getConnectionsList } from "@/services/userList";
 import NotFound from "@/components/not-found/not-found";
@@ -61,12 +61,12 @@ function RouteComponent() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <a
-                              href={`/profile/${item.user.id}`}
+                            <Link
+                              to={`/profile/${item.user.id}`}
                               className="text-lg font-medium hover:underline text-blue-700"
                             >
                               {item.user.name}
-                            </a>
+                            </Link>
                             <p className="text-sm text-muted-foreground">
                               @{item.user.username}
                             </p>
