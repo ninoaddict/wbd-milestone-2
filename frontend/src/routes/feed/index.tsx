@@ -203,43 +203,6 @@ function RouteComponent() {
     },
   });
 
-  // const addNewFeedState = useCallback((incoming: Feed) => {
-  //   setFeedList((current) => {
-  //     return [incoming, ...current];
-  //   });
-  // }, []);
-
-  // const addFeedState = useCallback((incoming: Feed[]) => {
-  //   setFeedList((current) => {
-  //     const combinedFeeds = [...current, ...incoming];
-  //     return combinedFeeds;
-  //   });
-  // }, []);
-
-  // const editFeedState = useCallback((incoming: Feed) => {
-  //   setFeedList((current) => {
-  //     return current.map((curr) => {
-  //       if (curr.id === incoming.id) {
-  //         return incoming;
-  //       } else {
-  //         return curr;
-  //       }
-  //     });
-  //   });
-  // }, []);
-
-  // const deleteFeedState = useCallback((incoming: Feed) => {
-  //   setFeedList((current) => {
-  //     return current.filter((curr) => curr.id !== incoming.id);
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   const feed = data?.pages[data.pages.length - 1].feeds || [];
-  //   console.log(data?.pages.length);
-  //   addFeedState(feed);
-  // }, [data?.pages, addFeedState]);
-
   const sendFeed = (feed: string) => {
     if (feed.length > 0) {
       mutationPost.mutate(feed);
