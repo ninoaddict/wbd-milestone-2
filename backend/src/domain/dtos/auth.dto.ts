@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { Request } from "express";
 
 export interface LoginDto {
@@ -13,6 +12,11 @@ export interface registerDto {
   name: string;
 }
 
+export interface UserPayload {
+  id: bigint;
+  email: string;
+}
+
 export type RequestWithUser = Request & {
-  user?: User;
+  user?: UserPayload;
 };

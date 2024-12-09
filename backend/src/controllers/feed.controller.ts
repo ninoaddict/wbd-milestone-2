@@ -4,9 +4,9 @@ import Controller from "@/interfaces/controller";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import FeedService from "../services/feed.service";
 import { handleRequest } from "../utils/handle-request";
-import { Request, Router } from "express";
+import { Router } from "express";
 import { validateRequest } from "../middlewares/validate.middleware";
-import { updateFeedSchema } from "../domain/schema/feed.schema";
+import { getFeedsSchema, updateFeedSchema } from "../domain/schema/feed.schema";
 import { upload } from "../utils/storage";
 
 class FeedController implements Controller {
@@ -90,21 +90,6 @@ class FeedController implements Controller {
    *         description: Feeds deleted successfully
    *       400:
    *         description: Bad Request
-   * /api/feed/{userId}:
-   *    get:
-   *     summary: This is the endpoint to get the specific user's feeds
-   *     parameters:
-   *       - name: userId
-   *         in: path
-   *         descriptions: The id of the specific user
-   *         required: true
-   *         schema:
-   *           type: integer
-   *     responses:
-   *       200:
-   *         description: Feeds retrieved successfully
-   *       400:
-   *         description: Bad Request
    */
 
   public path = "";
@@ -119,54 +104,41 @@ class FeedController implements Controller {
   }
 
   getFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
-    if (req.query.cursor) {
-      return {
-        body: await this.feedService.getFeeds(
-          req.query.limit,
-          req.query.cursor,
-          req.user?.id
-        ),
-        message: "Feeds retrieved successfully",
-      };
-    } else {
-      return {
-        body: await this.feedService.getFeeds(
-          req.query.limit,
-          BigInt(0),
-          req.user?.id
-        ),
-        message: "Feeds retrieved successfully",
-      };
-    }
-  };
-
-  getMyFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
-      body: await this.feedService.getMyFeeds(req.user?.id),
-      message: "Feeds retrieved successfully",
+      body: await this.feedService.getFeeds(
+        Number(req.query.limit),
+        // @ts-ignore
+        req.query.cursor,
+        req.user?.id
+      ),
+      message: "Feeds fetched successfully",
     };
   };
 
   postFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
-    await this.feedService.postFeeds(req.user?.id, req.body.content);
     return {
+      body: await this.feedService.postFeeds(req.user?.id, req.body.content),
       message: "Feeds posted successfully",
     };
   };
 
-  updateFeeds = async (req: Request): Promise<BaseResponse> => {
+  updateFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
       body: await this.feedService.updateFeeds(
         BigInt(req.params.feedId),
+        req.user?.id,
         req.body.content
       ),
       message: "Feeds edited successfully",
     };
   };
 
-  deleteFeeds = async (req: Request): Promise<BaseResponse> => {
+  deleteFeeds = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
-      body: await this.feedService.deleteFeeds(BigInt(req.params.feedId)),
+      body: await this.feedService.deleteFeeds(
+        BigInt(req.params.feedId),
+        req.user?.id
+      ),
       message: "Feeds deleted successfully",
     };
   };
@@ -174,7 +146,7 @@ class FeedController implements Controller {
   private initRoutes() {
     this.router.get(
       `${this.path}/feed`,
-      this.authMiddleware.checkUser,
+      [this.authMiddleware.checkUser, validateRequest(getFeedsSchema)],
       handleRequest(this.getFeeds)
     );
     this.router.post(
@@ -199,11 +171,6 @@ class FeedController implements Controller {
       `${this.path}/feed/:feedId`,
       this.authMiddleware.checkUser,
       handleRequest(this.deleteFeeds)
-    );
-    this.router.get(
-      `${this.path}/feed/:userId`,
-      this.authMiddleware.checkUser,
-      handleRequest(this.getMyFeeds)
     );
   }
 }

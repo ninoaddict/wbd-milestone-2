@@ -5,6 +5,7 @@ import UserRepository from "../repositories/user.repository";
 import { Prisma } from "@prisma/client";
 import webPush from "../config/webPushConfig";
 import prisma from "../database/prisma";
+import Unauthorized from "../errors/unauthorized.error";
 
 class FeedService {
   private feedRepository: FeedRepository;
@@ -17,53 +18,38 @@ class FeedService {
     this.userRepository = new UserRepository();
   }
 
-  getFeeds = async (limit: any, offset: any, userId?: bigint) => {
+  getFeeds = async (limit: number, cursor?: bigint, userId?: bigint) => {
     if (!userId) {
-      throw new BadRequest();
+      throw new Unauthorized();
     }
-    const raw = await this.feedRepository.getFeedRepository(
-      userId,
-      limit,
-      offset
-    );
-    const myMapped = raw.map((f) => {
-      const myDatum = {
-        id: f.id,
-        createdAt: f.createdAt,
-        updatedAt: f.updatedAt,
-        userId: f.userId,
-        content: f.content,
-        name: f.user.name,
+    const raw = await this.feedRepository.getFeeds(userId, limit, cursor);
+    const feeds = raw.feeds.map((feed) => {
+      return {
+        id: feed.id,
+        createdAt: feed.createdAt,
+        updatedAt: feed.updatedAt,
+        content: feed.content,
+        userId: feed.userId,
+        username: feed.user.username,
+        name: feed.user.name,
+        profile_photo_path: feed.user.profile_photo_path,
       };
-      return myDatum;
     });
-
-    return myMapped;
-  };
-
-  getMyFeeds = async (userId?: bigint) => {
-    if (!userId) {
-      throw new BadRequest();
-    }
-    const raw = await this.feedRepository.getMyFeedRepository(userId);
-    const myMapped = raw.map((f) => {
-      const myDatum = {
-        id: f.id,
-        createdAt: f.createdAt,
-        updatedAt: f.updatedAt,
-        userId: f.userId,
-        content: f.content,
-      };
-      return myDatum;
-    });
-    return myMapped;
+    return {
+      feeds,
+      hasNextPage: raw.hasNextPage,
+      nextCursor: raw.nextCursor,
+    };
   };
 
   postFeeds = async (userId?: bigint, content?: string) => {
     if (!userId || !content) {
       throw new BadRequest();
     }
-    await this.feedRepository.addFeedRepository(userId, content);
+    const newFeed = await this.feedRepository.addFeedRepository(
+      userId,
+      content
+    );
     const subscriptions =
       await this.notificationRepository.getConnectedSubscriptions(userId);
     const myProfile = await this.userRepository.getUserById(userId);
@@ -106,21 +92,28 @@ class FeedService {
         }
       });
     });
+
+    return newFeed;
   };
 
-  updateFeeds = async (userId?: bigint, content?: string) => {
-    if (!userId) {
+  updateFeeds = async (feedId?: bigint, userId?: bigint, content?: string) => {
+    if (!userId || !content || !feedId) {
       throw new BadRequest();
     }
-    if (content)
-      await this.feedRepository.updateFeedRepository(userId, content);
+    if (!(await this.feedRepository.userHasFeed(userId, feedId))) {
+      throw new Unauthorized();
+    }
+    return await this.feedRepository.updateFeedRepository(feedId, content);
   };
 
-  deleteFeeds = async (userId?: bigint) => {
-    if (!userId) {
+  deleteFeeds = async (feedId?: bigint, userId?: bigint) => {
+    if (!userId || !feedId) {
       throw new BadRequest();
     }
-    await this.feedRepository.deleteFeedRepository(userId);
+    if (!(await this.feedRepository.userHasFeed(userId, feedId))) {
+      throw new Unauthorized();
+    }
+    return await this.feedRepository.deleteFeedRepository(feedId);
   };
 }
 

@@ -1,16 +1,9 @@
 import { RequestWithUser } from "@/domain/dtos/auth.dto";
 import Unauthorized from "../errors/unauthorized.error";
-import UserService from "../services/user.service";
 import { Response, NextFunction } from "express";
 import { jwtService } from "../services/jwt.service";
 
 export class AuthMiddleware {
-  private userService: UserService;
-
-  constructor() {
-    this.userService = new UserService();
-  }
-
   extractToken = (req: RequestWithUser) => {
     const token = req.cookies["auth_token"];
     return token;
@@ -45,7 +38,10 @@ export class AuthMiddleware {
         throw new Unauthorized("Token issued in the future");
       }
 
-      req.user = await this.userService.findUserByEmail(decoded.email);
+      req.user = {
+        id: BigInt(decoded.id),
+        email: decoded.string as string,
+      };
       next();
     } catch (error) {
       next(error);
@@ -82,13 +78,15 @@ export class AuthMiddleware {
       }
 
       const id = BigInt(req.params.userId);
-      const user = await this.userService.findUserByEmail(decoded.email);
 
-      if (id !== user.id) {
+      if (id !== BigInt(decoded.id)) {
         throw new Unauthorized();
       }
 
-      req.user = user;
+      req.user = {
+        id: BigInt(decoded.id),
+        email: decoded.string as string,
+      };
       next();
     } catch (error) {
       next(error);
@@ -147,7 +145,10 @@ export class AuthMiddleware {
         return next();
       }
 
-      req.user = await this.userService.findUserByEmail(decoded.email);
+      req.user = {
+        id: BigInt(decoded.id),
+        email: decoded.string as string,
+      };
       next();
     } catch (error) {
       next(error);

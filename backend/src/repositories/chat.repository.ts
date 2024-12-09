@@ -2,7 +2,7 @@ import prisma from "../database/prisma";
 
 class ChatRepository {
   isInChatRoom = async (userId: bigint, matchId: bigint) => {
-    const match = await prisma.chatRoom.findFirst({
+    const match = await prisma.chatRoom.findUnique({
       where: {
         id: matchId,
         OR: [{ firstUserId: userId }, { secondUserId: userId }],

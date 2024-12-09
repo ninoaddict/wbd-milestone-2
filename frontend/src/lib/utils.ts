@@ -60,3 +60,59 @@ export const convertTime = (prevDate: any) => {
   const date = prevDateObj.getDate().toString().padStart(2, "0");
   return `${month}/${date}`;
 };
+
+export const convertCreatedAt = (prevDate: any) => {
+  const millisec = Math.floor(Date.now() - new Date(prevDate).getTime());
+  if (millisec >= 1000 * 60 && millisec < 1000 * 60 * 60) {
+    return `Posted ${Math.floor(millisec / (1000 * 60))} minutes ago`;
+  } else if (millisec >= 1000 * 60 * 60 && millisec < 1000 * 60 * 60 * 24) {
+    return `Posted ${Math.floor(millisec / (1000 * 60 * 60))} hours ago`;
+  } else if (
+    millisec >= 1000 * 60 * 60 * 24 &&
+    millisec < 1000 * 60 * 60 * 24 * 7
+  ) {
+    return `Posted ${Math.floor(millisec / (1000 * 60 * 60 * 24))} days ago`;
+  } else if (
+    millisec >= 1000 * 60 * 60 * 24 * 7 &&
+    millisec < 1000 * 60 * 60 * 24 * 30
+  ) {
+    return `Posted ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 7))} weeks ago`;
+  } else if (
+    millisec >= 1000 * 60 * 60 * 24 * 30 &&
+    millisec < 1000 * 60 * 60 * 24 * 365
+  ) {
+    return `Posted ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 30))} months ago`;
+  } else if (millisec >= 1000 * 60 * 60 * 24 * 365) {
+    return `Posted ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 365))} years ago`;
+  } else {
+    return `Posted ${Math.floor(millisec / 1000)} seconds ago`;
+  }
+};
+
+export const convertUpdatedAt = (prevDate: any) => {
+  const millisec = Math.floor(Date.now() - new Date(prevDate).getTime());
+  if (millisec >= 1000 * 60 && millisec < 1000 * 60 * 60) {
+    return `Updated ${Math.floor(millisec / (1000 * 60))} minutes ago`;
+  } else if (millisec >= 1000 * 60 * 60 && millisec < 1000 * 60 * 60 * 24) {
+    return `Updated ${Math.floor(millisec / (1000 * 60 * 60))} hours ago`;
+  } else if (
+    millisec >= 1000 * 60 * 60 * 24 &&
+    millisec < 1000 * 60 * 60 * 24 * 7
+  ) {
+    return `Updated ${Math.floor(millisec / (1000 * 60 * 60 * 24))} days ago`;
+  } else if (
+    millisec >= 1000 * 60 * 60 * 24 * 7 &&
+    millisec < 1000 * 60 * 60 * 24 * 30
+  ) {
+    return `Updated ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 7))} weeks ago`;
+  } else if (
+    millisec >= 1000 * 60 * 60 * 24 * 30 &&
+    millisec < 1000 * 60 * 60 * 24 * 365
+  ) {
+    return `Updated ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 30))} months ago`;
+  } else if (millisec >= 1000 * 60 * 60 * 24 * 365) {
+    return `Updated ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 365))} years ago`;
+  } else {
+    return `Updated ${Math.floor(millisec / 1000)} seconds ago`;
+  }
+};

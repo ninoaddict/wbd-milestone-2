@@ -1,13 +1,25 @@
 import { api } from "@/lib/api";
-import { Feed, FeedList } from "@/domain/interfaces/feed.interface";
+import { Feed, FeedList, RawFeed } from "@/domain/interfaces/feed.interface";
 
 interface FeedListResponse {
-  body: FeedList;
+  body: {
+    feeds: FeedList;
+    hasNextPage: boolean;
+    nextCursor: string;
+  };
   message: string;
 }
 
-export const getFeeds = async ({ pageParam }: {pageParam: number}) => {
-  if (pageParam === 0 || !pageParam) {
+interface UpdateFeedResponse {
+  body: RawFeed;
+}
+
+export const getFeeds = async ({
+  pageParam,
+}: {
+  pageParam: string | undefined;
+}) => {
+  if (!pageParam) {
     const res = (await api
       .get(`/feed?limit=${10}`)
       .then((r) => r.data)
@@ -17,7 +29,7 @@ export const getFeeds = async ({ pageParam }: {pageParam: number}) => {
         }
         throw err;
       })) as FeedListResponse;
-      return res.body;
+    return res.body;
   } else {
     const res = (await api
       .get(`/feed?cursor=${pageParam}&limit=${10}`)
@@ -27,23 +39,10 @@ export const getFeeds = async ({ pageParam }: {pageParam: number}) => {
           throw new Error("Failed to fetch the feeds");
         }
         throw err;
-    })) as FeedListResponse;
+      })) as FeedListResponse;
     return res.body;
   }
 };
-
-export const getMyFeeds = async (userId: bigint) => {
-  const res = (await api
-    .get(`/feed/${userId}`)
-    .then((r) => r.data)
-    .catch((err) => {
-      if (err.status === 404) {
-        throw new Error("Failed to fetch the feeds");
-      }
-      throw err;
-    })) as FeedListResponse;
-    return res.body;
-}
 
 export const postFeeds = async (feed: string) => {
   const formData = new FormData();
@@ -60,9 +59,9 @@ export const postFeeds = async (feed: string) => {
         throw new Error("Failed to post the feeds");
       }
       throw err;
-    })) as FeedListResponse;
+    })) as UpdateFeedResponse;
   return res.body;
-}
+};
 
 export const editFeeds = async (feed: string, feedId: bigint) => {
   const formData = new FormData();
@@ -79,9 +78,9 @@ export const editFeeds = async (feed: string, feedId: bigint) => {
         throw new Error("Failed to edit the feeds");
       }
       throw err;
-    })) as FeedListResponse;
+    })) as UpdateFeedResponse;
   return res.body;
-}
+};
 
 export const deleteFeeds = async (feedId: bigint) => {
   const res = (await api
@@ -92,6 +91,6 @@ export const deleteFeeds = async (feedId: bigint) => {
         throw new Error("Failed to edit the feeds");
       }
       throw err;
-    })) as FeedListResponse;
+    })) as UpdateFeedResponse;
   return res.body;
-}
+};

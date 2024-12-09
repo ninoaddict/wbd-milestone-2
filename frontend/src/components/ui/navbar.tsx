@@ -8,7 +8,10 @@ import {
   Users,
   LogOut,
   LogIn,
-  Rows4,
+  UserPlus,
+  UserRoundSearch,
+  User,
+  UserPlus2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,7 +21,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "@/services/auth";
 import { AxiosError } from "axios";
@@ -74,7 +82,7 @@ export const Navbar = () => {
           <NavButton to="/" icon={<Home className="h-6 w-6" />} text="Home" />
           <NavButton
             to={`/users`}
-            icon={<Rows4 className="h-6 w-6" />}
+            icon={<UserRoundSearch className="h-6 w-6" />}
             text="User List"
           />
           {user && (
@@ -84,6 +92,11 @@ export const Navbar = () => {
                 to={`/connection/${user.id}`}
                 icon={<Users className="h-6 w-6" />}
                 text="My Network"
+              />
+              <NavButton
+                to="/connection/request"
+                text="Request"
+                icon={<UserPlus className="h-6 w-6" />}
               />
               <NavButton
                 to="/chat"
@@ -154,14 +167,38 @@ export const Navbar = () => {
                 >
                   <Home className="h-5 w-5" /> Home
                 </Link>
+                <Link
+                  to="/users"
+                  className="flex items-center gap-2 text-lg font-semibold"
+                  onClick={() => setIsOpen(false)}
+                  search={{
+                    query: "",
+                  }}
+                >
+                  <UserRoundSearch className="h-5 w-5" /> User List
+                </Link>
                 {user && (
                   <>
                     <Link
-                      to="/"
+                      to={`/connection/${user.id}`}
                       className="flex items-center gap-2 text-lg font-semibold"
                       onClick={() => setIsOpen(false)}
                     >
                       <Users className="h-5 w-5" /> My Network
+                    </Link>
+                    <Link
+                      to="/connection/request"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <UserPlus className="h-5 w-5" /> Request
+                    </Link>
+                    <Link
+                      to={`/profile/${user.id}`}
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <User className="h-5 w-5" /> My Profile
                     </Link>
                     <Link
                       to="/chat"
@@ -181,13 +218,22 @@ export const Navbar = () => {
                   </div>
                 )}
                 {!user && (
-                  <Link
-                    to="/login"
-                    className="flex items-center gap-2 text-lg font-semibold"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <LogIn className="h-5 w-5" /> Login
-                  </Link>
+                  <>
+                    <Link
+                      to="/register"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <UserPlus2 className="h-5 w-5" /> Register
+                    </Link>
+                    <Link
+                      to="/login"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <LogIn className="h-5 w-5" /> Login
+                    </Link>
+                  </>
                 )}
               </nav>
             </SheetContent>

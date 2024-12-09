@@ -1,63 +1,70 @@
 import ApplicationError from "../errors/application.error";
 import prisma from "../database/prisma";
-// import { off } from "process";
+import NotFound from "../errors/not-found.error";
 
 class FeedRepository {
-  getFeedRepository = async (userId: bigint, limit: bigint, offset: bigint) => {
-    const friendFeed = await prisma.feed.findMany({
+  userHasFeed = async (userId: bigint, feedId: bigint) => {
+    const feed = await prisma.feed.findUnique({
       where: {
-        OR: [
-          { userId: userId },
-          {
-            user: {
-              connectionsSent: {
-                some: {
-                  OR: [{ fromId: userId }, { toId: userId }],
-                },
-              },
-            },
-          },
-        ],
+        id: feedId,
+        userId,
+      },
+    });
+    return !!feed;
+  };
+
+  getFeeds = async (userId: bigint, limit: number, cursor?: bigint) => {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        connectionsSent: {
+          select: { toId: true },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFound("User not found");
+    }
+
+    const connections = [
+      ...user.connectionsSent.map((conn) => conn.toId),
+      userId,
+    ];
+
+    const feeds = await prisma.feed.findMany({
+      where: {
+        userId: { in: connections },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
       select: {
         id: true,
         createdAt: true,
         updatedAt: true,
-        content: true,
         userId: true,
+        content: true,
         user: {
           select: {
             name: true,
+            username: true,
+            profile_photo_path: true,
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip: Number(offset),
-      take: Number(limit),
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
     });
-    return friendFeed;
-  };
 
-  getMyFeedRepository = async (userId: bigint) => {
-    const myFeed = await prisma.feed.findMany({
-      where: {
-        userId: userId,
-      },
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        content: true,
-        userId: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 5,
-    });
-    return myFeed;
+    const hasNextPage = feeds.length > limit;
+    const nextCursor = hasNextPage ? feeds.pop()?.id : undefined;
+
+    return {
+      feeds,
+      nextCursor,
+      hasNextPage,
+    };
   };
 
   addFeedRepository = async (userId: bigint, content: string) => {
@@ -75,6 +82,8 @@ class FeedRepository {
   };
 
   updateFeedRepository = async (feedId: bigint, content: string) => {
+    console.log(content);
+    console.log(feedId);
     try {
       return await prisma.feed.update({
         where: {
