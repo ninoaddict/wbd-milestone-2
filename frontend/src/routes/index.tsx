@@ -41,6 +41,7 @@ function HomeComponent() {
       <div className="flex justify-end">
         <img
           src="/guy_working.svg"
+          alt='guy working hard'
           className="w-[100%] h-[100%] hidden xl2:block"
         ></img>
       </div>
