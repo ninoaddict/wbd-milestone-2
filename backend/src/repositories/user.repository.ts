@@ -11,7 +11,7 @@ class UserRepository {
         full_name: true,
         profile_photo_path: true,
       },
-      take: 20,
+      // take: 50,
       where: {
         OR: query
           ? [
