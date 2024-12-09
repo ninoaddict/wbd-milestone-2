@@ -28,7 +28,7 @@ class ConnectionRepository {
         from: {
           select: {
             id: true,
-            name: true,
+            full_name: true,
             profile_photo_path: true,
             username: true,
           },
@@ -50,7 +50,7 @@ class ConnectionRepository {
         to: {
           select: {
             id: true,
-            name: true,
+            full_name: true,
             profile_photo_path: true,
             username: true,
           },

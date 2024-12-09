@@ -23,7 +23,7 @@ class ProfileService {
       }
       return {
         username: raw.username,
-        name: raw.name,
+        name: raw.full_name,
         skills: raw.skills,
         profile_photo: raw.profile_photo_path,
         work_history: raw.work_history,
@@ -55,7 +55,7 @@ class ProfileService {
 
       return {
         username: raw.username,
-        name: raw.name,
+        name: raw.full_name,
         skills: raw.skills,
         relevant_post: raw.feeds,
         profile_photo: raw.profile_photo_path,
@@ -101,7 +101,19 @@ class ProfileService {
       profile_photo_path: profile_photo === null ? "" : profile_photo,
       username: payload.username,
     };
-    return await this.profileRepository.updateProfile(profileData, id);
+    const data = await this.profileRepository.updateProfile(profileData, id);
+    return {
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      passwordHash: data.passwordHash,
+      name: data.full_name,
+      work_history: data.work_history,
+      skills: data.skills,
+      profile_photo_path: data.profile_photo_path,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   };
 }
 

@@ -18,7 +18,7 @@ model User {
   username                   String              @unique @db.VarChar(255)
   email                      String              @unique @db.VarChar(255)
   passwordHash               String              @map("password_hash") @db.VarChar(255)
-  name                       String              @db.VarChar(255)
+  full_name                  String              @db.VarChar(255)
   work_history               String              @db.Text
   skills                     String              @db.Text
   profile_photo_path         String              @db.VarChar(255)
@@ -43,7 +43,7 @@ model Feed {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
   content   String   @db.Text
-  userId    BigInt
+  userId    BigInt   @map("user_id")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([createdAt(sort: Desc)])
@@ -53,8 +53,8 @@ model Feed {
 model Chat {
   id         BigInt   @id @default(autoincrement())
   timestamp  DateTime @default(now()) @db.Timestamptz()
-  fromId     BigInt
-  toId       BigInt
+  fromId     BigInt   @map("from_id")
+  toId       BigInt   @map("to_id")
   message    String   @db.Text
   from       User     @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
   to         User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
@@ -80,8 +80,8 @@ model ChatRoom {
 }
 
 model ConnectionRequest {
-  fromId    BigInt
-  toId      BigInt
+  fromId    BigInt   @map("from_id")
+  toId      BigInt   @map("to_id")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   from      User     @relation("ConnectionRequestFromUser", fields: [fromId], references: [id], onDelete: Cascade)
   to        User     @relation("ConnectionRequestToUser", fields: [toId], references: [id], onDelete: Cascade)
@@ -92,8 +92,8 @@ model ConnectionRequest {
 }
 
 model Connection {
-  fromId    BigInt
-  toId      BigInt
+  fromId    BigInt   @map("from_id")
+  toId      BigInt   @map("to_id")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   from      User     @relation("ConnectionFromUser", fields: [fromId], references: [id], onDelete: Cascade)
   to        User     @relation("ConnectionToUser", fields: [toId], references: [id], onDelete: Cascade)
@@ -105,7 +105,7 @@ model Connection {
 
 model PushSubscription {
   endpoint  String   @id @db.Text
-  userId    BigInt?
+  userId    BigInt? @map("user_id")
   keys      Json
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)

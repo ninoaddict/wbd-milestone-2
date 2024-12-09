@@ -38,7 +38,7 @@ class ChatRepository {
               },
               select: {
                 username: true,
-                name: true,
+                full_name: true,
                 profile_photo_path: true,
               },
             });
@@ -53,7 +53,7 @@ class ChatRepository {
               },
               select: {
                 username: true,
-                name: true,
+                full_name: true,
                 profile_photo_path: true,
               },
             });

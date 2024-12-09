@@ -4,7 +4,13 @@ import { ProfileData } from "../services/profile.service";
 class ProfileRepository {
   updateProfile = async (profileData: ProfileData, id: bigint) => {
     return await prisma.user.update({
-      data: profileData,
+      data: {
+        full_name: profileData.name,
+        username: profileData.username,
+        work_history: profileData.work_history,
+        skills: profileData.skills,
+        profile_photo_path: profileData.profile_photo_path,
+      },
       where: {
         id,
       },
@@ -15,7 +21,7 @@ class ProfileRepository {
     return await prisma.user.findUnique({
       select: {
         username: true,
-        name: true,
+        full_name: true,
         profile_photo_path: true,
         work_history: true,
         skills: true,
@@ -35,7 +41,7 @@ class ProfileRepository {
     return await prisma.user.findUnique({
       select: {
         username: true,
-        name: true,
+        full_name: true,
         profile_photo_path: true,
         work_history: true,
         skills: true,
@@ -56,7 +62,7 @@ class ProfileRepository {
     return await prisma.user.findUnique({
       select: {
         username: true,
-        name: true,
+        full_name: true,
         profile_photo_path: true,
         work_history: true,
         skills: true,
@@ -77,7 +83,7 @@ class ProfileRepository {
     return await prisma.user.findUnique({
       select: {
         username: true,
-        name: true,
+        full_name: true,
         profile_photo_path: true,
         work_history: true,
         skills: true,

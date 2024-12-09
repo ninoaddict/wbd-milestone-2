@@ -84,7 +84,7 @@ export const messageEvent = createEvent(
         id: myId,
       },
       select: {
-        name: true,
+        full_name: true,
       },
     });
 
@@ -97,7 +97,7 @@ export const messageEvent = createEvent(
         const auth = keys.auth as string;
 
         const payload = {
-          title: myProfile?.name || "New Message",
+          title: myProfile?.full_name || "New Message",
           body:
             message.message.length <= 50
               ? message.message

@@ -8,6 +8,9 @@
     "start:nodemon": "nodemon ./src/index.ts",
     "start:dev": "ts-node src/index.ts"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "author": "WBD",
   "license": "ISC",
   "description": "",

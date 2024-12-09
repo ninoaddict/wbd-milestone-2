@@ -4,7 +4,6 @@ import Unauthorized from "../errors/unauthorized.error";
 import UserRepository from "../repositories/user.repository";
 import bcrypt from "bcrypt";
 import { jwtService } from "./jwt.service";
-import { User } from "@prisma/client";
 import BadRequest from "../errors/bad-request.error";
 import ConnectionRepository from "../repositories/connection.repository";
 
@@ -40,7 +39,11 @@ class UserService {
           status = "requesting";
         }
         return {
-          ...user,
+          username: user.username,
+          id: user.id,
+          email: user.email,
+          name: user.full_name,
+          profile_photo_path: user.profile_photo_path,
           status,
         };
       })
@@ -53,7 +56,19 @@ class UserService {
     if (!user) {
       throw new NotFound("User not found");
     }
-    return user;
+
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      name: user.full_name,
+      work_history: user.work_history,
+      skills: user.skills,
+      profile_photo_path: user.profile_photo_path,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   };
 
   findUserById = async (id: bigint) => {
@@ -61,7 +76,18 @@ class UserService {
     if (!user) {
       throw new NotFound("User not found");
     }
-    return user;
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      name: user.full_name,
+      work_history: user.work_history,
+      skills: user.skills,
+      profile_photo_path: user.profile_photo_path,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   };
 
   findLimitedUserById = async (id: bigint) => {
@@ -69,7 +95,12 @@ class UserService {
     if (!user) {
       throw new NotFound("User not found");
     }
-    return user;
+    return {
+      id: user.id,
+      username: user.username,
+      name: user.full_name,
+      profile_photo_path: user.profile_photo_path,
+    };
   };
 
   findUserByEmail = async (email: string) => {
@@ -77,7 +108,18 @@ class UserService {
     if (!user) {
       throw new NotFound("User not found");
     }
-    return user;
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      name: user.full_name,
+      work_history: user.work_history,
+      skills: user.skills,
+      profile_photo_path: user.profile_photo_path,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   };
 
   findUserByIdentifier = async (identifier: string) => {
@@ -85,7 +127,18 @@ class UserService {
     if (!user) {
       throw new NotFound("User not found");
     }
-    return user;
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      name: user.full_name,
+      work_history: user.work_history,
+      skills: user.skills,
+      profile_photo_path: user.profile_photo_path,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   };
 
   login = async ({ identifier, password }: LoginDto) => {
@@ -123,7 +176,7 @@ class UserService {
     return { token };
   };
 
-  generateToken = (user: User) => {
+  generateToken = (user: any) => {
     const iat = Date.now();
     const exp = iat + 3600000;
     const payload = {

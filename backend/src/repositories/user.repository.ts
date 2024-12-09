@@ -8,7 +8,7 @@ class UserRepository {
         id: true,
         email: true,
         username: true,
-        name: true,
+        full_name: true,
         profile_photo_path: true,
       },
       take: 20,
@@ -22,7 +22,7 @@ class UserRepository {
                 },
               },
               {
-                name: {
+                full_name: {
                   contains: query,
                   mode: "insensitive",
                 },
@@ -48,7 +48,7 @@ class UserRepository {
       },
       select: {
         id: true,
-        name: true,
+        full_name: true,
         username: true,
         profile_photo_path: true,
       },
@@ -90,7 +90,7 @@ class UserRepository {
     email: string,
     username: string,
     passwordHash: string,
-    name: string
+    full_name: string
   ) => {
     try {
       return await prisma.user.create({
@@ -98,7 +98,7 @@ class UserRepository {
           email,
           username,
           passwordHash,
-          name,
+          full_name,
           work_history: "",
           skills: "",
           profile_photo_path: "",

@@ -115,7 +115,7 @@ class AuthController implements Controller {
 
   register = async (req: Request, res: Response): Promise<BaseResponse> => {
     const body = await this.userService.register(req.body);
-    res.cookie("auth_token", body.token, { httpOnly: true });
+    res.cookie("token", body.token, { httpOnly: true });
     return {
       body,
       message: "User registered successfully",
@@ -124,7 +124,7 @@ class AuthController implements Controller {
 
   login = async (req: Request, res: Response): Promise<BaseResponse> => {
     const body = await this.userService.login(req.body);
-    res.cookie("auth_token", body.token, { httpOnly: true });
+    res.cookie("token", body.token, { httpOnly: true });
     return {
       body,
       message: "User logged in successfully",
@@ -143,8 +143,13 @@ class AuthController implements Controller {
     };
   };
 
-  logout = async (_: Request, res: Response): Promise<BaseResponse> => {
-    res.clearCookie("auth_token");
+  logout = async (
+    req: RequestWithUser,
+    res: Response
+  ): Promise<BaseResponse> => {
+    if (req.user) {
+      res.clearCookie("token");
+    }
     return {
       message: "User logged out successfully",
     };
@@ -177,7 +182,7 @@ class AuthController implements Controller {
     );
     this.router.post(
       `${this.path}/logout`,
-      this.authMiddleware.checkUser,
+      this.authMiddleware.checkPublicUser,
       handleRequest(this.logout)
     );
     this.router.get(
