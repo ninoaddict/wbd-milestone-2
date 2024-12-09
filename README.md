@@ -14,6 +14,7 @@
 ## Project Overview
 
 LinkedPurry adalah sebuah platform yang dirancang agar para pencari kerja dapat dengan mudah melakukan komunikasi dengan pencari kerja lainnya. Pencari kerja juga bisa melakukan posting yang bisa dilihat ke publik. Pencari kerja bisa menjadi teman atau melakukan koneksi ke pencari-pencari kerja lainnya.
+
 ---
 
 ## Features
