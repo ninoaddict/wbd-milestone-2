@@ -11,6 +11,7 @@ USER node
 
 # Menyalin package.json dan menginstal dependensi
 COPY --chown=node:node package*.json ./
+
 RUN npm ci
 
 RUN npm install prisma @prisma/client
@@ -18,13 +19,12 @@ RUN npm install prisma @prisma/client
 # Menyalin seluruh file proyek
 COPY --chown=node:node . .
 
+COPY ./.env.example ./.env
+
 RUN npx prisma generate
 
 # Build aplikasi (untuk proyek TypeScript)
 RUN npm run build
-
-# Deklarasi variabel lingkungan
-ENV PORT=3000
 
 # Expose port aplikasi
 EXPOSE 3000
