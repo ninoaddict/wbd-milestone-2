@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                         BigInt              @id @default(autoincrement())
+  username                   String              @unique @db.VarChar(255)
+  email                      String              @unique @db.VarChar(255)
+  passwordHash               String              @map("password_hash") @db.VarChar(255)
+  name                       String              @db.VarChar(255)
+  work_history               String              @db.Text
+  skills                     String              @db.Text
+  profile_photo_path         String              @db.VarChar(255)
+  createdAt                  DateTime            @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt                  DateTime            @updatedAt @map("updated_at") @db.Timestamptz()
+  feeds                      Feed[]
+  sentChats                  Chat[]              @relation("ChatFromUser")
+  receivedChats              Chat[]              @relation("ChatToUser")
+  connectionRequestsSent     ConnectionRequest[] @relation("ConnectionRequestFromUser")
+  connectionRequestsReceived ConnectionRequest[] @relation("ConnectionRequestToUser")
+  connectionsSent            Connection[]        @relation("ConnectionFromUser")
+  connectionsReceived        Connection[]        @relation("ConnectionToUser")
+  pushSubscriptions          PushSubscription[]
+
+  @@map("users")
+}
+
+model Feed {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  content   String   @db.Text
+  userId    BigInt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("feed")
+}
+
+model Chat {
+  id        BigInt   @id @default(autoincrement())
+  timestamp DateTime @default(now()) @db.Timestamptz()
+  fromId    BigInt
+  toId      BigInt
+  message   String   @db.Text
+  from      User     @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@index([timestamp], type: BTree)
+  @@map("chat")
+}
+
+model ConnectionRequest {
+  fromId    BigInt
+  toId      BigInt
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  from      User     @relation("ConnectionRequestFromUser", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("ConnectionRequestToUser", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@id([fromId, toId])
+  @@index([createdAt], type: BTree)
+  @@map("connection_request")
+}
+
+model Connection {
+  fromId    BigInt
+  toId      BigInt
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  from      User     @relation("ConnectionFromUser", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("ConnectionToUser", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@id([fromId, toId])
+  @@index([createdAt], type: BTree)
+  @@map("connection")
+}
+
+model PushSubscription {
+  endpoint  String   @id @db.Text
+  userId    BigInt?
+  keys      Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("push_subscriptions")
+}
