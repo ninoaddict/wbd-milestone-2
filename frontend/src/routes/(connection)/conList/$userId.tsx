@@ -63,6 +63,7 @@ function ConListComponent() {
                       <div className="w-[8%] h-[8%] bg-gray-100 overflow-hidden relative mr-[7px] flex">
                         <img
                           src="/placeholder.png"
+                          alt="Le Placeholder"
                           className="object-cover w-full h-full"
                         ></img>
                       </div>

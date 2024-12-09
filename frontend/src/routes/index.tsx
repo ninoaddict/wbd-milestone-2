@@ -46,6 +46,7 @@ function HomeComponent() {
         <div className="flex justify-end">
           <img
             src="/guy_working.svg"
+            alt="Supposed to be a picture to make it interesting"
             className="w-[100%] h-[100%] hidden xl2:block"
           ></img>
         </div>
@@ -149,7 +150,7 @@ function HomeComponent() {
           </p>
         </div>
         <div className="flex justify-end">
-          <img src="/guy_working.svg" className="w-[100%] h-[100%]"></img>
+          <img src="/guy_working.svg" alt="Guy Working" className="w-[100%] h-[100%]"></img>
         </div>
       </div>
     );
@@ -255,6 +256,7 @@ function HomeComponent() {
         <header className="flex flex-row mb-[10px] w-full">
           <img
             src="/placeholder.png"
+            alt="Le Placeholder"
             className="object-cover w-[50px] h-[50px] flex justify-center"
           ></img>
           <div className="flex grow justify-between">
@@ -320,6 +322,7 @@ function HomeComponent() {
           <div className="shadow-md bg-white border border-solid border-gray-300 w-100 h-100 flex flex-col justify-center items-center rounded-md">
             <img
               src="/banner.webp"
+              alt="Le Placeholder"
               className="object-cover xl:w-[300px] xl:h-[150px] md:w-[600px] w-[350px] flex justify-center rounded-t-md"
             ></img>
             <a
