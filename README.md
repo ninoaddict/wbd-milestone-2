@@ -63,6 +63,9 @@ LinkedPurry adalah sebuah platform yang dirancang agar para pencari kerja dapat 
 
 13. Google Lighthouse (Bonus)
 
+14. Connection Recommendation (Bonus)
+![Connection recommendation](/lighthouse_pics/job_recommendation.png)
+
 ## Tech Stack
 
 Program ini menggunakan Tech Stack sebagai berikut
@@ -160,3 +163,5 @@ docker compose down -v
 | Register                       |             |                         |
 | Feed Page                      |             |                         |
 | Connection Pages                      |             |                         |
+| Typing indicator (Bonus)                      |             |                         |
+| Connection recommendation (Bonus)                   |             |                         |
