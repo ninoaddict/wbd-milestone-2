@@ -36,17 +36,32 @@ LinkedPurry adalah sebuah platform yang dirancang agar para pencari kerja dapat 
 ![Connection Lists](/lighthouse_pics/connection_list_lighthouse.png)
 
 6. Feeds
+![Feeds](/lighthouse_pics/feed_page_lighthouse.png)
 
 7. Chats
 ![Chats](/lighthouse_pics/chat_header_lighthouse.png)
 ![Chats](/lighthouse_pics/chat_page_lighthouse.png)
 
 8. Profile Page
-![Profile Page](/ligthhouse_pics/profile_page_lighthouse.png)
+![Profile Page](/lighthouse_pics/profile_page_lighthouse.png)
 
 9. Notification
 
+10. Load Test
+
+- Load test profile
+![Load Test](/load_test/load_test_profile.png)
+
+- Load test feed
+![Load test profile](/load_test/load_test_feed.png)
 ---
+
+11. Typing indicator (Bonus)
+![Typing indicator](/lighthouse_pics/typing_indicator.png)
+
+12. UI Mirip Linkedin (Bonus)
+
+13. Google Lighthouse (Bonus)
 
 ## Tech Stack
 
@@ -141,3 +156,7 @@ docker compose down -v
 | Notification                             |             |                         |
 | Program Refactorings                     |             |                         |
 | Stress & Load Test                       |             |                         |
+| Login                       |             |                         |
+| Register                       |             |                         |
+| Feed Page                      |             |                         |
+| Connection Pages                      |             |                         |

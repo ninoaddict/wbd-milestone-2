@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ChevronLeftIcon } from "lucide-react";
 import useSubscription from "@/hooks/useSubscription";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { getLimitedUser } from "@/services/user";
 import { useRouter } from "@tanstack/react-router";
 import { ChatFooter } from "./chat-footer";
@@ -146,6 +150,8 @@ export default function ChatPage({
     setTimeout(() => setIsTyping(false), 2000);
   });
 
+  const queryClient = useQueryClient();
+
   const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewMessage(e.target.value);
     isTypingEmit.mutate({ roomId });
@@ -166,7 +172,10 @@ export default function ChatPage({
                 variant="ghost"
                 className="hover:bg-inherit"
                 onClick={() => {
-                  router.history.back();
+                  router.navigate({
+                    to: "/chat",
+                    replace: true,
+                  });
                 }}
               >
                 <ChevronLeftIcon className="h-4 w-4" />

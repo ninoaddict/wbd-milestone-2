@@ -4,15 +4,9 @@ import Loading from "@/components/loading/loading";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { queryOptions } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getChatHeaders } from "@/services/chat";
 import { convertTime } from "@/lib/utils";
-
-const chatHeadersQueryOptions = () =>
-  queryOptions({
-    queryKey: ["chatHeaders"],
-    queryFn: () => getChatHeaders(),
-  });
 
 export const Route = createFileRoute("/chat/")({
   component: RouteComponent,
@@ -25,13 +19,22 @@ export const Route = createFileRoute("/chat/")({
       });
     }
   },
-  loader: ({ context: { queryClient } }) => {
-    return queryClient.ensureQueryData(chatHeadersQueryOptions());
-  },
 });
 
 function RouteComponent() {
-  const chatHeaders = Route.useLoaderData();
+  const { data: chatHeaders, isLoading } = useQuery({
+    queryKey: ["chatHeaders"],
+    queryFn: () => getChatHeaders(),
+    refetchOnMount: "always",
+  });
+
+  if (!chatHeaders) {
+    return <NotFound />;
+  }
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#f4f2ee] lg:pt-6">

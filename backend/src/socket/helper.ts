@@ -48,7 +48,7 @@ export async function getSession(req: IncomingMessage) {
   if (!cookies) return null;
 
   const parsedCookie = cookie.parse(cookies);
-  const authToken = parsedCookie["auth_token"];
+  const authToken = parsedCookie["token"];
   const jwtService = new JwtService();
   try {
     const decodedToken = jwtService.decode(authToken);

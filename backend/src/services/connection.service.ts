@@ -18,7 +18,12 @@ class ConnectionService {
     const data = raw.map((f) => {
       const datum = {
         createdAt: f.createdAt,
-        user: f.from,
+        user: {
+          id: f.from.id,
+          username: f.from.username,
+          name: f.from.full_name,
+          profile_photo_path: f.from.profile_photo_path,
+        },
       };
       return datum;
     });
@@ -33,7 +38,12 @@ class ConnectionService {
     const data = raw.map((f) => {
       const datum = {
         createdAt: f.createdAt,
-        user: f.to,
+        user: {
+          id: f.to.id,
+          username: f.to.username,
+          name: f.to.full_name,
+          profile_photo_path: f.to.profile_photo_path,
+        },
       };
       return datum;
     });

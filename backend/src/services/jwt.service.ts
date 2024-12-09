@@ -1,3 +1,4 @@
+import BadRequest from "../errors/bad-request.error";
 import { SECRET_KEY } from "../config";
 import Unauthorized from "../errors/unauthorized.error";
 const crypto = require("crypto");
@@ -56,7 +57,7 @@ export class JwtService {
     const jwtArr = str.split(".");
 
     if (jwtArr.length !== 3) {
-      throw new Error("Invalid token structure");
+      throw new BadRequest("Invalid token structure");
     }
 
     const head = jwtArr[0];
@@ -65,8 +66,12 @@ export class JwtService {
     const checkSum = this.checkSumGen(head, body);
 
     if (hash === checkSum) {
-      const res = JSON.parse(this.decodeBase64(body));
-      return res;
+      try {
+        const res = JSON.parse(this.decodeBase64(body));
+        return res;
+      } catch (error) {
+        throw new BadRequest("Bad token");
+      }
     } else {
       throw new Unauthorized("Token signature verification failed");
     }

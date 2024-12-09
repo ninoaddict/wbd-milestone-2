@@ -21,8 +21,8 @@ export const getFeedsSchema: RequestSchema = {
         if (isNaN(num)) {
           throw new BadRequest("Invalid take");
         }
-        if (num < 1 || num > 50) {
-          // min 1, max 50
+        if (num < 1) {
+          // min 1
           throw new BadRequest("Invalid take");
         }
         return num;

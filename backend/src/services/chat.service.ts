@@ -17,7 +17,21 @@ class ChatService {
   };
 
   getChatHeaders = async (userId: bigint) => {
-    return await this.chatRepository.getChatHeaders(userId);
+    const data = await this.chatRepository.getChatHeaders(userId);
+    return data.map((datum) => {
+      return {
+        profile: {
+          username: datum.profile?.username,
+          name: datum.profile?.full_name,
+          profile_photo_path: datum.profile?.full_name,
+        },
+        id: datum.id,
+        firstUserId: datum.firstUserId,
+        secondUserId: datum.secondUserId,
+        lastMessage: datum.lastMessage,
+        lastTimeStamp: datum.lastTimeStamp,
+      };
+    });
   };
 
   getMessages = async (

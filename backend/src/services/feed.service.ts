@@ -31,7 +31,7 @@ class FeedService {
         content: feed.content,
         userId: feed.userId,
         username: feed.user.username,
-        name: feed.user.name,
+        name: feed.user.full_name,
         profile_photo_path: feed.user.profile_photo_path,
       };
     });
@@ -65,7 +65,7 @@ class FeedService {
         const payload = {
           title: "New Post",
           body: `${
-            myProfile?.name || ""
+            myProfile?.full_name || ""
           } just uploaded a new post. Click to see.`,
           url: `http://localhost:5173/`,
         };

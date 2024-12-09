@@ -5,7 +5,7 @@ import { jwtService } from "../services/jwt.service";
 
 export class AuthMiddleware {
   extractToken = (req: RequestWithUser) => {
-    const token = req.cookies["auth_token"];
+    const token = req.cookies["token"];
     return token;
   };
 
@@ -16,7 +16,7 @@ export class AuthMiddleware {
   ) => {
     try {
       const token = this.extractToken(req);
-      if (!token) {
+      if (!token || token === undefined || token === "undefined") {
         throw new Unauthorized();
       }
       const decoded = jwtService.decode(token);
@@ -29,12 +29,12 @@ export class AuthMiddleware {
       const currTime = Date.now();
 
       if (decoded.exp < currTime) {
-        res.clearCookie("auth_token");
+        res.clearCookie("token");
         throw new Unauthorized("Token expired");
       }
 
       if (currTime < decoded.iat) {
-        res.clearCookie("auth_token");
+        res.clearCookie("token");
         throw new Unauthorized("Token issued in the future");
       }
 
@@ -55,7 +55,7 @@ export class AuthMiddleware {
   ) => {
     try {
       const token = this.extractToken(req);
-      if (!token) {
+      if (!token || token === undefined || token === "undefined") {
         throw new Unauthorized();
       }
       const decoded = jwtService.decode(token);
@@ -68,12 +68,12 @@ export class AuthMiddleware {
       const currTime = Date.now();
 
       if (decoded.exp < currTime) {
-        res.clearCookie("auth_token");
+        res.clearCookie("token");
         throw new Unauthorized("Token expired");
       }
 
       if (currTime < decoded.iat) {
-        res.clearCookie("auth_token");
+        res.clearCookie("token");
         throw new Unauthorized("Token issued in the future");
       }
 
@@ -96,9 +96,10 @@ export class AuthMiddleware {
   checkAuthUser = (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const token = this.extractToken(req);
-      if (!token) {
+      if (!token || token === undefined || token === "undefined") {
         return next();
       }
+      console.log(token);
 
       const decoded = jwtService.decode(token);
       const validDecoded =
@@ -107,7 +108,7 @@ export class AuthMiddleware {
       const currTime = Date.now();
 
       if (!validDecoded || decoded.exp < currTime || currTime < decoded.iat) {
-        res.clearCookie("auth_token");
+        res.clearCookie("token");
         next();
       } else {
         throw new Unauthorized("You have to log out first");
@@ -124,7 +125,7 @@ export class AuthMiddleware {
   ) => {
     try {
       const token = this.extractToken(req);
-      if (!token) {
+      if (!token || token === undefined || token === "undefined") {
         return next();
       }
       const decoded = jwtService.decode(token);
@@ -136,12 +137,12 @@ export class AuthMiddleware {
 
       const currTime = Date.now();
       if (decoded.exp < currTime) {
-        res.clearCookie("auth_token");
+        res.clearCookie("token");
         return next();
       }
 
       if (currTime < decoded.iat) {
-        res.clearCookie("auth_token");
+        res.clearCookie("token");
         return next();
       }
 

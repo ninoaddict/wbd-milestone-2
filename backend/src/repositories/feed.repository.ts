@@ -47,7 +47,7 @@ class FeedRepository {
         content: true,
         user: {
           select: {
-            name: true,
+            full_name: true,
             username: true,
             profile_photo_path: true,
           },
@@ -82,8 +82,6 @@ class FeedRepository {
   };
 
   updateFeedRepository = async (feedId: bigint, content: string) => {
-    console.log(content);
-    console.log(feedId);
     try {
       return await prisma.feed.update({
         where: {
