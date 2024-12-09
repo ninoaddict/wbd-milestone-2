@@ -11,11 +11,15 @@ import { useToast } from "@/hooks/use-toast";
 import { STORAGE_URL } from "@/lib/const";
 import { convertCreatedAt, convertUpdatedAt } from "@/lib/utils";
 import { deleteFeeds, editFeeds, getFeeds, postFeeds } from "@/services/feed";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { AxiosError } from "axios";
-import { CodeSquare, Pencil, Send, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Pencil, Send, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 export const Route = createFileRoute("/feed/")({
@@ -36,30 +40,23 @@ function RouteComponent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editFeedValue, setEditFeedValue] = useState("");
   const [editFeedId, setEditFeedId] = useState("-1");
-  const [feedList, setFeedList] = useState<Feed[]>([]);
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { ref, inView } = useInView({
     threshold: 0.8,
   });
 
-  const {
-    data,
-    // error,
-    fetchNextPage,
-    hasNextPage,
-    // isFetching,
-    isFetchingNextPage,
-    // status,
-  } = useInfiniteQuery({
-    queryKey: ["feeds"],
-    queryFn: getFeeds,
-    initialPageParam: "",
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    refetchInterval: false,
-    refetchOnWindowFocus: false,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["feeds"],
+      queryFn: getFeeds,
+      initialPageParam: "",
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      refetchInterval: false,
+      refetchOnWindowFocus: false,
+    });
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -75,12 +72,26 @@ function RouteComponent() {
 
   const mutationPost = useMutation({
     mutationFn: (content: string) => postFeeds(content),
-    onSuccess: (data) => {
-      addNewFeedState({
-        ...data,
-        name: user?.name || "",
-        username: user?.username || "",
-        profile_photo_path: user?.profile_photo_path || "",
+    onSuccess: (newFeed) => {
+      queryClient.setQueryData(["feeds"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: [
+            {
+              ...oldData.pages[0],
+              feeds: [
+                {
+                  ...newFeed,
+                  name: user?.name || "",
+                  username: user?.username || "",
+                  profile_photo_path: user?.profile_photo_path || "",
+                },
+                ...oldData.pages[0].feeds,
+              ],
+            },
+          ],
+        };
       });
       toast({
         title: "Success",
@@ -110,12 +121,26 @@ function RouteComponent() {
     mutationFn: ({ feedId, content }: { feedId: bigint; content: string }) =>
       editFeeds(content, feedId),
     onSuccess: (data) => {
-      editFeedState({
-        ...data,
-        name: user?.name || "",
-        username: user?.username || "",
-        profile_photo_path: user?.profile_photo_path || "",
+      queryClient.setQueryData(["feeds"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            feeds: page.feeds.map((feed: Feed) =>
+              feed.id === data.id
+                ? {
+                    ...data,
+                    name: user?.name || "",
+                    username: user?.username || "",
+                    profile_photo_path: user?.profile_photo_path || "",
+                  }
+                : feed
+            ),
+          })),
+        };
       });
+
       setModalOpen(false);
       toast({
         title: "Success",
@@ -144,11 +169,15 @@ function RouteComponent() {
   const mutationDelete = useMutation({
     mutationFn: (feedId: bigint) => deleteFeeds(feedId),
     onSuccess: (data) => {
-      deleteFeedState({
-        ...data,
-        name: user?.name || "",
-        username: user?.username || "",
-        profile_photo_path: user?.profile_photo_path || "",
+      queryClient.setQueryData(["feeds"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => ({
+            ...page,
+            feeds: page.feeds.filter((feed: Feed) => feed.id !== data.id),
+          })),
+        };
       });
       toast({
         title: "Success",
@@ -174,41 +203,42 @@ function RouteComponent() {
     },
   });
 
-  const addNewFeedState = useCallback((incoming: Feed) => {
-    setFeedList((current) => {
-      return [incoming, ...current];
-    });
-  }, []);
+  // const addNewFeedState = useCallback((incoming: Feed) => {
+  //   setFeedList((current) => {
+  //     return [incoming, ...current];
+  //   });
+  // }, []);
 
-  const addFeedState = useCallback((incoming: Feed[]) => {
-    setFeedList((current) => {
-      const combinedFeeds = [...current, ...incoming];
-      return combinedFeeds;
-    });
-  }, []);
+  // const addFeedState = useCallback((incoming: Feed[]) => {
+  //   setFeedList((current) => {
+  //     const combinedFeeds = [...current, ...incoming];
+  //     return combinedFeeds;
+  //   });
+  // }, []);
 
-  const editFeedState = useCallback((incoming: Feed) => {
-    setFeedList((current) => {
-      return current.map((curr) => {
-        if (curr.id === incoming.id) {
-          return incoming;
-        } else {
-          return curr;
-        }
-      });
-    });
-  }, []);
+  // const editFeedState = useCallback((incoming: Feed) => {
+  //   setFeedList((current) => {
+  //     return current.map((curr) => {
+  //       if (curr.id === incoming.id) {
+  //         return incoming;
+  //       } else {
+  //         return curr;
+  //       }
+  //     });
+  //   });
+  // }, []);
 
-  const deleteFeedState = useCallback((incoming: Feed) => {
-    setFeedList((current) => {
-      return current.filter((curr) => curr.id !== incoming.id);
-    });
-  }, []);
+  // const deleteFeedState = useCallback((incoming: Feed) => {
+  //   setFeedList((current) => {
+  //     return current.filter((curr) => curr.id !== incoming.id);
+  //   });
+  // }, []);
 
-  useEffect(() => {
-    const feed = data?.pages[data.pages.length - 1].feeds || [];
-    addFeedState(feed);
-  }, [data?.pages, addFeedState]);
+  // useEffect(() => {
+  //   const feed = data?.pages[data.pages.length - 1].feeds || [];
+  //   console.log(data?.pages.length);
+  //   addFeedState(feed);
+  // }, [data?.pages, addFeedState]);
 
   const sendFeed = (feed: string) => {
     if (feed.length > 0) {
@@ -291,60 +321,62 @@ function RouteComponent() {
           </Card>
 
           <div className="space-y-4">
-            {feedList.map((feed) => (
-              <Card key={feed.id}>
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <Avatar>
-                    <AvatarImage
-                      src={
-                        feed.profile_photo_path
-                          ? `${STORAGE_URL}/${feed.profile_photo_path}`
-                          : ""
-                      }
-                    />
-                    <AvatarFallback>
-                      {feed.name.charAt(0) || "NF"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <Link
-                      to={`/profile/${feed.userId}`}
-                      className="hover:underline hover:text-blue-700"
-                    >
-                      <h3 className="font-semibold">{feed.name}</h3>
-                    </Link>
-                    <p className="text-sm text-gray-500">
-                      <span>
-                        {feed.createdAt !== feed.updatedAt
-                          ? convertUpdatedAt(feed.updatedAt)
-                          : convertCreatedAt(feed.createdAt)}
-                      </span>
-                    </p>
-                  </div>
-                  {feed.userId === user?.id && (
-                    <div className="flex gap-2">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => openModal(feed.content, feed.id)}
+            {data?.pages.map((page) =>
+              page.feeds.map((feed) => (
+                <Card key={feed.id}>
+                  <CardHeader className="flex flex-row items-center gap-4">
+                    <Avatar>
+                      <AvatarImage
+                        src={
+                          feed.profile_photo_path
+                            ? `${STORAGE_URL}/${feed.profile_photo_path}`
+                            : ""
+                        }
+                      />
+                      <AvatarFallback>
+                        {feed.name.charAt(0) || "NF"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <Link
+                        to={`/profile/${feed.userId}`}
+                        className="hover:underline hover:text-blue-700"
                       >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => deleteFeed(feed.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <h3 className="font-semibold">{feed.name}</h3>
+                      </Link>
+                      <p className="text-sm text-gray-500">
+                        <span>
+                          {feed.createdAt !== feed.updatedAt
+                            ? convertUpdatedAt(feed.updatedAt)
+                            : convertCreatedAt(feed.createdAt)}
+                        </span>
+                      </p>
                     </div>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <p>{feed.content}</p>
-                </CardContent>
-              </Card>
-            ))}
+                    {feed.userId === user?.id && (
+                      <div className="flex gap-2">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => openModal(feed.content, feed.id)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => deleteFeed(feed.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <p>{feed.content}</p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
           <div className="flex justify-center items-center">
             {user && data?.pages && data.pages.length > 0 && (

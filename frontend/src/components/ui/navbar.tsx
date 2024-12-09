@@ -21,13 +21,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { useMutation } from "@tanstack/react-query";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logout } from "@/services/auth";
 import { AxiosError } from "axios";
 import { STORAGE_URL } from "@/lib/const";
@@ -37,6 +32,7 @@ export const Navbar = () => {
   const { user, loading, setUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -46,6 +42,7 @@ export const Navbar = () => {
       flushSync(() => {
         setUser(null);
       });
+      queryClient.resetQueries();
       router.invalidate();
       router.navigate({ to: "/login", replace: false });
     },
