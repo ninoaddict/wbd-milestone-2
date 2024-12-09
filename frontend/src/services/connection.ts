@@ -1,10 +1,16 @@
 import { api } from "@/lib/api";
 import { UserList } from "@/domain/interfaces/connection.interface";
+import { LimitedUser } from "@/domain/interfaces/user.interface";
 
 interface UserListResponse {
   body: UserList;
   message: string;
 }
+
+export const getUserRecommendations = async () => {
+  const res = (await api.get("/connection/recommendation")).data;
+  return res.body as LimitedUser[];
+};
 
 export const sendConnectionReq = async (userId: bigint) => {
   const res = (await api

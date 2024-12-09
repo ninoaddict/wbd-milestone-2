@@ -18,7 +18,15 @@ class UserService {
   findAllUsers = async (query: any, userId?: bigint) => {
     const users = await this.userRepository.getAllUsers(query);
     if (!userId) {
-      return users;
+      return users.map((user) => {
+        return {
+          username: user.username,
+          id: user.id,
+          email: user.email,
+          name: user.full_name,
+          profile_photo_path: user.profile_photo_path,
+        };
+      });
     }
     const finalUsers = await Promise.all(
       users.map(async (user) => {

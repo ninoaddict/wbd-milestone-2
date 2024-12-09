@@ -20,7 +20,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
@@ -46,7 +46,9 @@ function RouteComponent() {
   const [query, setQuery] = useState(searchParams.query);
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   const { toast } = useToast();
-  const { data: userList } = useQuery(userListQueryOptions(debouncedQuery));
+  const { data: userList, isLoading } = useQuery(
+    userListQueryOptions(debouncedQuery)
+  );
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -204,6 +206,10 @@ function RouteComponent() {
     };
   }, [query]);
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f2ee]">
       <main className="container mx-auto py-8 px-4 pt-[80px]">
@@ -239,7 +245,7 @@ function RouteComponent() {
                                 alt={item.name}
                               />
                               <AvatarFallback>
-                                {item.name.charAt(0)}
+                                {item.name && item.name.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div>

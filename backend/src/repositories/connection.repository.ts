@@ -176,6 +176,67 @@ class ConnectionRepository {
       throw new ApplicationError("Internal server error", 500);
     }
   };
+
+  getConnectionRecommendations = async (userId: bigint) => {
+    const directConnections = await prisma.connection.findMany({
+      where: {
+        toId: userId,
+      },
+      select: {
+        fromId: true,
+      },
+    });
+
+    const directConnectionIds = directConnections.map((c) => c.fromId);
+    const secondDegreeConnections = await prisma.connection.findMany({
+      where: {
+        AND: [
+          { toId: { in: directConnectionIds } },
+          { fromId: { notIn: [...directConnectionIds, userId] } },
+        ],
+      },
+      select: {
+        fromId: true,
+      },
+    });
+
+    const secondDegreeIds = secondDegreeConnections.map((c) => c.fromId);
+    const thirdDegreeConnections = await prisma.connection.findMany({
+      where: {
+        AND: [
+          { toId: { in: secondDegreeIds } },
+          {
+            fromId: {
+              notIn: [...directConnectionIds, ...secondDegreeIds, userId],
+            },
+          },
+        ],
+      },
+      select: {
+        fromId: true,
+      },
+    });
+
+    const thirdDegreeIds = thirdDegreeConnections.map((c) => c.fromId);
+    const recommendedConnections = Array.from(
+      new Set([...secondDegreeIds, ...thirdDegreeIds])
+    );
+
+    // Fetch user details for recommendations
+    const recommendations = await prisma.user.findMany({
+      where: {
+        id: { in: recommendedConnections },
+      },
+      select: {
+        id: true,
+        username: true,
+        full_name: true,
+        profile_photo_path: true,
+      },
+    });
+
+    return recommendations;
+  };
 }
 
 export default ConnectionRepository;

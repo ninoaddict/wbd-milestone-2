@@ -102,6 +102,19 @@ class ConnectionService {
     }
     return await this.connectionRepository.deleteConnection(fromId, toId);
   };
+
+  getRecommendations = async (userId: bigint) => {
+    const recommendations =
+      await this.connectionRepository.getConnectionRecommendations(userId);
+    return recommendations.map((rec) => {
+      return {
+        id: rec.id,
+        username: rec.username,
+        name: rec.full_name,
+        profile_photo_path: rec.profile_photo_path,
+      };
+    });
+  };
 }
 
 export default ConnectionService;
