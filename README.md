@@ -64,6 +64,7 @@ LinkedPurry adalah sebuah platform yang dirancang agar para pencari kerja dapat 
 13. Google Lighthouse (Bonus)
 
 14. Connection Recommendation (Bonus)
+
 ![Connection recommendation](/lighthouse_pics/job_recommendation.png)
 
 ## Tech Stack
