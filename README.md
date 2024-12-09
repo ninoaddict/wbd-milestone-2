@@ -20,13 +20,30 @@ LinkedPurry adalah sebuah platform yang dirancang agar para pencari kerja dapat 
 ## Features
 
 1. Home Page
+![Home Page](/lighthouse_pics/welcome_page_lighthouse.png)
+
 2. Login and Register (Authentication)
+![Login and Register (Authentication)](/lighthouse_pics/login_page_lighthouse.png)
+![Login and Register (Authentication)](/lighthouse_pics/register_page_lighthouse.png)
+
 3. User Lists
+![User Lists](/lighthouse_pics/user_list_lighthouse.png)
+
 4. Connection Requests
+![Connection Requests](/lighthouse_pics/connection_request_lighthouse.png)
+
 5. Connection Lists
+![Connection Lists](/lighthouse_pics/connection_list_lighthouse.png)
+
 6. Feeds
+
 7. Chats
+![Chats](/lighthouse_pics/chat_header_lighthouse.png)
+![Chats](/lighthouse_pics/chat_page_lighthouse.png)
+
 8. Profile Page
+![Profile Page](/ligthhouse_pics/profile_page_lighthouse.png)
+
 9. Notification
 
 ---
