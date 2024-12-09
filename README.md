@@ -36,13 +36,14 @@ LinkedPurry adalah sebuah platform yang dirancang agar para pencari kerja dapat 
 ![Connection Lists](/lighthouse_pics/connection_list_lighthouse.png)
 
 6. Feeds
+![Feeds](/lighthouse_pics/feed_page_lighthouse.png)
 
 7. Chats
 ![Chats](/lighthouse_pics/chat_header_lighthouse.png)
 ![Chats](/lighthouse_pics/chat_page_lighthouse.png)
 
 8. Profile Page
-![Profile Page](/ligthhouse_pics/profile_page_lighthouse.png)
+![Profile Page](/lighthouse_pics/profile_page_lighthouse.png)
 
 9. Notification
 
