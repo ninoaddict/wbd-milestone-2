@@ -11,6 +11,7 @@ const updateProfileBody = z.object({
     .min(3, { message: "Name must be at least 3 characters" }),
   work_history: z.string().optional(),
   skills: z.string().optional(),
+  profile_photo: z.null().optional(),
 });
 
 export const updateProfileParamsSchema: RequestSchema = {

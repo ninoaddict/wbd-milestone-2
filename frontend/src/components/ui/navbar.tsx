@@ -1,17 +1,19 @@
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { Link, useRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  Bell,
   Home,
   Menu,
   MessageSquare,
   Users,
   LogOut,
   LogIn,
+  UserPlus,
+  UserRoundSearch,
+  User,
+  UserPlus2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,24 +21,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "@/services/auth";
 import { AxiosError } from "axios";
+import { STORAGE_URL } from "@/lib/const";
+import { flushSync } from "react-dom";
 
 export const Navbar = () => {
-  const { user, loading, setUser } = useUser();
+  const { user, loading, setUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const mutation = useMutation({
     mutationFn: () => {
       return logout();
     },
     onSuccess: () => {
-      setUser(null);
-      setIsLoggingOut(true);
+      flushSync(() => {
+        setUser(null);
+      });
+      router.invalidate();
+      router.navigate({ to: "/login", replace: false });
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -47,15 +58,8 @@ export const Navbar = () => {
     },
   });
 
-  useEffect(() => {
-    if (isLoggingOut && !user) {
-      router.navigate({ to: "/login", replace: false });
-      setIsLoggingOut(false);
-    }
-  }, [isLoggingOut, user, router]);
-
   if (loading) {
-    return <div>...Loading</div>;
+    return <></>;
   }
 
   return (
@@ -76,26 +80,31 @@ export const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-1">
           <NavButton to="/" icon={<Home className="h-6 w-6" />} text="Home" />
+          <NavButton
+            to={`/users`}
+            icon={<UserRoundSearch className="h-6 w-6" />}
+            text="User List"
+          />
           {user && (
             <>
               {" "}
               <NavButton
-                to="/mynetwork"
+                to={`/connection/${user.id}`}
                 icon={<Users className="h-6 w-6" />}
                 text="My Network"
               />
               <NavButton
-                to="/messaging"
+                to="/connection/request"
+                text="Request"
+                icon={<UserPlus className="h-6 w-6" />}
+              />
+              <NavButton
+                to="/chat"
                 icon={<MessageSquare className="h-6 w-6" />}
-                text="Messaging"
+                text="Chat"
               />
             </>
           )}
-          <NavButton
-            to="/notifications"
-            icon={<Bell className="h-6 w-6" />}
-            text="Notifications"
-          />
           {!user && (
             <NavButton
               to="/login"
@@ -109,15 +118,22 @@ export const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <button className="flex flex-col items-center w-[72px] py-1 hover:text-neutral-600">
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback>A</AvatarFallback>
+                      <AvatarImage
+                        src={
+                          user.profile_photo_path !== ""
+                            ? `${STORAGE_URL}/${user.profile_photo_path}`
+                            : undefined
+                        }
+                      />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <span className="text-xs">Me</span>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem>View Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to={`/profile/${user.id}`}>View Profile</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={() => mutation.mutate()}
@@ -151,31 +167,48 @@ export const Navbar = () => {
                 >
                   <Home className="h-5 w-5" /> Home
                 </Link>
+                <Link
+                  to="/users"
+                  className="flex items-center gap-2 text-lg font-semibold"
+                  onClick={() => setIsOpen(false)}
+                  search={{
+                    query: "",
+                  }}
+                >
+                  <UserRoundSearch className="h-5 w-5" /> User List
+                </Link>
                 {user && (
                   <>
                     <Link
-                      to="/"
+                      to={`/connection/${user.id}`}
                       className="flex items-center gap-2 text-lg font-semibold"
                       onClick={() => setIsOpen(false)}
                     >
                       <Users className="h-5 w-5" /> My Network
                     </Link>
                     <Link
-                      to="/"
+                      to="/connection/request"
                       className="flex items-center gap-2 text-lg font-semibold"
                       onClick={() => setIsOpen(false)}
                     >
-                      <MessageSquare className="h-5 w-5" /> Messaging
+                      <UserPlus className="h-5 w-5" /> Request
+                    </Link>
+                    <Link
+                      to={`/profile/${user.id}`}
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <User className="h-5 w-5" /> My Profile
+                    </Link>
+                    <Link
+                      to="/chat"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <MessageSquare className="h-5 w-5" /> Chat
                     </Link>
                   </>
                 )}
-                <Link
-                  to="/"
-                  className="flex items-center gap-2 text-lg font-semibold"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Bell className="h-5 w-5" /> Notifications
-                </Link>
                 {user && (
                   <div
                     className="flex items-center gap-2 text-lg font-semibold cursor-pointer"
@@ -185,13 +218,22 @@ export const Navbar = () => {
                   </div>
                 )}
                 {!user && (
-                  <Link
-                    to="/login"
-                    className="flex items-center gap-2 text-lg font-semibold"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <LogIn className="h-5 w-5" /> Login
-                  </Link>
+                  <>
+                    <Link
+                      to="/register"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <UserPlus2 className="h-5 w-5" /> Register
+                    </Link>
+                    <Link
+                      to="/login"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <LogIn className="h-5 w-5" /> Login
+                    </Link>
+                  </>
                 )}
               </nav>
             </SheetContent>

@@ -11,6 +11,8 @@ export const {
   REDIS_URL,
   SECRET_KEY,
   ORIGIN,
+  PUBLIC_VAPID_KEY,
+  PRIVATE_VAPID_KEY,
 } = process.env;
 
 export const CREDENTIALS = process.env.CREDENTIALS === "true";

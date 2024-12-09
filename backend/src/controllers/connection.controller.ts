@@ -9,6 +9,100 @@ import { validateRequest } from "../middlewares/validate.middleware";
 import { getConnectionSchema } from "../domain/schema/connection.schema";
 
 class ConnectionController implements Controller {
+  /**
+   * @swagger
+   * /api/connection/requests:
+   *   get:
+   *     summary: This is the endpoint to get connection requests
+   *     responses:
+   *       200:
+   *         description: Connection requests fetched successfully
+   *       400:
+   *         description: Bad Request
+   * /api/connection/{userId}:
+   *   get:
+   *     summary: This is the endpoint to get the specific user's connections
+   *     parameters:
+   *        - name: userId
+   *          in: path
+   *          descriptions: The id of the specific user
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Connection fetched successfully
+   *       400:
+   *         description: Bad Request
+   * /api/connection/send/{toId}:
+   *   post:
+   *     summary: This is the endpoint to send connection request to the target user
+   *     parameters:
+   *        - name: toId
+   *          in: path
+   *          descriptions: The id of the specific target user
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Connection fetched successfully
+   *       400:
+   *         description: Bad Request
+   *       401:
+   *         description: User already connected || Connection request has been sent || This user has sent connection request
+   * /api/connection/reject/{toId}:
+   *   post:
+   *     summary: This is the endpoint to reject connection request to the target user
+   *     parameters:
+   *        - name: toId
+   *          in: path
+   *          descriptions: The id of the specific target user
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Connection rejected successfully
+   *       400:
+   *         description: Bad Request
+   *       401:
+   *         description: Connection request has never been sent
+   * /api/connection/accept/{toId}:
+   *   post:
+   *     summary: This is the endpoint to accept connection request to the target user
+   *     parameters:
+   *        - name: toId
+   *          in: path
+   *          descriptions: The id of the specific target user
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Connection accepted successfully
+   *       400:
+   *         description: Bad Request
+   *       401:
+   *         description: Connection request has never been sent
+   * /api/connection/delete/{toId}:
+   *   delete:
+   *     summary: This is the endpoint to unconnect target user
+   *     parameters:
+   *        - name: toId
+   *          in: path
+   *          descriptions: The id of the specific target user
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Connection deleted successfully
+   *       400:
+   *         description: Bad Request
+   *       401:
+   *         description: Connection request has never been sent
+   */
   public path = "/connection";
   public router = Router();
   private connectionService: ConnectionService;
@@ -23,7 +117,7 @@ class ConnectionController implements Controller {
   getAllRequests = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
       body: await this.connectionService.getAllRequests(req.user!.id),
-      message: "Connection requests fetch successfully",
+      message: "Connection requests fetched successfully",
     };
   };
 
@@ -32,14 +126,13 @@ class ConnectionController implements Controller {
       body: await this.connectionService.getAllConnections(
         BigInt(req.params.id)
       ),
-      message: "Connections fetch successfully",
+      message: "Connections fetched successfully",
     };
   };
 
   sendConnectionRequest = async (
     req: RequestWithUser
   ): Promise<BaseResponse> => {
-    console.log(req.params.id, req.user!.id)
     return {
       body: await this.connectionService.sendConnectionRequest(
         req.user!.id,
@@ -74,7 +167,6 @@ class ConnectionController implements Controller {
   };
 
   deleteConnection = async (req: RequestWithUser): Promise<BaseResponse> => {
-    console.log("Aaaaaa")
     return {
       body: await this.connectionService.deleteConnection(
         BigInt(req.params.id),

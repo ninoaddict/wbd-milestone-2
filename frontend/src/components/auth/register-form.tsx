@@ -11,17 +11,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import { useRouter } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { register, RegisterPayload } from "@/services/auth";
 import { AxiosError } from "axios";
+import { flushSync } from "react-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const registerFormSchema = z
   .object({
     username: z
       .string({ required_error: "Username cannot be empty" })
-      .min(2, { message: "Username must be at least 2 characters" }),
+      .min(2, { message: "Username must be at least 2 characters" })
+      .refine((username) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username), {
+        message: "Username cannot be in the form of an email",
+      }),
     email: z
       .string({ required_error: "Email cannot be empty" })
       .email({ message: "Invalid email format" }),
@@ -37,19 +42,23 @@ const registerFormSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword", "password"],
+    path: ["confirmPassword"],
   });
 
 export const RegisterForm = () => {
-  const { setUser } = useUser();
+  const { setUser } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: (payload: RegisterPayload) => {
       return register(payload);
     },
     onSuccess: (data) => {
-      setUser(data);
+      flushSync(() => {
+        setUser(data);
+      });
+      router.invalidate();
       router.navigate({
         to: "/",
         replace: true,
@@ -57,9 +66,17 @@ export const RegisterForm = () => {
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
-        console.log(err.response?.data.message);
+        toast({
+          title: "Login Error",
+          description: err.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
       } else {
-        console.error("Unexpected error:", err);
+        toast({
+          title: "Login Error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
       }
     },
   });

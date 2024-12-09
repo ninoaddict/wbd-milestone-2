@@ -11,29 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as JobImport } from './routes/job'
-import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as UsersIndexImport } from './routes/users/index'
+import { Route as FeedIndexImport } from './routes/feed/index'
+import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as ProfileUserIdImport } from './routes/profile/$userId'
+import { Route as ConnectionUserIdImport } from './routes/connection/$userId'
+import { Route as ChatRoomIdImport } from './routes/chat/$roomId'
 import { Route as authRegisterImport } from './routes/(auth)/register'
 import { Route as authLoginImport } from './routes/(auth)/login'
-import { Route as connectionUserListUserIdImport } from './routes/(connection)/userList/$userId'
-import { Route as connectionConReqUserIdImport } from './routes/(connection)/conReq/$userId'
-import { Route as connectionConListUserIdImport } from './routes/(connection)/conList/$userId'
+import { Route as ConnectionRequestIndexImport } from './routes/connection/request/index'
 
 // Create/Update Routes
-
-const JobRoute = JobImport.update({
-  id: '/job',
-  path: '/job',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AboutRoute = AboutImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -41,9 +30,39 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const UsersIndexRoute = UsersIndexImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FeedIndexRoute = FeedIndexImport.update({
+  id: '/feed/',
+  path: '/feed/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChatIndexRoute = ChatIndexImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ProfileUserIdRoute = ProfileUserIdImport.update({
   id: '/profile/$userId',
   path: '/profile/$userId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ConnectionUserIdRoute = ConnectionUserIdImport.update({
+  id: '/connection/$userId',
+  path: '/connection/$userId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChatRoomIdRoute = ChatRoomIdImport.update({
+  id: '/chat/$roomId',
+  path: '/chat/$roomId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -59,21 +78,9 @@ const authLoginRoute = authLoginImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const connectionUserListUserIdRoute = connectionUserListUserIdImport.update({
-  id: '/(connection)/userList/$userId',
-  path: '/userList/$userId',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const connectionConReqUserIdRoute = connectionConReqUserIdImport.update({
-  id: '/(connection)/conReq/$userId',
-  path: '/conReq/$userId',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const connectionConListUserIdRoute = connectionConListUserIdImport.update({
-  id: '/(connection)/conList/$userId',
-  path: '/conList/$userId',
+const ConnectionRequestIndexRoute = ConnectionRequestIndexImport.update({
+  id: '/connection/request/',
+  path: '/connection/request/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -86,20 +93,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/job': {
-      id: '/job'
-      path: '/job'
-      fullPath: '/job'
-      preLoaderRoute: typeof JobImport
       parentRoute: typeof rootRoute
     }
     '/(auth)/login': {
@@ -116,6 +109,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authRegisterImport
       parentRoute: typeof rootRoute
     }
+    '/chat/$roomId': {
+      id: '/chat/$roomId'
+      path: '/chat/$roomId'
+      fullPath: '/chat/$roomId'
+      preLoaderRoute: typeof ChatRoomIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/connection/$userId': {
+      id: '/connection/$userId'
+      path: '/connection/$userId'
+      fullPath: '/connection/$userId'
+      preLoaderRoute: typeof ConnectionUserIdImport
+      parentRoute: typeof rootRoute
+    }
     '/profile/$userId': {
       id: '/profile/$userId'
       path: '/profile/$userId'
@@ -123,25 +130,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUserIdImport
       parentRoute: typeof rootRoute
     }
-    '/(connection)/conList/$userId': {
-      id: '/(connection)/conList/$userId'
-      path: '/conList/$userId'
-      fullPath: '/conList/$userId'
-      preLoaderRoute: typeof connectionConListUserIdImport
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatIndexImport
       parentRoute: typeof rootRoute
     }
-    '/(connection)/conReq/$userId': {
-      id: '/(connection)/conReq/$userId'
-      path: '/conReq/$userId'
-      fullPath: '/conReq/$userId'
-      preLoaderRoute: typeof connectionConReqUserIdImport
+    '/feed/': {
+      id: '/feed/'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedIndexImport
       parentRoute: typeof rootRoute
     }
-    '/(connection)/userList/$userId': {
-      id: '/(connection)/userList/$userId'
-      path: '/userList/$userId'
-      fullPath: '/userList/$userId'
-      preLoaderRoute: typeof connectionUserListUserIdImport
+    '/users/': {
+      id: '/users/'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/connection/request/': {
+      id: '/connection/request/'
+      path: '/connection/request'
+      fullPath: '/connection/request'
+      preLoaderRoute: typeof ConnectionRequestIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -151,100 +165,108 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/job': typeof JobRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/chat/$roomId': typeof ChatRoomIdRoute
+  '/connection/$userId': typeof ConnectionUserIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
-  '/conList/$userId': typeof connectionConListUserIdRoute
-  '/conReq/$userId': typeof connectionConReqUserIdRoute
-  '/userList/$userId': typeof connectionUserListUserIdRoute
+  '/chat': typeof ChatIndexRoute
+  '/feed': typeof FeedIndexRoute
+  '/users': typeof UsersIndexRoute
+  '/connection/request': typeof ConnectionRequestIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/job': typeof JobRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/chat/$roomId': typeof ChatRoomIdRoute
+  '/connection/$userId': typeof ConnectionUserIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
-  '/conList/$userId': typeof connectionConListUserIdRoute
-  '/conReq/$userId': typeof connectionConReqUserIdRoute
-  '/userList/$userId': typeof connectionUserListUserIdRoute
+  '/chat': typeof ChatIndexRoute
+  '/feed': typeof FeedIndexRoute
+  '/users': typeof UsersIndexRoute
+  '/connection/request': typeof ConnectionRequestIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/job': typeof JobRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/chat/$roomId': typeof ChatRoomIdRoute
+  '/connection/$userId': typeof ConnectionUserIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
-  '/(connection)/conList/$userId': typeof connectionConListUserIdRoute
-  '/(connection)/conReq/$userId': typeof connectionConReqUserIdRoute
-  '/(connection)/userList/$userId': typeof connectionUserListUserIdRoute
+  '/chat/': typeof ChatIndexRoute
+  '/feed/': typeof FeedIndexRoute
+  '/users/': typeof UsersIndexRoute
+  '/connection/request/': typeof ConnectionRequestIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
-    | '/job'
     | '/login'
     | '/register'
+    | '/chat/$roomId'
+    | '/connection/$userId'
     | '/profile/$userId'
-    | '/conList/$userId'
-    | '/conReq/$userId'
-    | '/userList/$userId'
+    | '/chat'
+    | '/feed'
+    | '/users'
+    | '/connection/request'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
-    | '/job'
     | '/login'
     | '/register'
+    | '/chat/$roomId'
+    | '/connection/$userId'
     | '/profile/$userId'
-    | '/conList/$userId'
-    | '/conReq/$userId'
-    | '/userList/$userId'
+    | '/chat'
+    | '/feed'
+    | '/users'
+    | '/connection/request'
   id:
     | '__root__'
     | '/'
-    | '/about'
-    | '/job'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/chat/$roomId'
+    | '/connection/$userId'
     | '/profile/$userId'
-    | '/(connection)/conList/$userId'
-    | '/(connection)/conReq/$userId'
-    | '/(connection)/userList/$userId'
+    | '/chat/'
+    | '/feed/'
+    | '/users/'
+    | '/connection/request/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  JobRoute: typeof JobRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
+  ChatRoomIdRoute: typeof ChatRoomIdRoute
+  ConnectionUserIdRoute: typeof ConnectionUserIdRoute
   ProfileUserIdRoute: typeof ProfileUserIdRoute
-  connectionConListUserIdRoute: typeof connectionConListUserIdRoute
-  connectionConReqUserIdRoute: typeof connectionConReqUserIdRoute
-  connectionUserListUserIdRoute: typeof connectionUserListUserIdRoute
+  ChatIndexRoute: typeof ChatIndexRoute
+  FeedIndexRoute: typeof FeedIndexRoute
+  UsersIndexRoute: typeof UsersIndexRoute
+  ConnectionRequestIndexRoute: typeof ConnectionRequestIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  JobRoute: JobRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
+  ChatRoomIdRoute: ChatRoomIdRoute,
+  ConnectionUserIdRoute: ConnectionUserIdRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
-  connectionConListUserIdRoute: connectionConListUserIdRoute,
-  connectionConReqUserIdRoute: connectionConReqUserIdRoute,
-  connectionUserListUserIdRoute: connectionUserListUserIdRoute,
+  ChatIndexRoute: ChatIndexRoute,
+  FeedIndexRoute: FeedIndexRoute,
+  UsersIndexRoute: UsersIndexRoute,
+  ConnectionRequestIndexRoute: ConnectionRequestIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -258,24 +280,19 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about",
-        "/job",
         "/(auth)/login",
         "/(auth)/register",
+        "/chat/$roomId",
+        "/connection/$userId",
         "/profile/$userId",
-        "/(connection)/conList/$userId",
-        "/(connection)/conReq/$userId",
-        "/(connection)/userList/$userId"
+        "/chat/",
+        "/feed/",
+        "/users/",
+        "/connection/request/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/about": {
-      "filePath": "about.tsx"
-    },
-    "/job": {
-      "filePath": "job.tsx"
     },
     "/(auth)/login": {
       "filePath": "(auth)/login.tsx"
@@ -283,17 +300,26 @@ export const routeTree = rootRoute
     "/(auth)/register": {
       "filePath": "(auth)/register.tsx"
     },
+    "/chat/$roomId": {
+      "filePath": "chat/$roomId.tsx"
+    },
+    "/connection/$userId": {
+      "filePath": "connection/$userId.tsx"
+    },
     "/profile/$userId": {
       "filePath": "profile/$userId.tsx"
     },
-    "/(connection)/conList/$userId": {
-      "filePath": "(connection)/conList/$userId.tsx"
+    "/chat/": {
+      "filePath": "chat/index.tsx"
     },
-    "/(connection)/conReq/$userId": {
-      "filePath": "(connection)/conReq/$userId.tsx"
+    "/feed/": {
+      "filePath": "feed/index.tsx"
     },
-    "/(connection)/userList/$userId": {
-      "filePath": "(connection)/userList/$userId.tsx"
+    "/users/": {
+      "filePath": "users/index.tsx"
+    },
+    "/connection/request/": {
+      "filePath": "connection/request/index.tsx"
     }
   }
 }

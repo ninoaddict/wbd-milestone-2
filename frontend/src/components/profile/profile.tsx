@@ -3,17 +3,121 @@ import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
 import { Profile } from "@/domain/interfaces/user.interface";
+import { experienceType } from "@/domain/interfaces/profile.interface";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import {
+  acceptConnection,
+  deleteConnection,
+  sendConnectionReq,
+} from "@/services/connection";
+import { STORAGE_URL } from "@/lib/const";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
 
-interface experienceType {
-  title: string;
-  company: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-}
+export default function ProfilePage({
+  profile,
+  userId,
+}: {
+  profile: Profile;
+  userId: bigint;
+}) {
+  const { toast } = useToast();
+  const [status, setStatus] = useState<String>(profile.connection_status);
+  const mutationAccept = useMutation({
+    mutationFn: (userId: bigint) => acceptConnection(userId),
+    onSuccess: () => {
+      setStatus("connected");
+      toast({
+        title: "Success",
+        description: "Connection request accepted",
+        className: "bg-green-500 text-white",
+      });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Update profile error",
+          description:
+            error.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
+      }
+    },
+  });
 
-export default function ProfilePage(profile: Profile) {
+  const mutationRequest = useMutation({
+    mutationFn: (userId: bigint) => sendConnectionReq(userId),
+    onSuccess: () => {
+      setStatus("requesting");
+      toast({
+        title: "Success",
+        description: "Connection requested successfully",
+        className: "bg-green-500 text-white",
+      });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Update profile error",
+          description:
+            error.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  const mutationDelete = useMutation({
+    mutationFn: (userId: bigint) => deleteConnection(userId),
+    onSuccess: () => {
+      setStatus("disconnected");
+      toast({
+        title: "Success",
+        description: "Connection deleted successfully",
+        className: "bg-green-500 text-white",
+      });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast({
+          title: "Update profile error",
+          description:
+            error.response?.data.message || "Unexpected error occured",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Update profile error",
+          description: "Unexpected error occured",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
   let experience: experienceType[] = [];
+  let skills: string[] = [];
+
+  profile.relevant_post?.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  let newList = profile.relevant_post?.slice(0, 4);
+  profile.relevant_post?.slice(0, 4);
+
   try {
     if (profile && profile.work_history && profile.work_history !== "") {
       const raw = JSON.parse(profile.work_history);
@@ -27,8 +131,55 @@ export default function ProfilePage(profile: Profile) {
         };
       });
     }
+
+    if (profile && profile.skills && profile.skills !== "") {
+      skills = JSON.parse(profile.skills);
+    }
   } catch (error) {
     // fail to parse
+  }
+
+  const ago: string[] = [];
+  if (profile.relevant_post) {
+    for (let feed of profile.relevant_post) {
+      const millisec = Math.floor(
+        Date.now() - new Date(feed.createdAt).getTime()
+      );
+      if (millisec >= 1000 * 60 && millisec < 1000 * 60 * 60) {
+        ago.push(`Created ${Math.floor(millisec / (1000 * 60))} minutes ago`);
+      } else if (millisec >= 1000 * 60 * 60 && millisec < 1000 * 60 * 60 * 24) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60))} hours ago`
+        );
+      } else if (
+        millisec >= 1000 * 60 * 60 * 24 &&
+        millisec < 1000 * 60 * 60 * 24 * 7
+      ) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24))} days ago`
+        );
+      } else if (
+        millisec >= 1000 * 60 * 60 * 24 * 7 &&
+        millisec < 1000 * 60 * 60 * 24 * 30
+      ) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 7))} weeks ago`
+        );
+      } else if (
+        millisec >= 1000 * 60 * 60 * 24 * 30 &&
+        millisec < 1000 * 60 * 60 * 24 * 365
+      ) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 30))} months ago`
+        );
+      } else if (millisec >= 1000 * 60 * 60 * 24 * 365) {
+        ago.push(
+          `Created ${Math.floor(millisec / (1000 * 60 * 60 * 24 * 365))} years ago`
+        );
+      } else {
+        ago.push(`Created ${Math.floor(millisec / 1000)} seconds ago`);
+      }
+    }
   }
 
   return (
@@ -45,7 +196,7 @@ export default function ProfilePage(profile: Profile) {
               {/* Cover Photo */}
               <div className="h-32 sm:h-48 bg-gray-300/80 rounded-t-xl">
                 <img
-                  src="/banner.jpeg"
+                  src="/banner.webp"
                   alt="banner"
                   className="object-cover rounded-t-xl w-full h-32 sm:h-48"
                 />
@@ -58,7 +209,7 @@ export default function ProfilePage(profile: Profile) {
                     src={
                       profile.profile_photo === ""
                         ? "/profile_photo_placeholder.webp"
-                        : profile.profile_photo
+                        : `${STORAGE_URL}/${profile.profile_photo}`
                     }
                     alt="Profile photo"
                     width={128}
@@ -76,8 +227,8 @@ export default function ProfilePage(profile: Profile) {
                     </p>
                     <div className="mt-2">
                       <Link
-                        href="/connections"
-                        className="text-xs sm:text-sm text-primary hover:underline"
+                        to={`/connection/${userId}`}
+                        className="text-xs text-[#0a66c2] font-bold sm:text-sm text-primary hover:underline"
                       >
                         {profile.connection_count} connections
                       </Link>
@@ -85,22 +236,54 @@ export default function ProfilePage(profile: Profile) {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {profile.connection_status === "disconnected" && (
-                    <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
+                  {status === "disconnected" && (
+                    <Button
+                      className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                      onClick={() => {
+                        mutationRequest.mutate(userId);
+                      }}
+                    >
                       Connect
                     </Button>
                   )}
-                  {profile.connection_status === "connected" && (
-                    <Button className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]">
-                      Disconnect
+                  {status === "connected" && (
+                    <>
+                      <Button
+                        className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                        onClick={() => {
+                          mutationDelete.mutate(userId);
+                        }}
+                      >
+                        Disconnect
+                      </Button>
+                      <Link to="/chat">
+                        <Button
+                          variant="outline"
+                          className="text-xs sm:text-sm border-[#0a66c2]"
+                        >
+                          Message
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                  {status === "requesting" && (
+                    <Button
+                      className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                      disabled
+                    >
+                      Pending
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    className="text-xs sm:text-sm border-[#0a66c2]"
-                  >
-                    Message
-                  </Button>
+                  {status === "requested" && (
+                    <Button
+                      className="bg-[#0a66c2] text-xs sm:text-sm hover:bg-[#0a66c2b6]"
+                      onClick={() => {
+                        mutationAccept.mutate(userId);
+                      }}
+                    >
+                      Connect
+                    </Button>
+                  )}
                 </div>
               </div>
             </Card>
@@ -141,7 +324,7 @@ export default function ProfilePage(profile: Profile) {
               </div>
               <div className="flex gap-4 flex-wrap">
                 {profile.skills !== "" &&
-                  profile.skills.split(",").map((skill) => (
+                  skills.map((skill) => (
                     <div
                       key={skill}
                       className="flex items-center justify-between"
@@ -153,9 +336,7 @@ export default function ProfilePage(profile: Profile) {
             </Card>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-6">
-            {/* Profile Language */}
             <Card className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -169,23 +350,20 @@ export default function ProfilePage(profile: Profile) {
               </div>
             </Card>
 
-            {/* Recent Posts */}
             <Card className="p-4 sm:p-6">
               <h2 className="mb-4 text-lg sm:text-xl font-semibold">
                 Recent Posts
               </h2>
               <div className="space-y-4">
-                {profile.relevant_post &&
-                  profile.relevant_post.map((post) => (
+                {newList &&
+                  newList.map((post, index) => (
                     <Card key={post.id} className="p-3 sm:p-4">
                       <h3 className="text-sm sm:text-base font-semibold">
-                        Exciting new developments in React 19
+                        Post #{ago.length - index}
                       </h3>
+                      <p className="mt-2 text-xs sm:text-sm">{post.content}</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        Shared by John Developer · 2d ago
-                      </p>
-                      <p className="mt-2 text-xs sm:text-sm">
-                        Check out these amazing new features coming to React...
+                        {ago && ago[index]}
                       </p>
                     </Card>
                   ))}

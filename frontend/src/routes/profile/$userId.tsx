@@ -1,9 +1,11 @@
-import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { getProfile } from "@/services/profile";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import ProfilePage from "@/components/profile/profile";
-import { useUser } from "@/context/auth-context";
+import { useAuth } from "@/context/auth-context";
 import SelfProfilePage from "@/components/profile/self-profile";
+import NotFound from "@/components/not-found/not-found";
+import Loading from "@/components/loading/loading";
 
 const profileQueryOptions = (userId: string) =>
   queryOptions({
@@ -13,7 +15,8 @@ const profileQueryOptions = (userId: string) =>
 
 export const Route = createFileRoute("/profile/$userId")({
   component: RouteComponent,
-  errorComponent: ErrorComponent,
+  errorComponent: NotFound,
+  pendingComponent: Loading,
   loader: ({ context: { queryClient }, params: { userId } }) => {
     return queryClient.ensureQueryData(profileQueryOptions(userId));
   },
@@ -21,14 +24,16 @@ export const Route = createFileRoute("/profile/$userId")({
 
 function RouteComponent() {
   const userId = Route.useParams().userId;
-  const { user, loading } = useUser();
-  const { data: profile } = useQuery(profileQueryOptions(userId));
+  const { user } = useAuth();
+  const profile = Route.useLoaderData();
+
   if (!profile) {
-    return <div>Unexpected error occured</div>;
+    return <NotFound />;
   }
+
   if (!user || user.id !== userId) {
-    return ProfilePage(profile);
+    return <ProfilePage profile={profile} userId={BigInt(userId)} />;
   } else {
-    return SelfProfilePage(profile);
+    return <SelfProfilePage profile={profile} />;
   }
 }

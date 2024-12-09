@@ -3,7 +3,8 @@ export interface UserShortInfo {
     name: string,
     email: string,
     profile_photo_path: string,
-    username: string
+    username: string,
+    status: string
 }
 
 export interface UserShortInfoQueried {

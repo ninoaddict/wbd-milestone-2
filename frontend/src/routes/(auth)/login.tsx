@@ -1,29 +1,20 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { LoginForm } from "@/components/auth/login-form";
-import { useUser } from "@/context/auth-context";
-import { useEffect } from "react";
+import Loading from "@/components/loading/loading";
 
 export const Route = createFileRoute("/(auth)/login")({
   component: RouteComponent,
+  pendingComponent: Loading,
+  beforeLoad: ({ context }) => {
+    if (context.auth.user) {
+      throw redirect({
+        to: "/",
+      });
+    }
+  },
 });
 
 function RouteComponent() {
-  const router = useRouter();
-  const { user, loading } = useUser();
-
-  useEffect(() => {
-    if (user) {
-      router.navigate({
-        to: "/",
-        replace: true,
-      });
-    }
-  }, [user, router]);
-
-  if (loading) {
-    return <div>...Loading</div>;
-  }
-
   return (
     <div className="flex flex-col items-center justify-center px-5 min-h-screen bg-[#f4f2ee]">
       <div className="w-full max-w-[352px] rounded-lg mx-auto shadow-lg bg-white p-6">

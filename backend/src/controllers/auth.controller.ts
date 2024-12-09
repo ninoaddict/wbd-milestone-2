@@ -9,6 +9,99 @@ import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { RequestWithUser } from "../domain/dtos/auth.dto";
 
 class AuthController implements Controller {
+  /**
+   * @swagger
+   * /api/register:
+   *   post:
+   *     summary: This is the endpoint to register new informations to create a new account
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                type: string
+   *                example: fluffy@gmail.com
+   *               username:
+   *                type: string
+   *                example: fluffy222
+   *               name:
+   *                type: string
+   *                example: fluffy
+   *               password:
+   *                type: string
+   *                example: password
+   *             required:
+   *               - email
+   *               - username
+   *               - name
+   *               - password
+   *     responses:
+   *       200:
+   *         description: User registered successfully
+   *       400:
+   *         description: Email or Username is already taken
+   * /api/login:
+   *   post:
+   *     summary: This is the endpoint to login to an existing account
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *              identifier:
+   *               type: string
+   *               example: bearish@gmail.com
+   *              password:
+   *               type: string
+   *               example: password
+   *     responses:
+   *       200:
+   *         description: User logged in successfully
+   *       401:
+   *         description: Invalid credential
+   * /api/logout:
+   *   post:
+   *     summary: This is the endpoint to logout from the user's account
+   *     responses:
+   *       200:
+   *         description: User logged out successfully
+   * /api/self:
+   *   get:
+   *     summary: This is the endpoint to retrieve current user's information
+   *     responses:
+   *       200:
+   *         description: Retrieve user successfully
+   *       404:
+   *         description: User not found
+   * /api/users:
+   *   get:
+   *     summary: This is the endpoint to find all users in LinkedPurry
+   *     responses:
+   *       200:
+   *         description: Successfully fetch all users
+   *       404:
+   *         description: User not found
+   * /api/user/{id}:
+   *   get:
+   *     summary: This is the endpoint to find a specific user in LinkedPurry
+   *     parameters:
+   *        - name: id
+   *          in: path
+   *          descriptions: The id of the specific user
+   *          required: true
+   *          schema:
+   *            type: integer
+   *     responses:
+   *       200:
+   *         description: Successfully fetch all users
+   *       404:
+   *         description: User not found
+   */
   public path = "";
   public router = Router();
   private userService: UserService;
@@ -57,10 +150,17 @@ class AuthController implements Controller {
     };
   };
 
-  getUsers = async (req: Request): Promise<BaseResponse> => {
+  getUsers = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
-      body: await this.userService.findAllUsers(req.query.query),
+      body: await this.userService.findAllUsers(req.query.query, req.user?.id),
       message: "Successfully fetch all users",
+    };
+  };
+
+  getUser = async (req: Request): Promise<BaseResponse> => {
+    return {
+      body: await this.userService.findLimitedUserById(BigInt(req.params.id)),
+      message: "Successfully fetch user",
     };
   };
 
@@ -85,7 +185,12 @@ class AuthController implements Controller {
       this.authMiddleware.checkPublicUser,
       handleRequest(this.self)
     );
-    this.router.get(`${this.path}/users`, handleRequest(this.getUsers));
+    this.router.get(
+      `${this.path}/users`,
+      this.authMiddleware.checkPublicUser,
+      handleRequest(this.getUsers)
+    );
+    this.router.get(`${this.path}/user/:id(\\d+)`, handleRequest(this.getUser));
   }
 }
 

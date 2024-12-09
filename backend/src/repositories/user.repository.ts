@@ -11,6 +11,7 @@ class UserRepository {
         name: true,
         profile_photo_path: true,
       },
+      take: 20,
       where: {
         OR: query
           ? [
@@ -36,6 +37,20 @@ class UserRepository {
     return await prisma.user.findUnique({
       where: {
         id,
+      },
+    });
+  };
+
+  getLimitedUserById = async (id: bigint) => {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        profile_photo_path: true,
       },
     });
   };

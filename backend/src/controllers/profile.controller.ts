@@ -14,6 +14,61 @@ import {
 import ProfileService from "../services/profile.service";
 
 class ProfileController implements Controller {
+  /**
+   * @swagger
+   * /api/profile/{userId}:
+   *    get:
+   *     summary: This is the endpoint to get profile from the user in the parameter
+   *     parameters:
+   *       - name: userId
+   *         in: path
+   *         descriptions: The id of the specific user
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Profile fetched successfully
+   *       404:
+   *         description: User not found
+   *    put:
+   *     summary: This is the endpoint to update profile
+   *     parameters:
+   *       - name: userId
+   *         in: path
+   *         descriptions: The id of the specific user
+   *         required: true
+   *         schema:
+   *           type: integer
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *                   id:
+   *                     type: string
+   *                     example: 9
+   *                   username:
+   *                     type: string
+   *                     example: kratos_222
+   *                   name:
+   *                     type: string
+   *                     example: Kratos Boii
+   *                   skills:
+   *                     type: string
+   *                     example: Yapper
+   *                   work_history:
+   *                     type: string
+   *                     example: hahaah
+   *     responses:
+   *       200:
+   *         description: Profile updated successfully
+   *       404:
+   *         description: User not Found
+   *   
+   */
   public path = "/profile";
   public router = Router();
   private authMiddleware: AuthMiddleware;
@@ -28,7 +83,7 @@ class ProfileController implements Controller {
   getProfile = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
       body: await this.profileService.getProfile(
-        req.user,
+        req.user?.id,
         BigInt(req.params.userId)
       ),
       message: "Profile fetched successfully",
@@ -36,6 +91,16 @@ class ProfileController implements Controller {
   };
 
   updateProfile = async (req: RequestWithUser): Promise<BaseResponse> => {
+    if (req.body.profile_photo === null) {
+      return {
+        body: await this.profileService.updateProfile(
+          req.user?.id!,
+          req.body,
+          null
+        ),
+        message: "Profile updated successfully",
+      };
+    }
     return {
       body: await this.profileService.updateProfile(
         req.user?.id!,

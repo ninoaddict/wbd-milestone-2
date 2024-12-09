@@ -31,6 +31,8 @@ model User {
   connectionRequestsReceived ConnectionRequest[] @relation("ConnectionRequestToUser")
   connectionsSent            Connection[]        @relation("ConnectionFromUser")
   connectionsReceived        Connection[]        @relation("ConnectionToUser")
+  firstUserRoom              ChatRoom[]          @relation("firstUserRoom")
+  secondUserRoom             ChatRoom[]          @relation("secondUserRoom")
   pushSubscriptions          PushSubscription[]
 
   @@map("users")
@@ -44,20 +46,37 @@ model Feed {
   userId    BigInt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([createdAt(sort: Desc)])
   @@map("feed")
 }
 
 model Chat {
-  id        BigInt   @id @default(autoincrement())
-  timestamp DateTime @default(now()) @db.Timestamptz()
-  fromId    BigInt
-  toId      BigInt
-  message   String   @db.Text
-  from      User     @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
-  to        User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
+  id         BigInt   @id @default(autoincrement())
+  timestamp  DateTime @default(now()) @db.Timestamptz()
+  fromId     BigInt
+  toId       BigInt
+  message    String   @db.Text
+  from       User     @relation("ChatFromUser", fields: [fromId], references: [id], onDelete: Cascade)
+  to         User     @relation("ChatToUser", fields: [toId], references: [id], onDelete: Cascade)
+  chatRoomId BigInt
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
 
-  @@index([timestamp], type: BTree)
+  @@index([timestamp(sort: Desc)])
   @@map("chat")
+}
+
+model ChatRoom {
+  id            BigInt   @id @default(autoincrement())
+  firstUserId   BigInt
+  secondUserId  BigInt
+  firstUser     User     @relation("firstUserRoom", fields: [firstUserId], references: [id])
+  secondUser    User     @relation("secondUserRoom", fields: [secondUserId], references: [id])
+  lastMessage   String?  @db.Text
+  lastTimeStamp DateTime @default(now()) @db.Timestamptz()
+  chat          Chat[]
+
+  @@unique([firstUserId, secondUserId])
+  @@index([lastTimeStamp(sort: Desc)])
 }
 
 model ConnectionRequest {
