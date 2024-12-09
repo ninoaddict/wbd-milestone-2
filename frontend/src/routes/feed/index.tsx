@@ -10,10 +10,12 @@ import { Feed } from "@/domain/interfaces/feed.interface";
 import { useToast } from "@/hooks/use-toast";
 import { STORAGE_URL } from "@/lib/const";
 import { convertCreatedAt, convertUpdatedAt } from "@/lib/utils";
+import { getUserRecommendations } from "@/services/connection";
 import { deleteFeeds, editFeeds, getFeeds, postFeeds } from "@/services/feed";
 import {
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
@@ -46,6 +48,11 @@ function RouteComponent() {
 
   const { ref, inView } = useInView({
     threshold: 0.8,
+  });
+
+  const { data: recommendation } = useQuery({
+    queryKey: ["recommendation"],
+    queryFn: getUserRecommendations,
   });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -366,18 +373,36 @@ function RouteComponent() {
               <h2 className="text-lg font-semibold">People you may know</h2>
             </CardHeader>
             <CardContent className="space-y-4">
-              {[1, 2, 3].map((connection) => (
-                <div key={connection} className="flex items-center gap-4">
+              {recommendation?.map((connection) => (
+                <div key={connection.id} className="flex items-center gap-4">
                   <Avatar>
-                    <AvatarImage src="/placeholder.svg" />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarImage
+                      src={
+                        connection.profile_photo_path
+                          ? `${STORAGE_URL}/${connection.profile_photo_path}`
+                          : ""
+                      }
+                    />
+                    <AvatarFallback>
+                      {connection.name.charAt(0) || "NF"}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <h3 className="font-medium">Sarah Designer</h3>
-                    <p className="text-sm text-gray-500">UI/UX Designer</p>
+                    <Link
+                      to={`/profile/${connection.id}`}
+                      className="hover:underline hover:text-blue-700"
+                    >
+                      <h3 className="font-medium">{connection.name}</h3>
+                    </Link>
+                    <p className="text-sm text-gray-500">
+                      @{connection.username}
+                    </p>
                   </div>
                 </div>
               ))}
+              {(!recommendation || recommendation.length === 0) && (
+                <div>No recommendations</div>
+              )}
             </CardContent>
           </Card>
         </aside>

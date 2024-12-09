@@ -166,6 +166,13 @@ class ConnectionController implements Controller {
     };
   };
 
+  getRecommendations = async (req: RequestWithUser): Promise<BaseResponse> => {
+    return {
+      body: await this.connectionService.getRecommendations(req.user?.id!),
+      message: "Successfully get recommendations",
+    };
+  };
+
   deleteConnection = async (req: RequestWithUser): Promise<BaseResponse> => {
     return {
       body: await this.connectionService.deleteConnection(
@@ -187,6 +194,12 @@ class ConnectionController implements Controller {
       `${this.path}/:id(\\d+)`,
       validateRequest(getConnectionSchema),
       handleRequest(this.getAllConnections)
+    );
+
+    this.router.get(
+      `${this.path}/recommendation`,
+      this.authMiddleware.checkUser,
+      handleRequest(this.getRecommendations)
     );
 
     this.router.post(

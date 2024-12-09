@@ -46,7 +46,9 @@ function RouteComponent() {
   const [query, setQuery] = useState(searchParams.query);
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   const { toast } = useToast();
-  const { data: userList } = useQuery(userListQueryOptions(debouncedQuery));
+  const { data: userList, isLoading } = useQuery(
+    userListQueryOptions(debouncedQuery)
+  );
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -204,6 +206,10 @@ function RouteComponent() {
     };
   }, [query]);
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f2ee]">
       <main className="container mx-auto py-8 px-4 pt-[80px]">
@@ -239,16 +245,16 @@ function RouteComponent() {
                                 alt={item.name}
                               />
                               <AvatarFallback>
-                                {item.name.charAt(0)}
+                                {item.name && item.name.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <a
-                                href={`/profile/${item.id}`}
+                              <Link
+                                to={`/profile/${item.id}`}
                                 className="text-lg font-medium hover:underline text-blue-700"
                               >
                                 {item.name}
-                              </a>
+                              </Link>
                               <p className="text-sm text-muted-foreground">
                                 @{item.username}
                               </p>
