@@ -23,7 +23,10 @@ const registerFormSchema = z
   .object({
     username: z
       .string({ required_error: "Username cannot be empty" })
-      .min(2, { message: "Username must be at least 2 characters" }),
+      .min(2, { message: "Username must be at least 2 characters" })
+      .refine((username) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username), {
+        message: "Username cannot be in the form of an email",
+      }),
     email: z
       .string({ required_error: "Email cannot be empty" })
       .email({ message: "Invalid email format" }),

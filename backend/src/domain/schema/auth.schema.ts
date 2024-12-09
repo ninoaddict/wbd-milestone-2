@@ -15,7 +15,10 @@ export const registerSchema: RequestSchema = {
     username: z
       .string({ required_error: "Username cannot be empty" })
       .min(5, { message: "Username should not be shorter than 5 characters" })
-      .max(16, { message: "Username should not be longer than 16 characters" }),
+      .max(16, { message: "Username should not be longer than 16 characters" })
+      .refine((username) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username), {
+        message: "Username cannot be in the form of an email",
+      }),
     email: z
       .string({ required_error: "Email cannot be empty" })
       .email({ message: "Invalid email format" }),
