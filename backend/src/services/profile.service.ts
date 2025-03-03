@@ -4,6 +4,7 @@ import { updateProfileDto } from "../domain/schema/profile.schema";
 import NotFound from "../errors/not-found.error";
 import UserRepository from "../repositories/user.repository";
 import { unlink } from "fs";
+import redis from "../redis/redis";
 
 class ProfileService {
   private profileRepository: ProfileRepository;
@@ -16,8 +17,21 @@ class ProfileService {
   }
 
   getProfile = async (myUserID: bigint | undefined | null, userId: bigint) => {
+    let raw;
     if (!myUserID) {
-      const raw = await this.profileRepository.getProfileByPublic(userId);
+      const publicCachedData = await redis.get(`profile-public:${userId}`);
+      if (publicCachedData) {
+        raw = JSON.parse(publicCachedData);
+      } else {
+        raw = await this.profileRepository.getProfileByPublic(userId);
+        await redis.setex(
+          `profile-public:${userId}`,
+          60,
+          JSON.stringify(raw, (_, value) =>
+            typeof value === "bigint" ? value.toString() : value
+          )
+        );
+      }
       if (!raw) {
         throw new NotFound("User not found");
       }
@@ -31,7 +45,19 @@ class ProfileService {
         connection_status: "public",
       };
     } else {
-      const raw = await this.profileRepository.getProfileByUser(userId);
+      const cachedData = await redis.get(`profile:${userId}`);
+      if (cachedData) {
+        raw = JSON.parse(cachedData);
+      } else {
+        raw = await this.profileRepository.getProfileByUser(userId);
+        await redis.setex(
+          `profile:${userId}`,
+          60,
+          JSON.stringify(raw, (_, value) =>
+            typeof value === "bigint" ? value.toString() : value
+          )
+        );
+      }
       if (!raw) {
         throw new NotFound("User not found");
       }

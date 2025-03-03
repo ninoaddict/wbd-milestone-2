@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { jwtService } from "./jwt.service";
 import BadRequest from "../errors/bad-request.error";
 import ConnectionRepository from "../repositories/connection.repository";
+import redis from "../redis/redis";
 
 class UserService {
   private userRepository: UserRepository;
@@ -16,7 +17,29 @@ class UserService {
   }
 
   findAllUsers = async (query: any, userId?: bigint) => {
-    const users = await this.userRepository.getAllUsers(query);
+    let users;
+    const cachedUsers = await redis.get("users");
+    if (cachedUsers) {
+      const parsedUsers: any[] = JSON.parse(cachedUsers);
+      users = parsedUsers.map((user) => {
+        return {
+          id: BigInt(user.id),
+          username: user.username,
+          email: user.email,
+          full_name: user.full_name,
+          profile_photo_path: user.profile_photo_path,
+        };
+      });
+    } else {
+      users = await this.userRepository.getAllUsers(query);
+      await redis.setex(
+        "users",
+        60,
+        JSON.stringify(users, (_, value) =>
+          typeof value === "bigint" ? value.toString() : value
+        )
+      );
+    }
     if (!userId) {
       return users.map((user) => {
         return {

@@ -12,6 +12,7 @@ import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import redis from "./redis/redis";
 
 class Application {
   public app: express.Application;
@@ -46,6 +47,7 @@ class Application {
     this.app.use(cookieParser());
     this.initSocket();
     this.initSwagger();
+    this.initRedis();
 
     // Initialize routes and error handling
     this.initRoutes(controllers);
@@ -62,6 +64,16 @@ class Application {
   private initRoutes(controllers: Controller[]) {
     controllers.forEach((controller) => {
       this.app.use("/api", controller.router);
+    });
+  }
+
+  private initRedis() {
+    redis.on("connect", () => {
+      console.log("Connected to redis");
+    });
+
+    redis.on("error", (err: any) => {
+      console.error("Redis connection error: ", err);
     });
   }
 
