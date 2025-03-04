@@ -5,7 +5,7 @@ import { SocketServer, setupSocket } from "./socket/socket";
 import helmet from "helmet";
 import hpp from "hpp";
 import cors from "cors";
-import { PORT } from "./config";
+import { PORT, ORIGIN } from "./config";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import cookieParser from "cookie-parser";
 import http from "http";
@@ -30,7 +30,7 @@ class Application {
     // Initialize Socket.IO with WebSocket transport only
     this.io = new SocketIOServer(this.server, {
       cors: {
-        origin: "http://localhost:5173",
+        origin: ORIGIN || "http://localhost:5173",
         credentials: true,
       },
       parser,
@@ -38,7 +38,9 @@ class Application {
     });
 
     // Middleware
-    this.app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+    this.app.use(
+      cors({ origin: ORIGIN || "http://localhost:5173", credentials: true })
+    );
     this.app.use("/storage", express.static("storage"));
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
