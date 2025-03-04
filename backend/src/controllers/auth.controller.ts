@@ -115,7 +115,7 @@ class AuthController implements Controller {
 
   register = async (req: Request, res: Response): Promise<BaseResponse> => {
     const body = await this.userService.register(req.body);
-    res.cookie("token", body.token, { httpOnly: true });
+    res.cookie("token", body.token, { httpOnly: true, secure: true });
     return {
       body,
       message: "User registered successfully",
@@ -124,7 +124,7 @@ class AuthController implements Controller {
 
   login = async (req: Request, res: Response): Promise<BaseResponse> => {
     const body = await this.userService.login(req.body);
-    res.cookie("token", body.token, { httpOnly: true });
+    res.cookie("token", body.token, { httpOnly: true, secure: true });
     return {
       body,
       message: "User logged in successfully",

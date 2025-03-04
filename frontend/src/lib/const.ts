@@ -1,1 +1,2 @@
-export const STORAGE_URL = "http://localhost:3000/storage/images";
+import { BACKEND_URL } from "@/config";
+export const STORAGE_URL = `${BACKEND_URL}/storage/images`;
