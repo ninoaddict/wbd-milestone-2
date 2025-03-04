@@ -1,8 +1,9 @@
 import type { Socket } from "socket.io-client";
 import io from "socket.io-client";
 import parser from "socket.io-msgpack-parser";
+import { BACKEND_URL } from "@/config";
 
-const URL = "http://localhost:3000";
+const URL = BACKEND_URL;
 
 export type ChatPayload = {
   id: string;
