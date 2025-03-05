@@ -212,7 +212,7 @@ function RouteComponent() {
 
   return (
     <div className="min-h-screen bg-[#f4f2ee]">
-      <main className="container mx-auto py-8 px-4 pt-[80px]">
+      <main className="container mx-auto py-8 px-4 pt-[70px] lg:pt-[80px]">
         <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
           <Input
             type="text"

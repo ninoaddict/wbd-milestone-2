@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import webPush from "../config/webPushConfig";
 import prisma from "../database/prisma";
 import Unauthorized from "../errors/unauthorized.error";
+import { ORIGIN } from "../config";
 
 class FeedService {
   private feedRepository: FeedRepository;
@@ -67,7 +68,7 @@ class FeedService {
           body: `${
             myProfile?.full_name || ""
           } just uploaded a new post. Click to see.`,
-          url: `http://localhost:5173/`,
+          url: ORIGIN || `http://localhost:5173/`,
         };
 
         try {

@@ -226,7 +226,7 @@ function RouteComponent() {
 
   return (
     <div className="p-2 min-h-screen bg-[#f4f2ee]">
-      <main className="max-w-[1280px] mx-auto grid grid-cols-1 gap-6 px-4 pt-20 md:grid-cols-12 lg:gap-8">
+      <main className="max-w-[1280px] mx-auto grid grid-cols-1 gap-6 px-4 pt-16 md:pt-20 md:grid-cols-12 lg:gap-8">
         <aside className="hidden md:col-span-3 md:block">
           <Card className="shadow">
             <CardContent className="p-0 text-center pb-4">
@@ -348,6 +348,13 @@ function RouteComponent() {
               ))
             )}
           </div>
+
+          {data?.pages && !data.pages[0].feeds.length && (
+            <div className="flex justify-center">
+              <p>Posts not found</p>
+            </div>
+          )}
+
           <div className="flex justify-center items-center">
             {user && data?.pages && data.pages.length > 0 && (
               <button
@@ -359,8 +366,8 @@ function RouteComponent() {
                 {isFetchingNextPage
                   ? "Loading more..."
                   : hasNextPage
-                    ? "Load More"
-                    : ""}
+                  ? "Load More"
+                  : ""}
               </button>
             )}
           </div>

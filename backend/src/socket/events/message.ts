@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createEvent } from "../helper";
 import { Prisma } from "@prisma/client";
 import webPush from "../../config/webPushConfig";
+import { ORIGIN } from "../../config";
 
 export const messageEvent = createEvent(
   {
@@ -102,7 +103,9 @@ export const messageEvent = createEvent(
             message.message.length <= 50
               ? message.message
               : message.message.substring(0, 50) + "...",
-          url: `http://localhost:5173/chat/${message.chatRoomId}`,
+          url: `${ORIGIN || "http://localhost:5173"}/chat/${
+            message.chatRoomId
+          }`,
         };
 
         try {

@@ -23,7 +23,7 @@ export default function FeedEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-50">
-      <div className="flex flex-col bg-white rounded-lg shadow-lg p-6 w-[90%] max-w-md">
+      <div className="flex flex-col bg-white rounded-lg shadow-lg py-3 px-4 w-[90%] max-w-md">
         <button
           onClick={closeModal}
           className="flex justify-end top-2 right-2 text-gray-400 hover:text-gray-900"
@@ -31,7 +31,7 @@ export default function FeedEditor({
           ✕
         </button>
         <div>
-          <p className="text-2xl flex justify-center mb-[10px] font-bold">
+          <p className="text-2xl flex justify-center mb-2 font-bold">
             Edit Feed
           </p>
         </div>
@@ -47,14 +47,14 @@ export default function FeedEditor({
           ></textarea>
         </div>
         <div className="flex justify-start">
-          <p className="text-xs text-gray-400 mt-[5px] mb-[15px]">
+          <p className="text-xs text-gray-400 mt-[4px] mb-[12px]">
             {feed.length}/280
           </p>
         </div>
         <div className="flex justify-center">
           <button
             onClick={mutationUpdate}
-            className="bg-blue-950 rounded-md text-white py-[5px] px-[10px] hover:bg-gray-400 hover:text-blue-950"
+            className="bg-blue-600 rounded-md text-white py-[5px] px-[10px] hover:bg-blue-800"
           >
             Edit Feed
           </button>

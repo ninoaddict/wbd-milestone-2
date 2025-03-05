@@ -106,7 +106,7 @@ class Application {
         },
         servers: [
           {
-            url: `http://localhost:${this.port}`, // Replace with your base URL if needed
+            url: ORIGIN, // Replace with your base URL if needed
           },
         ],
       },
