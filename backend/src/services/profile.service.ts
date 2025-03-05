@@ -128,6 +128,7 @@ class ProfileService {
       username: payload.username,
     };
     const data = await this.profileRepository.updateProfile(profileData, id);
+    await redis.del(`profile:${id}`, `profile-public:${id}`);
     return {
       id: data.id,
       username: data.username,
