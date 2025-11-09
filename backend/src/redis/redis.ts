@@ -1,10 +1,7 @@
 import Redis from "ioredis";
 
-import { REDIS_HOST, REDIS_PORT } from "./../config";
+import { REDIS_URL } from "./../config";
 
-const redis = new Redis({
-  host: REDIS_HOST || "localhost",
-  port: Number(REDIS_PORT) || 6379,
-});
+const redis = new Redis(REDIS_URL || "redis://localhost:6379");
 
 export default redis;
