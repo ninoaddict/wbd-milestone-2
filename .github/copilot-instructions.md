@@ -7,13 +7,14 @@ LinkedPurry is a LinkedIn-like platform built with:
 - **Frontend**: React with TypeScript, TanStack Router, React Query, Radix UI, Tailwind CSS
 - **Real-time**: Socket.io for chat with typing indicators
 - **Notifications**: Web Push API for browser notifications
+- **Security**: Rate limiting with express-rate-limit, trust proxy enabled for reverse proxy support
 
 ### Key Components
 - **Controllers**: Handle HTTP requests, implement `Controller` interface, use Swagger annotations
 - **Services**: Business logic layer, handle caching with Redis, interact with repositories
 - **Repositories**: Data access layer using Prisma ORM
 - **Socket Events**: Real-time features with Zod validation and typed event handlers
-- **Middleware**: Auth (JWT with cookies), validation (Zod), error handling
+- **Middleware**: Auth (JWT with cookies), validation (Zod), error handling, rate limiting
 
 ## Critical Developer Workflows
 
@@ -205,6 +206,19 @@ const { data, isLoading } = useQuery({
 - Automatic cleanup of invalid subscriptions
 - Payload includes title, body, and chat URL
 
+### Rate Limiting
+
+**Configuration** (`src/config/rateLimiter.ts`):
+- **General Limiter**: 100 req/15min on all `/api/*` routes
+- **Auth Limiter**: 5 req/15min on login/register (brute force protection)
+- **Content Limiter**: 30 req/15min on POST/PUT/DELETE operations
+- **Trust Proxy**: Enabled in `application.ts` for accurate IP detection behind reverse proxies
+
+**Important**: Trust proxy MUST be enabled for rate limiting to work correctly in Docker/production:
+```typescript
+this.app.set("trust proxy", true);
+```
+
 ## Common Gotchas
 
 - **BigInt Serialization**: Always convert BigInt to string in JSON responses
@@ -213,6 +227,7 @@ const { data, isLoading } = useQuery({
 - **Prisma Migrations**: Run in development before starting server
 - **Docker Volumes**: Use named volumes for database persistence
 - **Environment Variables**: Backend uses `.env`, frontend uses `VITE_` prefixed vars
+- **Trust Proxy**: Must be enabled for rate limiting behind reverse proxies (Docker, nginx, cloud LBs)
 
 ## Development Commands Reference
 

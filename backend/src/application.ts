@@ -25,6 +25,8 @@ class Application {
     this.app = express();
     this.port = PORT || "3000";
 
+    this.app.set("trust proxy", true);
+
     // Create the HTTP server
     this.server = http.createServer(this.app);
 
