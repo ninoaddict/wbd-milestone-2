@@ -12,6 +12,7 @@ import {
   updateProfileParamsSchema,
 } from "../domain/schema/profile.schema";
 import ProfileService from "../services/profile.service";
+import { createContentLimiter } from "../config/rateLimiter";
 
 class ProfileController implements Controller {
   /**
@@ -67,7 +68,7 @@ class ProfileController implements Controller {
    *         description: Profile updated successfully
    *       404:
    *         description: User not Found
-   *   
+   *
    */
   public path = "/profile";
   public router = Router();
@@ -120,6 +121,7 @@ class ProfileController implements Controller {
     this.router.put(
       `${this.path}/:userId`,
       [
+        createContentLimiter,
         validateRequest(updateProfileParamsSchema),
         this.authMiddleware.checkUserUpload,
         upload.single("profile_photo"),

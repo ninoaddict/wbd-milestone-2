@@ -13,6 +13,7 @@ import { Server as SocketIOServer } from "socket.io";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import redis from "./redis/redis";
+import { generalLimiter } from "./config/rateLimiter";
 
 class Application {
   public app: express.Application;
@@ -47,6 +48,10 @@ class Application {
     this.app.use(helmet());
     this.app.use(hpp());
     this.app.use(cookieParser());
+
+    // Apply general rate limiter to all API routes
+    this.app.use("/api", generalLimiter);
+
     this.initSocket();
     this.initSwagger();
     this.initRedis();

@@ -7,6 +7,7 @@ import { RequestWithUser } from "@/domain/dtos/auth.dto";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { validateRequest } from "../middlewares/validate.middleware";
 import { getConnectionSchema } from "../domain/schema/connection.schema";
+import { createContentLimiter } from "../config/rateLimiter";
 
 class ConnectionController implements Controller {
   /**
@@ -204,25 +205,33 @@ class ConnectionController implements Controller {
 
     this.router.post(
       `${this.path}/send/:id(\\d+)`,
-      this.authMiddleware.checkUser,
+      [createContentLimiter, this.authMiddleware.checkUser],
       handleRequest(this.sendConnectionRequest)
     );
 
     this.router.post(
       `${this.path}/reject/:id(\\d+)`,
-      [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
+      [
+        createContentLimiter,
+        this.authMiddleware.checkUser,
+        validateRequest(getConnectionSchema),
+      ],
       handleRequest(this.rejectConnectionRequest)
     );
 
     this.router.post(
       `${this.path}/accept/:id(\\d+)`,
-      [this.authMiddleware.checkUser, validateRequest(getConnectionSchema)],
+      [
+        createContentLimiter,
+        this.authMiddleware.checkUser,
+        validateRequest(getConnectionSchema),
+      ],
       handleRequest(this.acceptConnectionRequest)
     );
 
     this.router.delete(
       `${this.path}/delete/:id(\\d+)`,
-      this.authMiddleware.checkUser,
+      [createContentLimiter, this.authMiddleware.checkUser],
       handleRequest(this.deleteConnection)
     );
   }

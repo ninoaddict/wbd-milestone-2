@@ -8,6 +8,7 @@ import { Router } from "express";
 import { validateRequest } from "../middlewares/validate.middleware";
 import { getFeedsSchema, updateFeedSchema } from "../domain/schema/feed.schema";
 import { upload } from "../utils/storage";
+import { createContentLimiter } from "../config/rateLimiter";
 
 class FeedController implements Controller {
   /**
@@ -152,6 +153,7 @@ class FeedController implements Controller {
     this.router.post(
       `${this.path}/feed`,
       [
+        createContentLimiter,
         this.authMiddleware.checkUser,
         upload.single("sum_random_file"),
         validateRequest(updateFeedSchema),
@@ -161,6 +163,7 @@ class FeedController implements Controller {
     this.router.put(
       `${this.path}/feed/:feedId`,
       [
+        createContentLimiter,
         this.authMiddleware.checkUser,
         upload.single("sum_random_file"),
         validateRequest(updateFeedSchema),
@@ -169,7 +172,7 @@ class FeedController implements Controller {
     );
     this.router.delete(
       `${this.path}/feed/:feedId`,
-      this.authMiddleware.checkUser,
+      [createContentLimiter, this.authMiddleware.checkUser],
       handleRequest(this.deleteFeeds)
     );
   }

@@ -7,6 +7,7 @@ import { loginSchema, registerSchema } from "../domain/schema/auth.schema";
 import UserService from "../services/user.service";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { RequestWithUser } from "../domain/dtos/auth.dto";
+import { authLimiter } from "../config/rateLimiter";
 
 class AuthController implements Controller {
   /**
@@ -172,12 +173,20 @@ class AuthController implements Controller {
   private initRoutes() {
     this.router.post(
       `${this.path}/register`,
-      [this.authMiddleware.checkAuthUser, validateRequest(registerSchema)],
+      [
+        authLimiter,
+        this.authMiddleware.checkAuthUser,
+        validateRequest(registerSchema),
+      ],
       handleRequest(this.register)
     );
     this.router.post(
       `${this.path}/login`,
-      [this.authMiddleware.checkAuthUser, validateRequest(loginSchema)],
+      [
+        authLimiter,
+        this.authMiddleware.checkAuthUser,
+        validateRequest(loginSchema),
+      ],
       handleRequest(this.login)
     );
     this.router.post(
